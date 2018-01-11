@@ -1,0 +1,44 @@
+<Project><PRODUCT_VERSION><ProjectCreatedProductVersion>IxVerify Version 8.40.2 </ProjectCreatedProductVersion><LastProjectSavedProductVersion>IxVerify Version 8.30.5 </LastProjectSavedProductVersion></PRODUCT_VERSION><AGENDA_OPTIONS><AgendaName xmlns=" Default Project Options"/><Options><DiagnosticOptions><bSyntaxCheck>0</bSyntaxCheck><bTraceCheck>0</bTraceCheck><bAutomaticStateCheck>0</bAutomaticStateCheck><bSaveCSJSCheck>0</bSaveCSJSCheck><bCSJSDiagnosticMessages>0</bCSJSDiagnosticMessages></DiagnosticOptions><FunctionalTestingOptions><bTransFailed>0</bTransFailed><nFailedTime>20</nFailedTime><nSeverity>2</nSeverity><sTextSearch></sTextSearch><bCheckCRC>0</bCheckCRC><bCheckCompareValues>0</bCheckCompareValues><VarificationData><nCompareTitle>2</nCompareTitle><nFramesNumber>0</nFramesNumber><nTextSearch>0</nTextSearch><nVerifyLink>0</nVerifyLink><nCompareLinks>0</nCompareLinks><nCompareForms>0</nCompareForms><nCompareImages>0</nCompareImages><nCompareTables>0</nCompareTables></VarificationData></FunctionalTestingOptions><SleepTimeControlOptions><nSleepControlType>1</nSleepControlType><nBetween>2</nBetween><nAnd>10</nAnd><nDeviationPersent>10</nDeviationPersent></SleepTimeControlOptions><PlayBackOptions><nNavigationTimeOut>60</nNavigationTimeOut><nFileDownloadTimeout>0</nFileDownloadTimeout><nStartNavigationTimeOut>3</nStartNavigationTimeOut><bClearCache>0</bClearCache><bClearCookies>0</bClearCookies><nPlaybackMode>1</nPlaybackMode><bUseDOROptimizer>0</bUseDOROptimizer></PlayBackOptions><PassFailDefinition><bCheckErrors>0</bCheckErrors><bCheckSevere>1</bCheckSevere><bCheckWarnings>0</bCheckWarnings><nErrorNum>1</nErrorNum><nRuleCheck>15</nRuleCheck><nWarningNum>15</nWarningNum></PassFailDefinition><ErrorHandling><SubmitButton>1</SubmitButton><NavObject>9</NavObject><Page>4</Page><PageRetryNum>3</PageRetryNum><Object>6</Object></ErrorHandling><EmulationPlaybackOptions><bUseOptimizer>0</bUseOptimizer><bUseHistory>0</bUseHistory><nHistoryLimit>1</nHistoryLimit><bCodeFormatter>0</bCodeFormatter><bCSJSRecovery>1</bCSJSRecovery></EmulationPlaybackOptions><WebServices><sBasicPassword></sBasicPassword><sUserName></sUserName><sProxyHost></sProxyHost><sProxyPassword></sProxyPassword><sProxyUser></sProxyUser><sProxyPort></sProxyPort><nWSClientType>1</nWSClientType></WebServices><BrowserEmulationOptions><bBrowserCache>1</bBrowserCache><bDNSCache>1</bDNSCache><bSSLCache>1</bSSLCache><bHTTPVersion>1</bHTTPVersion><bKeepAlive>1</bKeepAlive><bRedirectionEnabled>1</bRedirectionEnabled><nRedirectionLimit>10</nRedirectionLimit><strBrowserType>Default</strBrowserType><strUserAgent></strUserAgent></BrowserEmulationOptions><Authentication><sUserName></sUserName><sPassWord></sPassWord><sNTUserName></sNTUserName><sNTUserPassword></sNTUserPassword><sProxyUserName></sProxyUserName><sProxyPassWord></sProxyPassWord><sProxyHost></sProxyHost><sProxyPort></sProxyPort><sSSLClientCertificateFile></sSSLClientCertificateFile><sSSLClientCertificatePassword></sSSLClientCertificatePassword></Authentication><IxLoad><wVerSetRounds>0</wVerSetRounds><bVerification>0</bVerification><ClientType>2</ClientType><bToSEnabled>0</bToSEnabled><ToSType>0</ToSType></IxLoad></Options></AGENDA_OPTIONS><ADDITIONAL_INFORMATION><ProjectComments></ProjectComments><CreatedBy></CreatedBy><Custom1></Custom1><Custom2></Custom2><Custom3></Custom3><Subject></Subject><TestDescription></TestDescription><ResultsDescription></ResultsDescription><VersionBuild></VersionBuild><Title>C:\Program Files\Ixia\IxLoad\Repository\Samples\functional_verification_newClientActivity1_1.pft</Title></ADDITIONAL_INFORMATION><VisualAgenda><Agenda CallBack="Do_Agenda" ClonedXML="0"><Properties><PropertyPage Name="Attributes"><ItemName ReadOnly="0"/><Comments Type="MultiLineString" ReadOnly="0"/></PropertyPage><PropertyPage Name="JavaScript" Visible="0"><NodeScript></NodeScript><InitAgenda Type="JavaScript" ReadOnly="0"/><InitClient Type="JavaScript" ReadOnly="0"/><TerminateAgenda Type="JavaScript" ReadOnly="0"/><TerminateClient Type="JavaScript" ReadOnly="0"/></PropertyPage><PropertyPage Name="GlobalVariables"><System Type="Array" ReadOnly="0"><Variable Name="ClientNum" Description="Returns the main thread number for each client"/><Variable Name="GeneratorName()" Description="Returns the name of this load generator as a string"/><Variable Name="GMTDate()" Description="Current date in GMT/UTC as a string"/><Variable Name="Hours()" Description="Current Hour (0-23)"/><Variable Name="LocalDate()" Description="Current date in local time as a string"/><Variable Name="Milliseconds()" Description="Current ms value"/><Variable Name="Minutes()" Description="Current minutes (0-59)"/><Variable Name="RandomNumber()" Description="Generate a random number"/><Variable Name="RoundNum" Description="Returns the number of rounds for the specific client"/><Variable Name="Seconds()" Description="Current seconds (0-59)"/><Variable Name="ThisYear()" Description="Current Year (4-digit, e.g. 2001)"/><Variable Name="Time()" Description="Time in ms since 1/1/1970"/><Variable Name="TodaysDate()" Description="Current date (1-31)"/><Variable Name="TodaysDay()" Description="Current Day (0-6, 0==Sunday)"/><Variable Name="TodaysMonth()" Description="Current Month (0-11)"/><Variable Name="VCUniqueID()" Description="Returns a string unique to this VC"/></System><UserDefined Type="Array" ReadOnly="0"/><InputParameters Type="Array" ReadOnly="0"/><OutputParameters Type="Array" ReadOnly="0"/></PropertyPage><PropertyPage Name="CodeGeneratorCounters" Visible="0"><Array CallBack="OnGet" ArrayName="Counters" ArrayLen="21"><Counter19>0</Counter19><Counter18>0</Counter18><Counter17>0</Counter17><Counter16>0</Counter16><Counter15>0</Counter15><Counter14>0</Counter14><Counter13>0</Counter13><Counter12>0</Counter12><Counter11>0</Counter11><Counter10>0</Counter10><Counter20>0</Counter20><Counter0>0</Counter0><Counter1>0</Counter1><Counter2>0</Counter2><Counter3>0</Counter3><Counter4>0</Counter4><Counter5>0</Counter5><Counter6>0</Counter6><Counter7>0</Counter7><Counter8>0</Counter8><Counter9>0</Counter9></Array></PropertyPage></Properties><JavaScriptObject CallBack="Do_JavaScriptObject" ClonedXML="0" ObjectID="2"><Properties><PropertyPage Name="Attributes"><ItemName ReadOnly="0"/><Comments Type="MultiLineString" ReadOnly="0"/></PropertyPage><PropertyPage Name="JavaScript" Visible="0"><NodeScript ReadOnly="0">InfoMessage("shalom")
+function check_title()
+{
+	if (RoundNum % 3) // Change this to document.title != "my expected title"
+	{
+		SetFailureReason("Title is not as expected")
+		return WLMinorError;
+	}
+	if (RoundNum % 5) //Change this to document.title == ""
+	{
+		SetFailureReason("Title is null")
+		return WLMinorError;
+	}
+	return WLSuccess;
+}
+
+function check_login()
+{
+	if (RoundNum % 3) //change this to document.wlSearch("Login failed")
+	{
+		SetFailureReason("Login failed")
+		return WLMinorError;
+	}
+	if (RoundNum % 5) //change this to something else
+	{
+		SetFailureReason("Some other reason")
+		return WLMinorError;
+	}
+	return WLSuccess;
+}
+
+BeginTransaction("First Page")
+wlBrowser.Navigate("http://198.18.200.1/4k.html")
+EndTransaction("First Page",check_title())
+
+BeginTransaction("Second Page")
+wlBrowser.Navigate("http://198.18.200.1/8k.html")
+EndTransaction("Second Page",check_login())
+
+Sleep(1000);
+
+</NodeScript></PropertyPage></Properties></JavaScriptObject>
+		</Agenda>
+	</VisualAgenda><BreakPointsMap/></Project>
