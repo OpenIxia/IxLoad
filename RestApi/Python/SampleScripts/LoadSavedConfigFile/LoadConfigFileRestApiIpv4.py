@@ -20,7 +20,7 @@ import os, sys, time, signal, traceback
 from IxL_RestApi import *
 
 # Choices: linux or windows 
-serverOs = 'windows'
+serverOs = 'linux'
 #
 # It is mandatory to include the exact IxLoad version.
 ixLoadVersion = '8.40.0.277'
@@ -37,8 +37,9 @@ if serverOs == 'windows':
 
 if serverOs == 'linux':
     # Linux settings.  Comment out these variables if you are using Windows.
-    apiServerIp = '192.168.70.108'
+    apiServerIp = '192.168.70.111'
     apiServerIpPort = '8080'
+    localRxfFileToUpload = '/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
     rxfFile = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.30.rxf'
 
 licenseServerIp = '192.168.70.3'
@@ -91,7 +92,7 @@ try:
 
     # If connecting to Linux server, must upload the config file to the server first.
     if serverOs == 'linux':
-        restObj.uploadFile(rxfFile)
+        restObj.uploadFile(localRxfFileToUpload, rxfFile)
 
     restObj.loadConfigFile(rxfFile)
 
@@ -104,7 +105,7 @@ try:
     restObj.pollStats(statsDict, pollStatInterval=pollStatInterval, csvFile=csvStatFile,
                       csvEnableFileTimestamp=csvEnableFileTimestamp, csvFilePrependName=csvFilePrependName)
     restObj.waitForActiveTestToUnconfigure()
-    #restObj.deleteSessionId()
+    restObj.deleteSessionId()
 
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
