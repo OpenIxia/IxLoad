@@ -1,4 +1,4 @@
-#!/usr/local/python2.7.6/bin/python2.7
+#!/usr/local/python2.7.14/bin/python2.7
 
 # By Hubert Gee
 #
@@ -23,7 +23,14 @@
 #    But you must have the Tkinter module installed in your Python.
 #    Set the first variable enableAbortTest = True if you satisfied the above
 #    requirements. Otherwise, set to False or else the script will error out.
-#       
+#
+# Optionally:
+#   
+#    Email the PDF report to user.
+#    This script uses the Linux sendmail command to send emails.
+#    To verify if sendmail works on your Linux, send an email to yourself with the below command:
+#       echo "Subject: Sendmail Test" | sendmail -v you@domain.com
+#
 # Notes:
 #
 #   In order for this script to save the stats to a csv format file on your local
@@ -62,21 +69,32 @@ if enableAbortTest == True:
     if enableAbortTest == True:
         tclEval = Tkinter.Tcl()
 
-remote_server = '192.168.70.127'
+remote_server = '192.168.70.3'
 
 # For Python, the whacks are forward slashes.
 configFile = 'C:/Users/hgee/Dropbox/MyIxiaWork/IxLoad/IxL_Http_Ipv4.rxf'
+configFile = 'C:/Results/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 # Where do you want IxLoad to store your csv statistic results
 resultsOnWindows = 'C:/Results'
+
+# Set the path and the PDF file name to copy from Windows to Linux at the end of the test.
+pdfPathOnWindows = resultsOnWindows+'/IxLoad Summary Report.pdf'
+generatePdfResult = True
+pdfDestinationPathAndFilename = './IxLoadPdfResult.pdf'
 
 # Creating a local csv file with all of your runtime stats
 csvFilePathAndName = 'IxL_statResults.csv'
 
 # Uncomment this if you want to reassign ports:
-#portsToReassign = [['10.219.117.101', 1, 5], ['10.219.117.101', 1, 6]]
-portsToReassign = [['192.168.70.10', 1, 1], ['192.168.70.10', 2, 1]]
+portsToReassign = [['192.168.70.11', 1, 1], ['192.168.70.11', 2, 1]]
 
+#--------------- Email 
+emailSubject = 'IxLoad Test is done'
+emailFrom = 'IxLoad script'
+sendEmailFrom = 'IxLoad@test.com' ;# Could be anything .com
+sendEmailTo = 'hubert.gee@keysight.com'
+sendEmail = False
 
 # These .csv files are stats results stored on your Windows client PC.
 # You could retreive them after the test. Leave an empty tuple list
@@ -271,6 +289,43 @@ def loadConfigFile( configFile ):
             print '\nError: IxLoad config file not found: ', configFile
             sys.exit()
 
+def generatePdfReport(testController, pdfPathOnWindows, testName):
+    print 'Generating PDF result file ...'
+    try:
+        testController.generateReport(detailedReport=1, format="PDF", orientation="Portrait", outputFile=pdfPathOnWindows, testName=testName)
+    except Exception as errMsg:
+        print '\nError: Faild to generate PDF file: %s' % errMsg
+
+def copyFileFromWindows(sourcePath, destPath):
+    ixLoad.retrieveFileCopy(sourcePath, destPath)
+
+def sendEmail(sendEmailTo, sendEmailFrom, fileAttachment=None):
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.application import MIMEApplication
+    from subprocess import Popen, PIPE
+
+    body = MIMEText('IxLoad test is complete.')
+    msg = MIMEMultipart("alternative")
+    msg["From"] = sendEmailFrom
+    msg["To"] = sendEmailTo
+    msg["Subject"] = emailSubject
+    msg.attach(body)
+
+    filename = fileAttachment.split('/')[-1]
+    attachment = MIMEApplication(open(fileAttachment, 'rb').read())
+    attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+    msg.attach(attachment)
+
+    print '\nSending email notification...'
+    try:
+        # Python 2
+        p = Popen(["sendmail", "-t"], stdin=PIPE)
+    except:
+        # Python 3
+        p = Popen(["sendmail", "-t"], stdin=PIPE, universal_newlines=True)
+
+    p.communicate(msg.as_string())
 
 ixLoad = IxLoad()
 
@@ -298,6 +353,7 @@ test_name = repository.testList[0].cget("name")
 test = repository.testList.getItem(test_name)
 
 setResultsDir(resultsOnWindows)
+testController.enableAutoGenerateReport(1)
 
 test.config(
 	statsRequired = 1,
@@ -314,7 +370,7 @@ except:
 # -----------------------------------------------------------------------
 # Set up stat Collection
 
-test_server_handle=testController.getTestServerHandle()
+test_server_handle = testController.getTestServerHandle()
 statUtils.Initialize(test_server_handle)
 
 # Clear any stats that may have been registered previously
@@ -350,8 +406,12 @@ else:
 # Stop the collector (running in the tcl event loop)
 statUtils.StopCollector()
 
+if generatePdfResult:
+    testName = repository.testList[0].cget('name')
+    generatePdfReport(testController, pdfPathOnWindows, testName)
+    copyFileFromWindows(pdfPathOnWindows, pdfDestinationPathAndFilename)
+    
 # Cleanup
-#testController.generateReport(detailedReport=1, format="PDF;HTML")
 testController.releaseConfigWaitFinish()
 
 ixLoad.delete(test)
@@ -368,5 +428,9 @@ for stat_file in statsToGet:
 	print 'Getting csv stat file: %s' % (stat_file)
 	ixLoad.retrieveFileCopy('%s/%s' % (resultsOnWindows, stat_file), 'ixLoad_%s' % enhancedStatFile)
 
+if sendEmail:
+    if generatePdfResult == False:
+        pdfDestinationPathAndFilename = None
+    sendEmail(sendEmailTo, sendEmailFrom, fileAttachment=pdfDestinationPathAndFilename)
 
 ixLoad.disconnect()
