@@ -17,30 +17,35 @@
 #    IxL_RestApi.py API file.
 
 import os, sys, time, signal, traceback
+
+sys.path.insert(0, '../../Modules')
 from IxL_RestApi import *
 
 # Choices: linux or windows 
-serverOs = 'linux'
+serverOs = 'windows'
 #
 # It is mandatory to include the exact IxLoad version.
 ixLoadVersion = '8.40.0.277'
 
-# Do you want to delete the session if the test failed and at the end of the test? True|False
+# Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
+
+# CLI parameter input:  windows|linux
+if len(sys.argv) > 1:
+    serverOs = sys.argv[1]
 
 if serverOs == 'windows':
     # Windows settings
     apiServerIp = '192.168.70.3'
     apiServerIpPort = '8080'
-    #rxfFile = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.30.rxf'
     rxfFile = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 if serverOs == 'linux':
     # Linux settings.  Comment out these variables if you are using Windows.
     apiServerIp = '192.168.70.111'
     apiServerIpPort = '8080'
-    localRxfFileToUpload = '/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
-    rxfFile = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.30.rxf'
+    localRxfFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+    rxfFile = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 licenseServerIp = '192.168.70.3'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
@@ -48,12 +53,13 @@ licenseModel = 'Subscription Mode'
 
 # To record stats to CSV file: True or False
 csvStatFile = False
+
 # Enable timestamp to not overwrite the previous csv file: True or False
 csvEnableFileTimestamp = False
+
 # To add a custom ID name to the beginning of the CSV file: string format
 csvFilePrependName = None
 pollStatInterval = 2
-
 
 # To reassign ports, uncomment this and replace chassis and port values
 # Format = (cardId,portId)
@@ -86,7 +92,7 @@ statsDict = {
 }
 
 try:
-    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, deleteSession=deleteSession)
+    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, deleteSession=deleteSession, generateRestLogFile=False)
     restObj.connect(ixLoadVersion)
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
 
@@ -105,16 +111,21 @@ try:
     restObj.pollStats(statsDict, pollStatInterval=pollStatInterval, csvFile=csvStatFile,
                       csvEnableFileTimestamp=csvEnableFileTimestamp, csvFilePrependName=csvFilePrependName)
     restObj.waitForActiveTestToUnconfigure()
-    restObj.deleteSessionId()
+    resultPath = restObj.getResultPath()
+
+    if deleteSession:
+        restObj.deleteSessionId()
 
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
-    restObj.abortActiveTest()
-    #restObj.deleteSessionId()
+    if deleteSession:
+        restObj.abortActiveTest()
+        restObj.deleteSessionId()
     sys.exit(errMsg)
 
 except KeyboardInterrupt:
     print('\nCTRL-C detected.')
-    restObj.abortActiveTest()
-    restObj.deleteSessionId()
+    if deleteSession:
+        restObj.abortActiveTest()
+        restObj.deleteSessionId()
  
