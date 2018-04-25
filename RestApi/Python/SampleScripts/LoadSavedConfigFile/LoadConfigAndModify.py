@@ -19,30 +19,37 @@
 #    IxL_RestApi.py API file.
 
 import requests, json, sys, os, time, traceback
+
+sys.path.insert(0, '../../Modules')
 from IxL_RestApi import *
 
 # Choices: linux or windows 
 serverOs = 'windows'
 #
 # It is mandatory to include the exact IxLoad version.
-ixLoadVersion = '8.30.115.50'
+ixLoadVersion = '8.40.0.277'
 
 # Do you want to delete the session if the test failed and at the end of the test? True|False
 deleteSession = True
 
+# CLI parameter input:  windows|linux
+if len(sys.argv) > 1:
+    serverOs = sys.argv[1]
+
 if serverOs == 'windows':
     # Windows settings
-    apiServerIp = '192.168.70.127'
+    apiServerIp = '192.168.70.3'
     apiServerIpPort = '8080'
     rxfFile = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 if serverOs == 'linux':
     # Linux settings.  Comment out these variables if you are using Windows.
-    apiServerIp = '192.168.70.151'
+    apiServerIp = '192.168.70.111'
     apiServerIpPort = '8080'
+    localRxfFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
     rxfFile = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
-licenseServerIp = '192.168.70.127'
+licenseServerIp = '192.168.70.3'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
 
@@ -168,13 +175,13 @@ def pollStats(sessionIdUrl, statsDict, pollStatInterval=2, csvFile=False, csvEna
 
         
 try:
-    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, deleteSession=deleteSession)
+    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, deleteSession=deleteSession, generateRestLogFile=False)
     restObj.connect(ixLoadVersion)
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
 
     # If connecting to Linux server, must upload the config file to the server first.
     if serverOs == 'linux':
-        restObj.uploadFile(rxfFile)
+        restObj.uploadFile(localRxfFileToUpload, rxfFile)
 
     restObj.loadConfigFile(rxfFile)
 
@@ -212,16 +219,20 @@ try:
                           csvFilePrependName=csvFilePrependName)
 
     restObj.waitForActiveTestToUnconfigure()
-    restObj.deleteSessionId()
+
+    if deleteSession:
+        restObj.deleteSessionId()
 
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
-    restObj.abortActiveTest()
-    restObj.deleteSessionId()
+    if deleteSession:
+        restObj.abortActiveTest()
+        restObj.deleteSessionId()
     sys.exit(errMsg)
 
 except KeyboardInterrupt:
     print('\nCTRL-C detected.')
-    restObj.abortActiveTest()
-    restObj.deleteSessionId()
+    if deleteSession:
+        restObj.abortActiveTest()
+        restObj.deleteSessionId()
  
