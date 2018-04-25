@@ -29,10 +29,10 @@ class Main():
         self.jsonHeader = {'content-type': 'application/json'}
         self.generateRestLogFile = generateRestLogFile
 
-        if self.generateRestLogFile == True:
+        if self.generateRestLogFile != False:
             # Default the log filename if user did not provide one.
             self.restLogFile = 'restApiLog.txt'
-        else:
+
             if '/' in generateRestLogFile and len(generateRestLogFile.split('/')) > 1:
                 path = generateRestLogFile.split('/')[:-1]
                 path = list(filter(None, path))
@@ -41,9 +41,10 @@ class Main():
                     raise IxNetRestApiException('\nError: No such path for generateRestLogFile: %s' % path)
 
             self.restLogFile = generateRestLogFile
-        # Instantiate a new log file here.
-        with open(self.restLogFile, 'w') as restLogFile:
-            restLogFile.write('')
+
+            # Instantiate a new log file here.
+            with open(self.restLogFile, 'w') as restLogFile:
+                restLogFile.write('')
 
         from requests.exceptions import ConnectionError
         from requests.packages.urllib3.connection import HTTPConnection
@@ -57,7 +58,7 @@ class Main():
            msg: (str): The message to print.
         """
         print('{0}'.format(msg), end=end)
-        if self.generateRestLogFile:
+        if self.generateRestLogFile != False:
             with open(self.restLogFile, 'a') as restLogFile:
                 restLogFile.write(msg+end)
 
@@ -647,7 +648,7 @@ class Main():
 
     def waitForActiveTestToUnconfigure(self):
         ''' Wait for the active test state to be Unconfigured '''
-        self.logInfo()
+        self.logInfo('\n')
         for counter in range(1,31):
             currentState = self.getActiveTestCurrentState()
             self.logInfo('waitForActiveTestToUnconfigure current state:', currentState)
