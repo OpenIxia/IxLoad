@@ -2,12 +2,15 @@
 
 ${path_IxLoad_version} =  C:/Program Files (x86)/Ixia/IxLoad/8.30.0.116-EB   # <-NEEDS TO BE MODIFIED, Path to the IxLoad instalation folder
 
-${path_save_file} =  D:/robot_framework/empty_config_modified.rxf
+${path_IxLoad_version} =  /home/hgee/Dropbox/MyIxiaWork/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/Robot/RobotFramework
 
-${ixLoadVersion} =  8.30.0.116			# <-NEEDS TO BE MODIFIED, IxLoad version the test will run 
-${chassisIp} =  10.215.124.37			# <-NEEDS TO BE MODIFIED, IP of the chassis on which the card is found
-@{portList1} =  1.7.1  					# <-NEEDS TO BE MODIFIED, chassis.card.port on which the test will run 
-@{portList2} =  1.7.5					# <-NEEDS TO BE MODIFIED, chassis.card.port on which the test will run		
+#${path_save_file} =  D:/robot_framework/empty_config_modified.rxf
+${path_save_file} =  c:/Results/ftp_robot2.rxf
+
+${ixLoadVersion} =  8.40.0.277			# <-NEEDS TO BE MODIFIED, IxLoad version the test will run 
+${chassisIp} =  192.168.70.11			# <-NEEDS TO BE MODIFIED, IP of the chassis on which the card is found
+@{portList1} =  1.1.1  					# <-NEEDS TO BE MODIFIED, chassis.card.port on which the test will run 
+@{portList2} =  1.2.1					# <-NEEDS TO BE MODIFIED, chassis.card.port on which the test will run		
 
 
 *** Settings ***
@@ -19,7 +22,7 @@ Test Teardown     Teardown Actions
 
 *** Variables ***
 
-${clientIp} =  127.0.0.1
+${clientIp} =  192.168.70.3
 ${clientPort} =  8443
 
 *** Test Cases ***

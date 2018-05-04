@@ -1,18 +1,16 @@
+
 *** Settings ***
+Variables  variables.py
 Library  BuiltIn
 Library  String
 Library  Collections
-Library           IxLoadRobot  C:/Program Files (x86)/Ixia/IxLoad/8.30.0.116-EB   # <-NEEDS TO BE MODIFIED, Path to the IxLoad instalation folder
+Library           IxLoadRobot  ${path_IxLoad_version}   # <-NEEDS TO BE MODIFIED, Path to the IxLoad instalation folder
 Test Teardown     Teardown Actions 
 
 *** Variables ***
-${clientIp} =  127.0.0.1
-${clientPort} =  8443
-${ixLoadVersion} =  8.30.0.116		# <-NEEDS TO BE MODIFIED, IxLoad version the test will run 
 
-${chassisIp} =  10.215.124.37			# <-NEEDS TO BE MODIFIED, IP of the chassis on which the card is found
-@{portList1} =  1.7.1  					# <-NEEDS TO BE MODIFIED, chassis.card.port on which the test will run 
-@{portList2} =  1.7.2					# <-NEEDS TO BE MODIFIED, chassis.card.port on which the test will run 
+
+${clientPort} =  8443
 
 *** Test Cases ***
 Run IxLoad Configuration
@@ -103,7 +101,7 @@ Run IxLoad Configuration
     Config  object=${httpCommand_get}  destination=Traffic2_HTTPServer1:80  pageObject=/1b.html
 	
 	${httpCommand_post} =  Append Item  ${httpClientActionList}  commandType=POST
-    Config  object=${httpCommand_post}  destination=Traffic2_HTTPServer1:80  pageObject=/256k.html  arguments=D:/robot_framework/test_preferences.rxf
+    Config  object=${httpCommand_post}  destination=Traffic2_HTTPServer1:80  pageObject=/256k.html  arguments=C:/Program Files (x86)/Ixia/IxLoad/8.20.115.124-EB/RobotFramework/DNS.rxf
 	
 	${httpCommand_think} =  Append Item  ${httpClientActionList}  commandType=THINK
      
@@ -122,7 +120,7 @@ Run IxLoad Configuration
 # Save the repository    #
 ##########################
     
-    Save As  ${test}  fullPath=D:/robot_framework/empty_config_modified.rxf  overWrite=${TRUE}  # <- TO BE MODIFIED, path to the location f the new .rxf file
+    Save As  ${test}  fullPath=${path_save_file} overWrite=${TRUE}  # <- TO BE MODIFIED, path to the location f the new .rxf file
     
 ##########################
 # 	Run Test	         #
@@ -141,33 +139,24 @@ Run IxLoad Configuration
     
   ${ixLoadStats} =  Get IxLoad Stats  session=${session}
 
-    ${HTTP_Client_Requests_Sent} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPClientPerURL  statName=HTTP Requests Sent  timeStamp=latest
-    ${HTTP_Client_Requests_Successful} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPClientPerURL  statName=HTTP Requests Successful  timeStamp=latest
-	${HTTP_Client_Requests_Failed} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPClientPerURL  statName=HTTP Requests Failed  timeStamp=latest
+    ${HTTP_Requests_Sent} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPClientPerURL  statName=HTTP Requests Sent  timeStamp=latest
+    ${HTTP_Requests_Successful} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPClientPerURL  statName=HTTP Requests Successful  timeStamp=latest
+	${HTTP_Requests_Failed} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPClientPerURL  statName=HTTP Requests Failed  timeStamp=latest
 	
-	${HTTP_Server_Requests_Received} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPServerPerURL  statName=HTTP Requests Received  timeStamp=latest
-	${HTTP_Server_Responses_Sent} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPServerPerURL  statName=HTTP Responses Sent  timeStamp=latest
-	${HTTP_Server_Requests_Successful} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPServerPerURL  statName=HTTP Requests Successful  timeStamp=latest
+	${HTTP_Requests_Received} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPServerPerURL  statName=HTTP Requests Received  timeStamp=latest
+	${HTTP_Responses_Sent} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPServerPerURL  statName=HTTP Responses Sent  timeStamp=latest
+	${HTTP_Requests_Successful} =  Get Stat Value  object=${ixLoadStats}  statSource=HTTPServerPerURL  statName=HTTP Requests Successful  timeStamp=latest
 	
-    Log To Console  ${\n}
-    Log To Console  ${\n}
 	
-    Log To Console  Client Request Successful=${HTTP_Client_Requests_Sent}
-    Log To Console  Client Request Sent=${HTTP_Client_Requests_Successful}
-    Log To Console  Client Request Failed=${HTTP_Client_Requests_Failed}
+	Log To Console 	Request Successful=${HTTP_Requests_Sent}
+	Log To Console 	Request Sent=${HTTP_Requests_Successful}
+	Log To Console  Request Failed=${HTTP_Requests_Failed}
 
-    Log To Console  Server Requests Received=${HTTP_Server_Requests_Received}
-    Log To Console  Server Responses Sent=${HTTP_Server_Responses_Sent}
-    Log To Console  Server Requests Successful=${HTTP_Server_Requests_Successful}
+	Log To Console  Requests Received=${HTTP_Requests_Received}
+	Log To Console  Responses Sent=${HTTP_Responses_Sent}
+	Log To Console  Requests Successful=${HTTP_Requests_Successful}
 	
-#######################
-# Stats Interrogation #	
-#######################
 
-
-    Run Keyword If  '${HTTP_Client_Requests_Sent}' != '${HTTP_Client_Requests_Successful}'  FAIL  "Requests Sent differ from Requests Successful on Client"  ELSE  Log To Console  Successful stat check on client done.
-    Run Keyword If  '${HTTP_Server_Requests_Received}' != '${HTTP_Server_Requests_Successful}'  FAIL  "Requests Sent differ from Requests Successful on Server"  ELSE  Log To Console  Successful stat check on server done.
-    Run Keyword If  '${HTTP_Client_Requests_Failed}' != '0'  FAIL  "Requests Failed stat check failed."  ELSE  Log To Console  Requests Failed stat check done.
     
 ##########################
 # Stop Test              #
