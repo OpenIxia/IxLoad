@@ -29,18 +29,15 @@ class Main():
         self.jsonHeader = {'content-type': 'application/json'}
         self.generateRestLogFile = generateRestLogFile
 
-        if self.generateRestLogFile != False:
-            # Default the log filename if user did not provide one.
-            self.restLogFile = 'restApiLog.txt'
+        # GenerateRestLogFile could be a filename or boolean
+        # If True, create default log file name: restApiLog.txt
+        if generateRestLogFile:
+            if generateRestLogFile == True:
+                # Default the log file name
+                self.restLogFile = 'restApiLog.txt'
 
-            if '/' in generateRestLogFile and len(generateRestLogFile.split('/')) > 1:
-                path = generateRestLogFile.split('/')[:-1]
-                path = list(filter(None, path))
-                path = '/' + '/'.join(path)
-                if os.path.exists(path) == False:
-                    raise IxNetRestApiException('\nError: No such path for generateRestLogFile: %s' % path)
-
-            self.restLogFile = generateRestLogFile
+            if type(generateRestLogFile) != bool:
+                self.restLogFile = generateRestLogFile
 
             # Instantiate a new log file here.
             with open(self.restLogFile, 'w') as restLogFile:
@@ -81,7 +78,7 @@ class Main():
             response = requests.get(restApi, headers=self.jsonHeader)
             if silentMode is False:
                 self.logInfo('STATUS CODE: %s' % response.status_code)
-            if not re.match('2[0-9][0-9]', str(response.status_code)):
+            if not str(response.status_code).startswith('2'):
                 if ignoreError == False:
                     raise IxLoadRestApiException('http GET error:{0}\n'.format(response.text))
             return response
@@ -119,7 +116,7 @@ class Main():
             # 200 or 201
             if silentMode == False:
                 self.logInfo('STATUS CODE: %s' % response.status_code)
-            if not re.match('2[0-9][0-9]', str(response.status_code)):
+            if not str(response.status_code).startswith('2'):
                 if ignoreError == False:
                     self.showErrorMessage()
                     raise IxLoadRestApiException('http POST error: {0}\n'.format(response.text))
@@ -151,7 +148,7 @@ class Main():
             response = requests.patch(restApi, data=json.dumps(data), headers=self.jsonHeader)
             if silentMode == False:
                 self.logInfo('STATUS CODE: %s' % response.status_code)
-            if not re.match('2[0-9][0-9]', str(response.status_code)):
+            if not str(response.status_code).startswith('2'):
                 self.logInfo('\nPatch error:')
                 self.showErrorMessage()
                 raise IxLoadRestApiException('http PATCH error: {0}\n'.format(response.text))
@@ -180,7 +177,7 @@ class Main():
         try:
             response = requests.delete(restApi, data=json.dumps(data), headers=self.jsonHeader)
             self.logInfo('STATUS CODE: %s' % response.status_code)
-            if not re.match('2[0-9][0-9]', str(response.status_code)):
+            if not str(response.status_code).startswith('2'):
                 self.showErrorMessage()
                 raise IxLoadRestApiException('http DELETE error: {0}\n'.format(response.text))
             return response
@@ -331,7 +328,6 @@ class Main():
            'SvrTraffic0@SvrNetwork_0': [(chassisId,2,1)]
            }
         '''
-
         communityListUrl = self.sessionIdUrl+'ixLoad/test/activeTest/communityList/'
         communityList = self.get(communityListUrl)
 
