@@ -22,12 +22,17 @@ import re
 class IxLoadRestApiException(Exception):pass
 
 class Main():
-    def __init__(self, apiServerIp, apiServerIpPort, deleteSession=True, generateRestLogFile=False):
+    def __init__(self, apiServerIp, apiServerIpPort, deleteSession=True, generateRestLogFile=False, robotFrameworkStdout=False):
         self.apiServerIp = apiServerIp
         self.deleteSession = deleteSession
         self.httpHeader = 'http://{0}:{1}'.format(apiServerIp, apiServerIpPort)
         self.jsonHeader = {'content-type': 'application/json'}
         self.generateRestLogFile = generateRestLogFile
+        self.robotFrameworkStdout = robotFrameworkStdout
+
+        if self.robotFrameworkStdout:
+            from robot.libraries.BuiltIn import _Misc
+            self.robotLogger = _Misc()
 
         # GenerateRestLogFile could be a filename or boolean
         # If True, create default log file name: restApiLog.txt
@@ -58,6 +63,9 @@ class Main():
         if self.generateRestLogFile != False:
             with open(self.restLogFile, 'a') as restLogFile:
                 restLogFile.write(msg+end)
+
+        if self.robotFrameworkStdout:
+            self.robotLogger.log_to_console(msg)
 
     def get(self, restApi, data={}, silentMode=False, ignoreError=False):
         """
@@ -188,7 +196,7 @@ class Main():
         pass
 
     # CONNECT
-    def connect(self, ixLoadVersion):
+    def connect(self, ixLoadVersion, timeout=90):
         # http://10.219.x.x:8080/api/v0/sessions
         response = self.post(self.httpHeader+'/api/v0/sessions', data=({'ixLoadVersion': ixLoadVersion}))
         response = requests.get(self.httpHeader+'/api/v0/sessions')
@@ -197,7 +205,7 @@ class Main():
         self.sessionId = str(sessionId)
         self.sessionIdUrl = self.httpHeader+'/api/v0/sessions/'+self.sessionId+'/'
         response = self.startOperations()
-        self.verifyStartOperations(response)
+        self.verifyStartOperations(response, timeout=timeout)
 
     # START OPERATIONS
     def startOperations(self):
@@ -226,11 +234,11 @@ class Main():
                     raise IxLoadRestApiException('Error: Verify operation start failed')
 
     # VERIFY STATUS
-    def verifyStartOperations(self, response): 
+    def verifyStartOperations(self, response, timeout=90): 
         # deleteSessionId = You could set this to False for debugging.
         
         if response.status_code is 202:
-            status = self.verifyStatus('startOperations', self.sessionIdUrl, statusName='isActive', expectedStatus=True)
+            status = self.verifyStatus('startOperations', self.sessionIdUrl, statusName='isActive', expectedStatus=True, timeout=timeout)
             if status == 1:
                 if self.deleteSession == True: self.deleteSessionId()
                 serverId = self.sessionIdUrl.split('/api')[0]
