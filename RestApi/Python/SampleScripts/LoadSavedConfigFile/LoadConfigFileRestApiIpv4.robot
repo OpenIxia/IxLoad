@@ -1,23 +1,43 @@
 
+# Description
+#    Load a saved config file (FTP Client/Server)
+#    Reassign chassisIp/ports, run traffic and get stats.
+#
+# Requirements
+#    Python 2.7-3+
+#    requests module
+#    ../../Modules/IxL_RestApi.py module
+#
+# Prerequisites
+#   - For Linux: Add the Module path to .bashrc PYTHONPATH env variable     
+#   - For Windows: Add c:\Program Files (x86)\Ixia\IxLoad\<version folder>
+#   - pip install robotframework
+#
+# Usage:
+#    robot LoadConfigFileRestApiIpv4.robot
+
+
 *** Settings ***
 Library  BuiltIn
 Library  String
 Library  Collections
-Library  IxL_RestApi.Main  apiServerIp=${apiServerIp}  apiServerIpPort=${apiServerIpPort}  deleteSession=${deleteSession}
-...  generateRestLogFile=robotLogs  robotFramework=True   WITH NAME  ixlObj  
+Library  IxL_RestApi.Main  apiServerIp=${apiServerIp}  apiServerIpPort=${apiServerIpPort}  deleteSession=${deleteSessionAfterTest}
+...  generateRestLogFile=robotLogs  robotFrameworkStdout=True   WITH NAME  ixlObj  
 
 
 *** Variables ***
-${serverOs} =  linux
-${ixLoadVersion} =  8.40.0.277
-${deleteSession} =  True
+${serverOs} =  windows
 
+# Must state the exact version you are using
+${ixLoadVersion} =  8.40.0.277
+${deleteSessionAfterTest} =  True
 ${apiServerIp} =  192.168.70.3
 ${apiServerIpPort} =  8080
 
 # For Linux
-${uploadRxfFileToLinuxServer} =  IxL_Http_Ipv4Ftp_vm_8.20.rxf
+#${uploadRxfFileToLinuxServer} =  IxL_Http_Ipv4Ftp_vm_8.20.rxf
 #${rxfFile} =  /mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf
+
 # For Windows
 ${rxfFile} =  C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf
 
@@ -40,19 +60,21 @@ ${pollStatInterval} =  2
 # To get the Key names: On the IxLoad GUI config, get the name of the stacks:
 # Also, could be found here: http://<ip>:8080/api/v0/sessions/<id>/ixload/test/activeTest/communityList
 # Create a list
+${chassisIp} =  192.168.70.11
 @{port1} =  1  1
 @{port2} =  2  1
 @{port1List} =  ${port1}
 @{port2List} =  ${port2}
 
 # Create a Dict
-&{communityPortList} =  chassisIp=192.168.70.11  Traffic1@Network1=${port1List}  Traffic2@Network2=${port2List}  
+&{communityPortList} =  chassisIp=${chassisIp}  Traffic1@Network1=${port1List}  Traffic2@Network2=${port2List}  
 
 # Set the stats to get and display at real time testing.
 # To get the Key names such as HTTPClient1 HTTPServer1 FTPClient1 FTPServer1, look at "statName" in the below link...
 # Two ways to get them:  
 #    1: Do a scriptgen on IxLoad GUI. Open the scriptgen file and do a word search for "statName".
-#    2: Use ReST API to load the config and do an apply. Then go to: http://192.168.70.3:8080/api/v0/sessions/10/ixload/stats/HTTPServer/availableStats
+#    2: Use ReST API to load the config and do an apply. 
+# Then go to: http://192.168.70.3:8080/api/v0/sessions/10/ixload/stats/HTTPServer/availableStats
 @{httpClient} =  TCP Connections Established
                  ...  HTTP Simulated Users
                  ...  HTTP Concurrent Connections
@@ -60,8 +82,7 @@ ${pollStatInterval} =  2
                  ...  HTTP Transactions
                  ...  HTTP Connection Attempts
 
-@{httpServer} =  TCP Connections Established
-                 ...  TCP Connection Requests Failed
+@{httpServer} =  TCP Connections Established   TCP Connection Requests Failed
 
 @{ftpClient} =  FTP Concurrent Sessions   FTP Transactions
 @{ftpServer} =  FTP Control Conn Established
