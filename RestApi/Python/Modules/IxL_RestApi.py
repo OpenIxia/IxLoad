@@ -7,6 +7,7 @@ import time
 import subprocess
 import os
 import re
+import datetime
 
 # 200 (OK)
 # 201 (OK. Server processed the connection)
@@ -19,16 +20,48 @@ import re
 # 405 Not allowed
 # 501 and 502 Errors
 
-class IxLoadRestApiException(Exception):pass
+class IxLoadRestApiException(Exception):
+    def __init__(self, msg=None):
+        showErrorMsg = '\nIxLoadRestApiException error: {0}\n\n'.format(msg)
+        print(showErrorMsg)
+        if Main.enableDebugLogFile:
+            with open(Main.debugLogFile, 'a') as restLogFile:
+                restLogFile.write(showErrorMsg)
+
 
 class Main():
-    def __init__(self, apiServerIp, apiServerIpPort, deleteSession=True, generateRestLogFile=False, robotFrameworkStdout=False):
+    debugLogFile = None
+    enableDebugLogFile = False
+
+    def __init__(self, apiServerIp, apiServerIpPort, apiKey=None, deleteSession=True,
+                 generateRestLogFile='ixLoadRestApiLog.txt', robotFrameworkStdout=False):
+        """
+        Description
+           Initialize the class variables
+        
+        Parameters
+           apiServerIp: <str>: The IP address of the IxLoad API server.
+           apiServerIpPort: <str>: The API server port. Default = 8080.
+           apiKey: <str>: The apiKey to use for authentication. You only need this if you
+                          enabled "enabled authentication on IxLoadGateway" during installation.
+                          Then, get the apiKey from IxLoad GUI, Preferences, General, API-Key.
+           deleteSession: <bool>: True = Delete the session after test is done.
+           generateRestLogFile: <bool>: True = generate a complete log file.
+                                Filename = ixLoadRestApiLog.txt
+           robotFrameworkStdout: <bool>: True = Display print statements on stdout.
+        """
         self.apiServerIp = apiServerIp
         self.deleteSession = deleteSession
         self.httpHeader = 'http://{0}:{1}'.format(apiServerIp, apiServerIpPort)
         self.jsonHeader = {'content-type': 'application/json'}
         self.generateRestLogFile = generateRestLogFile
         self.robotFrameworkStdout = robotFrameworkStdout
+        Main.debugLogFile = self.generateRestLogFile
+        Main.enableDebugLogFile = self.generateRestLogFile
+
+        if apiKey:
+            self.apiKey = apiKey
+            self.jsonHeader.update({'X-Api-Key': self.apiKey})
 
         if self.robotFrameworkStdout:
             from robot.libraries.BuiltIn import _Misc
@@ -37,10 +70,12 @@ class Main():
         # GenerateRestLogFile could be a filename or boolean
         # If True, create default log file name: restApiLog.txt
         if generateRestLogFile:
-            if generateRestLogFile == True:
-                # Default the log file name
-                self.restLogFile = 'restApiLog.txt'
+            if type(generateRestLogFile) == bool and generateRestLogFile == True:
+                # Default the log file name since user didn't provide a log file name.
+                self.restLogFile = 'ixLoadRestApiLog.txt'
+                Main.debugLogFile = self.restLogFile
 
+            # User provided a log file name.
             if type(generateRestLogFile) != bool:
                 self.restLogFile = generateRestLogFile
 
@@ -51,7 +86,7 @@ class Main():
         from requests.exceptions import ConnectionError
         from requests.packages.urllib3.connection import HTTPConnection
 
-    def logInfo(self, msg, end='\n'):
+    def logInfo(self, msg, end='\n', timestamp=True):
         """
         Description
            An internal function to print info to stdout
@@ -59,6 +94,14 @@ class Main():
         Parameters
            msg: (str): The message to print.
         """
+        currentTime = self.getTime()
+
+        if timestamp:
+            msg = '\n' + currentTime + ': ' + msg
+        else:
+            # No timestamp and no newline are mainly for verifying states and status
+            msg = msg
+
         print('{0}'.format(msg), end=end)
         if self.generateRestLogFile != False:
             with open(self.restLogFile, 'a') as restLogFile:
@@ -66,6 +109,34 @@ class Main():
 
         if self.robotFrameworkStdout:
             self.robotLogger.log_to_console(msg)
+
+    def getTime(self):
+        dateAndTime = str(datetime.datetime.now()).split(' ')
+        return dateAndTime[1]
+
+    def logError(self, msg, end='\n', timestamp=True):
+        """
+        Description
+           An internal function to print error to stdout.
+        
+        Parameter
+           msg: (str): The message to print.
+        """
+        currentTime = self.getTime()
+
+        if timestamp:
+            msg = '\n{0}: Error: {1}'.format(currentTime, msg)
+        else:
+            # No timestamp and no newline are mainly for verifying states and status
+            msg = '\nError: {0}'.format(msg)
+
+        print('{0}'.format(msg), end=end)
+        if self.generateRestLogFile:
+            with open(self.restLogFile, 'a') as restLogFile:
+                restLogFile.write('Error: '+msg+end)
+
+        if self.robotFrameworkStdout:
+            self.robotStdout.log_to_console(msg)
 
     def get(self, restApi, data={}, silentMode=False, ignoreError=False):
         """
@@ -79,13 +150,13 @@ class Main():
            ignoreError: True or False.  If False, the response will be returned.
         """
         if silentMode is False:
-            self.logInfo('\nGET: %s' % restApi)
-            self.logInfo('HEADERS: %s' % self.jsonHeader)
+            self.logInfo('\n\tGET: {0}\n\tHEADERS: {1}'.format(restApi, self.jsonHeader))
 
         try:
             response = requests.get(restApi, headers=self.jsonHeader)
             if silentMode is False:
-                self.logInfo('STATUS CODE: %s' % response.status_code)
+                self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
+
             if not str(response.status_code).startswith('2'):
                 if ignoreError == False:
                     raise IxLoadRestApiException('http GET error:{0}\n'.format(response.text))
@@ -114,19 +185,17 @@ class Main():
 
         data = json.dumps(data)
 
-        self.logInfo('\nPOST: %s' % restApi)
         if silentMode == False:
-            self.logInfo('DATA: %s' % data)
-            self.logInfo('HEADERS: %s' % self.jsonHeader)
+            self.logInfo('\n\tPOST: {0}\n\tDATA: {1}\n\tHEADERS: {2}'.format(restApi, data, self.jsonHeader))
 
         try:
             response = requests.post(restApi, data=data, headers=self.jsonHeader)
             # 200 or 201
             if silentMode == False:
-                self.logInfo('STATUS CODE: %s' % response.status_code)
+                self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
+
             if not str(response.status_code).startswith('2'):
                 if ignoreError == False:
-                    self.showErrorMessage()
                     raise IxLoadRestApiException('http POST error: {0}\n'.format(response.text))
 
             # Change it back to the original json header
@@ -134,6 +203,7 @@ class Main():
                 self.jsonHeader = originalJsonHeader
 
             return response
+
         except requests.exceptions.RequestException as errMsg:
             raise IxLoadRestApiException('http POST error: {0}\n'.format(errMsg))
 
@@ -149,22 +219,21 @@ class Main():
         """
 
         if silentMode == False:
-            self.logInfo('\nPATCH: %s' % restApi)
-            self.logInfo('DATA: %s' % data)
-            self.logInfo('HEADERS: %s' % self.jsonHeader)
+            self.logInfo('\n\tPATCH: {0}\n\tDATA: {1}\n\tHEADERS: {2}'.format(restApi, data, self.jsonHeader))
+
         try:
             response = requests.patch(restApi, data=json.dumps(data), headers=self.jsonHeader)
             if silentMode == False:
-                self.logInfo('STATUS CODE: %s' % response.status_code)
+                self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
+
             if not str(response.status_code).startswith('2'):
-                self.logInfo('\nPatch error:')
-                self.showErrorMessage()
+                self.logError('Patch error:')
                 raise IxLoadRestApiException('http PATCH error: {0}\n'.format(response.text))
             return response
         except requests.exceptions.RequestException as errMsg:
             raise IxLoadRestApiException('http PATCH error: {0}\n'.format(errMsg))
 
-    def delete(self, restApi, data={}, headers=None):
+    def delete(self, restApi, data={}, headers=None, silentMode=False):
         """
         Description
            A HTTP DELETE function to delete the session.
@@ -179,21 +248,18 @@ class Main():
         if headers != None:
             self.jsonHeader = headers
 
-        self.logInfo('\nDELETE: %s' % restApi)
-        self.logInfo('DATA: %s' % data)
-        self.logInfo('HEADERS: %s' % self.jsonHeader)
+        if silentMode == False:
+            self.logInfo('\n\tDELETE: {0}\n\tDATA: {1}\n\tHEADERS: {2}'.format(restApi, data, self.jsonHeader))
+
         try:
             response = requests.delete(restApi, data=json.dumps(data), headers=self.jsonHeader)
-            self.logInfo('STATUS CODE: %s' % response.status_code)
+            self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
+
             if not str(response.status_code).startswith('2'):
-                self.showErrorMessage()
                 raise IxLoadRestApiException('http DELETE error: {0}\n'.format(response.text))
             return response
         except requests.exceptions.RequestException as errMsg:
             raise IxLoadRestApiException('http DELETE error: {0}\n'.format(errMsg))
-
-    def showErrorMessage(self):
-        pass
 
     # CONNECT
     def connect(self, ixLoadVersion, timeout=90):
@@ -219,37 +285,40 @@ class Main():
         timeout = timeout
         for counter in range(1,timeout+1):
             response = self.get(url)
-            self.logInfo('\nverifyStatus %s: %s\n' % (subject, url))
+            self.logInfo('\nverifyStatus %s: %s\n' % (subject, url), timestamp=False)
             for key, value in response.json().items():
-                self.logInfo('%s: %s' % (key, value))
+                self.logInfo('%s: %s' % (key, value), timestamp=False)
 
-            if response.status_code is 200:
-                if counter < timeout and response.json()[statusName] != expectedStatus:
-                    self.logInfo('\t%s: Expecting %s = %s: %s/%d sec' % (subject, statusName, expectedStatus, counter, timeout))
-                    time.sleep(1)
-                    continue            
-                if counter < timeout and response.json()[statusName] == expectedStatus:
-                    self.logInfo('\t%s %s=%s' % (subject, statusName, expectedStatus))
-                if counter is timeout and response.json()[statusName] != expectedStatus:
-                    raise IxLoadRestApiException('Error: Verify operation start failed')
+            if counter < timeout and response.json()[statusName] != expectedStatus:
+                self.logInfo('\t%s: Expecting %s = %s: %s/%d sec' % (subject, statusName, expectedStatus, counter, timeout) , timestamp=False)
+                time.sleep(1)
+                continue
+ 
+            if counter < timeout and response.json()[statusName] == expectedStatus:
+                self.logInfo('\t%s %s=%s' % (subject, statusName, expectedStatus), timestamp=False)
+                return
 
+            if counter == timeout and response.json()[statusName] != expectedStatus:
+                raise IxLoadRestApiException('Verify operation start failed')
+
+                
     # VERIFY STATUS
     def verifyStartOperations(self, response, timeout=90): 
-        # deleteSessionId = You could set this to False for debugging.
-        
-        if response.status_code is 202:
-            status = self.verifyStatus('startOperations', self.sessionIdUrl, statusName='isActive', expectedStatus=True, timeout=timeout)
-            if status == 1:
-                if self.deleteSession == True: self.deleteSessionId()
-                serverId = self.sessionIdUrl.split('/api')[0]
-                totalOpenedSessions = self.getTotalOpenedSessions(serverId)
-                self.logInfo('\nFailed: Probable cause:  The REST API Server has %d active opened sessions.' % totalOpenedSessions)
-                self.logInfo('Check your server preference for maximumInstances allowed. Default is 2 maximum allowed.')
-                raise IxNetRestApiException('\nFailed. Session ID %s failed to activate' % (self.sessionId))
+        status = self.verifyStatus('startOperations', self.sessionIdUrl, statusName='isActive',
+                                   expectedStatus=True, timeout=timeout)
+        '''
+        if status == 1:
+            if self.deleteSession == True: self.deleteSessionId()
+            serverId = self.sessionIdUrl.split('/api')[0]
+            totalOpenedSessions = self.getTotalOpenedSessions(serverId)
+            self.logInfo('\nFailed: Probable cause:  The REST API Server has %d active opened sessions.' % totalOpenedSessions)
+            self.logInfo('Check your server preference for maximumInstances allowed. Default is 2 maximum allowed.')
+            raise IxNetRestApiException('Session ID %s failed to activate' % (self.sessionId))
         else:
             if self.deleteSession == True:
                 self.deleteSessionId()
-                raise IxLoadRestApiException('\nFailed: operations/start. Status code: %s' % response.status_code)
+                raise IxLoadRestApiException('operations/start. Status code: %s' % response.status_code)
+        '''
 
     # LOAD CONFIG FILE
     def loadConfigFile(self, rxfFile):
@@ -260,7 +329,7 @@ class Main():
         status = self.verifyStatus('loadConfig', self.httpHeader+operationsId, statusName='status', expectedStatus='Successful')
         if status == 1:
             self.deleteSessionId()
-            raise IxLoadRestApiException('Error: Load config file failed')
+            raise IxLoadRestApiException('Load config file failed')
 
     def configLicensePreferences(self, licenseServerIp, licenseModel='Subscription Mode'):
         """
@@ -273,7 +342,8 @@ class Main():
         url = self.sessionIdUrl+'ixload/chassischain/chassisList/'+str(objectId)+'/operations/refreshConnection'
         response = self.post(url)
         # Give the api server addtional time to avoid resource is still lock error.
-        time.sleep(5)
+        #self.logInfo('Wait 5 seconds ...')
+        #time.sleep(5)
 
     def addNewChassis(self, chassisIp):
         # Verify if chassisIp exists. If exists, no need to add new chassis.
@@ -300,23 +370,27 @@ class Main():
         self.waitForChassisIpToConnect(objectId)
         return newChassisId,objectId
 
-    def isChassisIpConnected(self, objectId):
-        # Returns True or False
-        url = self.sessionIdUrl+'ixload/chassischain/chassisList/'+str(objectId)
-        response = self.get(url)
-        return response.json()['isConnected']
-
     def waitForChassisIpToConnect(self, chassisObjectId):
-        for counter in range(1,31):
-            status = self.isChassisIpConnected(chassisObjectId)
-            self.logInfo('waitForChassisIpToConnect: chassisObjectID:%s : Status is: %s' % (chassisObjectId, status))
-            if status == False or status == None:
-                self.logInfo('Wait %s/30 secs' % counter)
+        timeout = 60
+        for counter in range(1,timeout+1):
+            response = self.get(self.sessionIdUrl+'ixload/chassischain/chassisList/'+str(chassisObjectId), ignoreError=True)
+            print('\nwaitForChassisIpToConnect response:', response.json())
+            if 'status' in response.json() and 'Request made on a locked resource' in response.json()['status']:
+                self.logInfo('API server response: Request made on a locked resource. Retrying %s/%d secs' % (counter, timeout))
                 time.sleep(1)
+                continue
+
+            status = response.json()['isConnected']
+            self.logInfo('waitForChassisIpToConnect: chassisObjectID:%s : Status is: %s' % (chassisObjectId, status), timestamp=False)
+            if status == False or status == None:
+                self.logInfo('Wait %s/%d secs' % (counter, timeout), timestamp=False)
+                time.sleep(1)
+
             if status == True:
-                self.logInfo('Chassis objectID %s is connected' % chassisObjectId)
+                self.logInfo('Chassis objectID %s is connected' % chassisObjectId, timestamp=False)
                 break
-            if counter == 30:
+
+            if counter == timeout:
                 if status == False or status == None:
                     self.deleteSessionId()
                     raise IxLoadRestApiException("Chassis failed to get connected")
@@ -347,7 +421,7 @@ class Main():
             currentCommunityName = eachCommunity['name']
             if currentCommunityName not in communityPortListDict:
                 self.logInfo('\nNo such community name found: %s' % currentCommunityName)
-                self.logInfo('\tYour stated communityPortList are: %s' % communityPortListDict)
+                self.logInfo('\tYour stated communityPortList are: %s' % communityPortListDict, timestamp=False)
                 communityNameNotFoundList.append(currentCommunityName)
                 return 1
 
@@ -363,8 +437,7 @@ class Main():
         if failedToAddList == []:
             return 0
         else:
-            raise IxLoadRestApiException('\nFailed to add ports:', failedToAddList)
-            
+            raise IxLoadRestApiException('Failed to add ports:', failedToAddList)
 
     def assignChassisAndPorts(self, communityPortListDict):
         '''
@@ -385,7 +458,7 @@ class Main():
         # Assign Chassis
         chassisIp = communityPortListDict['chassisIp']
         newChassisId, newChassisObject = self. addNewChassis(chassisIp)
-        self.logInfo('\nNew Chassis objectID: %s' % newChassisObject)
+        self.logInfo('assignChassisAndPorts: New Chassis objectID: %s' % newChassisObject)
 
         # Assign Ports
         communityListUrl = self.sessionIdUrl+'ixLoad/test/activeTest/communityList/'
@@ -413,13 +486,13 @@ class Main():
                     cardId,portId = eachTuplePort
                     params = {"chassisId":int(newChassisId), "cardId":cardId, "portId":portId}
                     url = communityListUrl+str(currentCommunityObjectId)+'/network/portList'
-                    self.logInfo('assignChassisAndPorts URL: %s' % url)
-                    self.logInfo('assignChassisAndPorts Params: %s' % json.dumps(params))
+                    self.logInfo('assignChassisAndPorts URL: %s' % url, timestamp=False)
+                    self.logInfo('assignChassisAndPorts Params: %s' % json.dumps(params), timestamp=False)
                     response = self.post(url, data=params, ignoreError=True)
                     if response.status_code != 201:
                         portAlreadyConnectedMatch = re.search('.*has already been assigned.*', response.json()['error'])
                         if portAlreadyConnectedMatch:
-                            self.logInfo('%s/%s is already assigned' % (cardId,portId))
+                            self.logInfo('%s/%s is already assigned' % (cardId,portId), timestamp=False)
                         else:
                             failedToAddList.append((newChassisId,cardId,portId))
                             self.logInfo('\nassignChassisAndPorts failed: %s' % response.text)
@@ -429,7 +502,7 @@ class Main():
         if failedToAddList != []:
             if self.deleteSession:
                 self.abortActiveTest()
-            raise IxLoadRestApiException('\nFailed to add ports to chassisIp %s: %s:' % (chassisIp, failedToAddList))
+            raise IxLoadRestApiException('Failed to add ports to chassisIp %s: %s:' % (chassisIp, failedToAddList))
 
     # ENABLE FORCE OWNERSHIP
     def enableForceOwnership(self):
@@ -442,7 +515,7 @@ class Main():
         self.logInfo('\ngetStatNames: %s\n' % statsUrl)
         response = self.get(statsUrl)
         for eachStatName in response.json()['links']:
-            self.logInfo('\t%s' % eachStatName['href'])
+            self.logInfo('\t%s' % eachStatName['href'], timestamp=False)
         return response.json()
 
     # DISABLE ALL STATS
@@ -475,7 +548,8 @@ class Main():
                     self.logInfo('\t{time}: Severity:{severity} ModuleName:{2} {3}'.format(eachLogEntry['timeStamp'],
                                                                                     eachLogEntry['severity'],
                                                                                     eachLogEntry['moduleName'],
-                                                                                    eachLogEntry['message']))
+                                                                                           eachLogEntry['message']), 
+                                 timestamp=False)
 
     # RUN TRAFFIC
     def runTraffic(self):
@@ -488,7 +562,7 @@ class Main():
         runTestOperationsId = self.runTraffic()
         if runTestOperationsId == 'failed':
             self.deleteSessionId()
-            raise IxLoadRestApiException('\nError: Traffic failed to run')
+            raise IxLoadRestApiException('Traffic failed to run')
         self.waitForTestStatusToRunSuccessfully(runTestOperationsId)
         return runTestOperationsId
 
@@ -578,19 +652,19 @@ class Main():
         waitForRunningStatusCounterExit = 20
         while True:
             currentState = self.getActiveTestCurrentState(silentMode=True)
-            self.logInfo('\nActiveTest current status: %s' % currentState)
+            self.logInfo('\nActiveTest current status: %s' % currentState, timestamp=False)
             if currentState == 'Running':
                 # statType:  HTTPClient or HTTPServer (Just a example using HTTP.)
                 # statNameList: transaction success, transaction failures, ...
                 for statType,statNameList in statsDict.items():
-                    self.logInfo('\n%s:' % statType)
+                    self.logInfo('\n%s:' % statType, timestamp=False)
                     statUrl = self.sessionIdUrl+'/ixLoad/stats/'+statType+'/values'
                     response = self.getStats(statUrl)
                     highestTimestamp = 0
                     # Each timestamp & statnames: values                
                     for eachTimestamp,valueList in response.json().items():
                         if eachTimestamp == 'error':
-                            raise IxLoadRestApiException('\npollStats error: Probable cause: Misconfigured stat names to retrieve.')
+                            raise IxLoadRestApiException('pollStats error: Probable cause: Misconfigured stat names to retrieve.')
 
                         if int(eachTimestamp) > highestTimestamp:
                             highestTimestamp = int(eachTimestamp)
@@ -605,11 +679,11 @@ class Main():
                     for statName in statNameList:
                         if statName in response.json()[str(highestTimestamp)]:
                             statValue = response.json()[str(highestTimestamp)][statName]
-                            self.logInfo('\t%s: %s' % (statName, statValue))
+                            self.logInfo('\t%s: %s' % (statName, statValue), timestamp=False)
                             if csvFile:
                                 csvFilesDict[statType]['rowValueList'].append(statValue)
                         else:
-                            self.logInfo('\tStat name not found. Check spelling and case sensitivity: %s' % statName)
+                            self.logError('\tStat name not found. Check spelling and case sensitivity: %s' % statName)
 
                     if csvFile:
                         if csvFilesDict[statType]['rowValueList'] != []:
@@ -622,7 +696,7 @@ class Main():
                 # If currentState is "Stopping Run" or Cleaning
                 if waitForRunningStatusCounter < waitForRunningStatusCounterExit:
                     waitForRunningStatusCounter += 1
-                    self.logInfo('\tWaiting {0}/{1} seconds'.format(waitForRunningStatusCounter, waitForRunningStatusCounterExit))
+                    self.logInfo('\tWaiting {0}/{1} seconds'.format(waitForRunningStatusCounter, waitForRunningStatusCounterExit), timestamp=False)
                     time.sleep(1)
                     continue
                 if waitForRunningStatusCounter == waitForRunningStatusCounterExit:
@@ -647,7 +721,7 @@ class Main():
             if currentStatus == 'Successful' and counter < timer:
                 return 0
             if currentStatus != 'Successful' and counter == timer:
-                raise IxLoadRestApiException('\nTest status failed to run')
+                raise IxLoadRestApiException('Test status failed to run')
 
 
     def waitForActiveTestToUnconfigure(self):
@@ -657,13 +731,13 @@ class Main():
             currentState = self.getActiveTestCurrentState()
             self.logInfo('waitForActiveTestToUnconfigure current state:', currentState)
             if counter < 30 and currentState != 'Unconfigured':
-                self.logInfo('ActiveTest current state = %s\nWaiting for state = Unconfigued: Wait %s/30' % (currentState, counter))
+                self.logInfo('ActiveTest current state = %s\nWaiting for state = Unconfigued: Wait %s/30' % (currentState, counter), timestamp=False)
                 time.sleep(1)
             if counter < 30 and currentState == 'Unconfigured':
                 self.logInfo('\nActiveTest is Unconfigured')
                 return 0
             if counter == 30 and currentState != 'Unconfigured':
-                raise IxLoadRestApiException('\nActiveTest is stuck at:', currentState)
+                raise IxLoadRestApiException('ActiveTest is stuck at:', currentState)
 
     def applyConfiguration(self):
         # Apply the configuration.
@@ -675,7 +749,7 @@ class Main():
         if response.status_code != 202:
             if self.deleteSession:
                 self.deleteSessionId()
-                raise IxLoadRestApiException('\napplyConfiguration failed')
+                raise IxLoadRestApiException('applyConfiguration failed')
 
         operationsId = response.headers['Location']
         operationsId = operationsId.split('/')[-1] ;# Return the number only
@@ -684,20 +758,20 @@ class Main():
         for counter in range(1,31):
             response = self.get(url)
             currentState = response.json()['status']
-            self.logInfo('\nApplyConfiguration current state: %s' % currentState)
+            self.logInfo('\nApplyConfiguration current state: %s' % currentState, timestamp=False)
             if counter < 30 and currentState != 'Successful':
-                self.logInfo('\tWaiting for state = Successful: Wait %s/30' % (counter))
+                self.logInfo('\tWaiting for state = Successful: Wait %s/30' % (counter), timestamp=False)
                 time.sleep(1)
                 continue
             if counter < 30 and currentState == 'Successful':
-                self.logInfo('\nApplyConfiguation = success')
+                self.logInfo('\nApplyConfiguation = success', timestamp=False)
                 return 0
             if counter == 30 and currentState != 'Successful':
-                raise IxLoadRestApiException('\nApplyConfiguration is stuck at:', currentState)
+                raise IxLoadRestApiException('ApplyConfiguration is stuck at:', currentState)
 
     def saveConfiguration(self):
         url = self.sessionIdUrl+'ixLoad/test/operations/save'
-        self.logInfo('\nsaveConfiguration: %s' % url)
+        self.logInfo('\nsaveConfiguration: %s' % url, timestamp=False)
         response = self.post(url)
 
     def abortActiveTest(self):
@@ -716,10 +790,10 @@ class Main():
                 status = response.json()['status']
                 state = response.json()['state']
                 if counter < 30 and status != 'Successful':
-                    self.logInfo('Aborting activeTest status: %s. Wait %s/30' % (status, counter))
+                    self.logInfo('Aborting activeTest status: %s. Wait %s/30' % (status, counter), timestamp=False)
                     time.sleep(1)
                 if counter < 30 and status == 'Successful':
-                    self.logInfo('Successfully aborted active test')
+                    self.logInfo('Successfully aborted active test', timestamp=False)
                     break
                 if counter == 30 and status != 'Successful':
                     raise IxLoadRestApiException('Aborting test is stuck unsuccessfully')
@@ -743,9 +817,9 @@ class Main():
         activeSessionCounter = 0
         self.logInfo()
         for eachOpenedSession in response.json():
-            self.logInfo('\t%d: Opened sessionId: %s' % (counter, serverId+eachOpenedSession['links'][0]['href']))
-            self.logInfo('\t      isActive: %s' % eachOpenedSession['isActive'])
-            self.logInfo('\t      activeTime: %s' % eachOpenedSession['activeTime'])
+            self.logInfo('\t%d: Opened sessionId: %s' % (counter, serverId+eachOpenedSession['links'][0]['href']), timestamp=False)
+            self.logInfo('\t      isActive: %s' % eachOpenedSession['isActive'], timestamp=False)
+            self.logInfo('\t      activeTime: %s' % eachOpenedSession['activeTime'], timestamp=False)
             counter += 1
             if eachOpenedSession['isActive'] == True:
                 activeSessionCounter += 1
@@ -782,7 +856,7 @@ class Main():
             with open(localPathAndFilename, 'rb') as f:
                 response = requests.post(url, data=f, params=params, headers=headers)
                 if response.status_code != 200:
-                    raise IxLoadRestApiException('\nuploadFile failed', response.json()['text'])
+                    raise IxLoadRestApiException('uploadFile failed', response.json()['text'])
         except requests.exceptions.ConnectionError as e:
             raise IxLoadRestApiException(
                 'Upload file failed. Received connection error. One common cause for this error is the size of the file to be uploaded.'
