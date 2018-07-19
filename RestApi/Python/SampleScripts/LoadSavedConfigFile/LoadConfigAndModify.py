@@ -20,7 +20,8 @@
 
 import requests, json, sys, os, time, traceback
 
-sys.path.insert(0, '../../Modules')
+# These  modules are one level above.
+sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile', 'Modules'))))
 from IxL_RestApi import *
 
 # Choices: linux or windows 
@@ -30,7 +31,7 @@ serverOs = 'windows'
 ixLoadVersion = '8.40.0.277'
 
 # Do you want to delete the session if the test failed and at the end of the test? True|False
-deleteSession = True
+deleteSession = False
 
 # CLI parameter input:  windows|linux
 if len(sys.argv) > 1:
@@ -190,7 +191,7 @@ try:
 
     restObj.enableForceOwnership()
     restObj.getStatNames()
-    restObj.runTrafficAndVerifySuccess()
+    restObj.runTraffic()
 
     if pollStats(restObj.sessionIdUrl, statsDict, pollStatInterval=pollStatInterval, csvFile=csvStatFile,
                  csvEnableFileTimestamp=csvEnableFileTimestamp, csvFilePrependName=csvFilePrependName) == 2:
@@ -213,7 +214,7 @@ try:
 
         # Show the stat names on the terminal
         restObj.getStatNames()
-        runTestOperationsId = restObj.runTrafficAndVerifySuccess()
+        runTestOperationsId = restObj.runTraffic()
 
         restObj.pollStats(statsDictFtp, pollStatInterval=pollStatInterval, csvFile=csvStatFile, csvEnableFileTimestamp=csvEnableFileTimestamp,
                           csvFilePrependName=csvFilePrependName)

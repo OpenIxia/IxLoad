@@ -115,7 +115,7 @@ Test FTP Client Server
    ixlObj.Get Stat Names
 
    Log To Console  Run Traffic and verify for success
-   ixlObj.Run Traffic And Verify Success
+   ixlObj.Run Traffic
 
    Log To Console  Poll stat
    ${pollStatInterval} =  Convert To Integer  2	

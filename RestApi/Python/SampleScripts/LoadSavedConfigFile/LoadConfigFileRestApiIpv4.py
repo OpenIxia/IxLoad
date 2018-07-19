@@ -107,7 +107,7 @@ try:
 
     restObj.enableForceOwnership()
     restObj.getStatNames()
-    runTestOperationsId = restObj.runTrafficAndVerifySuccess()
+    runTestOperationsId = restObj.runTraffic()
     restObj.pollStats(statsDict, pollStatInterval=pollStatInterval, csvFile=csvStatFile,
                       csvEnableFileTimestamp=csvEnableFileTimestamp, csvFilePrependName=csvFilePrependName)
     restObj.waitForActiveTestToUnconfigure()
