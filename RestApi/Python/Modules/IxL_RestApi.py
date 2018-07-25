@@ -301,14 +301,8 @@ class Main():
         for counter in range(1,timeout+1):
             response = self.get(url)
             currentStatus = response.json()['status']
-            #self.logInfo('\nverifyStatus: %s\n' % (url), timestamp=False)
-
-            #self.logInfo('\n', timestamp=False)
-            #for key, value in response.json().items():
-            #    self.logInfo('\t%s: %s' % (key, value), timestamp=False)
 
             if counter < timeout and currentStatus not in ['Successful']:
-                #self.logInfo('\tExpecting %s = %s: %s/%d sec' % (statusName, expectedStatus, counter, timeout) , timestamp=False)
                 self.logInfo('\tCurrent status: {0}. Wait {1}/{2} seconds...'.format(currentStatus, counter, timeout),
                              timestamp=False)
                 time.sleep(1)
@@ -336,7 +330,12 @@ class Main():
         self.patch(self.sessionIdUrl+'/ixLoad/preferences',
                    data = {'licenseServer': licenseServerIp, 'licenseModel': licenseModel})
 
-    def refreshConnection(self, objectId):
+    def refreshConnection(self, locationUrl):
+        url = self.httpHeader+locationUrl+'/operations/refreshConnection'
+        response = self.post(url)
+        self.verifyStatus(self.httpHeader + response.headers['location'])
+
+    def refreshConnection_backup(self, objectId):
         url = self.sessionIdUrl+'/ixload/chassischain/chassisList/'+str(objectId)+'/operations/refreshConnection'
         response = self.post(url)
         self.verifyStatus(self.httpHeader + response.headers['location'])
@@ -350,26 +349,33 @@ class Main():
             if eachChassisIp['name'] == chassisIp:
                 self.logInfo('\nChassis Ip exists in config. No need to add new chassis')
                 objectId = eachChassisIp['objectID']
-                return eachChassisIp['id'],objectId
+                # /api/v0/sessions/10/ixLoad/chassisChain/chassisList/1/docs
+                return eachChassisIp['id'], eachChassisIp['links'][0]['href'].replace('/docs', '')
 
         self.logInfo('\nChassis IP does not exists')
         self.logInfo('Adding new chassisIP: %s:\nURL: %s' % (chassisIp, url))
         self.logInfo('Server synchronous blocking state. Please wait a few seconds ...')
         response = self.post(url, data = {"name": chassisIp})
         objectId = response.headers['Location'].split('/')[-1]
-        url = self.sessionIdUrl+'/ixload/chassischain/chassislist/'+str(objectId)
+
+        # /api/v0/sessions/2/ixLoad/chassisChain/chassisList/0
+        locationUrl = response.headers['Location']
+
+        self.logInfo('\nAddNewChassis: locationUrl: %s' % locationUrl)
+        url = self.httpHeader+locationUrl
         self.logInfo('\nAdded new chassisIp Object to chainList: %s' % url)
         response = self.get(url)
         newChassisId = response.json()['id']
         self.logInfo('\nNew Chassis ID: %s' % newChassisId)
-        self.refreshConnection(objectId=objectId)
-        self.waitForChassisIpToConnect(objectId)
-        return newChassisId,objectId
+        self.refreshConnection(locationUrl=locationUrl)
+        self.waitForChassisIpToConnect(locationUrl=locationUrl)
 
-    def waitForChassisIpToConnect(self, chassisObjectId):
+        return newChassisId,locationUrl
+
+    def waitForChassisIpToConnect(self, locationUrl):
         timeout = 60
         for counter in range(1,timeout+1):
-            response = self.get(self.sessionIdUrl+'/ixload/chassischain/chassisList/'+str(chassisObjectId), ignoreError=True)
+            response = self.get(self.httpHeader+locationUrl, ignoreError=True)
             print('\nwaitForChassisIpToConnect response:', response.json())
             if 'status' in response.json() and 'Request made on a locked resource' in response.json()['status']:
                 self.logInfo('API server response: Request made on a locked resource. Retrying %s/%d secs' % (counter, timeout))
@@ -377,13 +383,13 @@ class Main():
                 continue
 
             status = response.json()['isConnected']
-            self.logInfo('waitForChassisIpToConnect: chassisObjectID:%s : Status is: %s' % (chassisObjectId, status), timestamp=False)
+            self.logInfo('waitForChassisIpToConnect: Status: %s' % (status), timestamp=False)
             if status == False or status == None:
                 self.logInfo('Wait %s/%d secs' % (counter, timeout), timestamp=False)
                 time.sleep(1)
 
             if status == True:
-                self.logInfo('Chassis objectID %s is connected' % chassisObjectId, timestamp=False)
+                self.logInfo('Chassis is connected', timestamp=False)
                 break
 
             if counter == timeout:
@@ -453,15 +459,15 @@ class Main():
 
         # Assign Chassis
         chassisIp = communityPortListDict['chassisIp']
-        newChassisId, newChassisObject = self. addNewChassis(chassisIp)
-        self.logInfo('assignChassisAndPorts: New Chassis objectID: %s' % newChassisObject)
+        newChassisId, locationUrl = self. addNewChassis(chassisIp)
+        self.logInfo('assignChassisAndPorts: To new chassis: %s' % locationUrl, timestamp=False)
 
         # Assign Ports
         communityListUrl = self.sessionIdUrl+'/ixLoad/test/activeTest/communityList/'
         communityList = self.get(communityListUrl)
 
-        self.refreshConnection(newChassisObject)
-        self.waitForChassisIpToConnect(newChassisObject)
+        self.refreshConnection(locationUrl=locationUrl)
+        self.waitForChassisIpToConnect(locationUrl=locationUrl)
 
         failedToAddList = []
         communityNameNotFoundList = []
@@ -642,13 +648,12 @@ class Main():
         waitForRunningStatusCounterExit = 20
         while True:
             currentState = self.getActiveTestCurrentState(silentMode=True)
-            self.logInfo('\nActiveTest current status: %s' % currentState, timestamp=False)
+            self.logInfo('ActiveTest current status: %s' % currentState)
             if currentState == 'Running':
                 if statsDict == None:
                     time.sleep(1)
                     continue
                     
-
                 # statType:  HTTPClient or HTTPServer (Just a example using HTTP.)
                 # statNameList: transaction success, transaction failures, ...
                 for statType,statNameList in statsDict.items():
