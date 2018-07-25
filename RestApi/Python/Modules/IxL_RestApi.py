@@ -33,7 +33,7 @@ class Main():
     debugLogFile = None
     enableDebugLogFile = False
 
-    def __init__(self, apiServerIp, apiServerIpPort, apiKey=None, deleteSession=True,
+    def __init__(self, apiServerIp, apiServerIpPort, useHttps=False, apiKey=None, verifySsl=False, deleteSession=True,
                  generateRestLogFile='ixLoadRestApiLog.txt', robotFrameworkStdout=False):
         """
         Description
@@ -50,10 +50,26 @@ class Main():
                                 Filename = ixLoadRestApiLog.txt
            robotFrameworkStdout: <bool>: True = Display print statements on stdout.
         """
+        from requests.exceptions import ConnectionError
+        from requests.packages.urllib3.connection import HTTPConnection
+
+        # Disable SSL warnings
+        requests.packages.urllib3.disable_warnings()
+
+        # Disable non http connections.
+        from requests.packages.urllib3.exceptions import InsecureRequestWarning
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+        if useHttps:
+            httpHead = 'https'
+        else:
+            httpHead = 'http'
+
         self.apiServerIp = apiServerIp
         self.deleteSession = deleteSession
-        self.httpHeader = 'http://{0}:{1}'.format(apiServerIp, apiServerIpPort)
+        self.httpHeader = '{0}://{1}:{2}'.format(httpHead, apiServerIp, apiServerIpPort)
         self.jsonHeader = {'content-type': 'application/json'}
+        self.verifySsl = verifySsl
         self.generateRestLogFile = generateRestLogFile
         self.robotFrameworkStdout = robotFrameworkStdout
         Main.debugLogFile = self.generateRestLogFile
@@ -82,9 +98,6 @@ class Main():
             # Instantiate a new log file here.
             with open(self.restLogFile, 'w') as restLogFile:
                 restLogFile.write('')
-
-        from requests.exceptions import ConnectionError
-        from requests.packages.urllib3.connection import HTTPConnection
 
     def logInfo(self, msg, end='\n', timestamp=True):
         """
@@ -153,7 +166,7 @@ class Main():
             self.logInfo('\n\tGET: {0}\n\tHEADERS: {1}'.format(restApi, self.jsonHeader))
 
         try:
-            response = requests.get(restApi, headers=self.jsonHeader)
+            response = requests.get(restApi, headers=self.jsonHeader, verify=self.verifySsl)
             if silentMode is False:
                 self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
 
@@ -189,7 +202,7 @@ class Main():
             self.logInfo('\n\tPOST: {0}\n\tDATA: {1}\n\tHEADERS: {2}'.format(restApi, data, self.jsonHeader))
 
         try:
-            response = requests.post(restApi, data=data, headers=self.jsonHeader)
+            response = requests.post(restApi, data=data, headers=self.jsonHeader, verify=self.verifySsl)
             # 200 or 201
             if silentMode == False:
                 self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
@@ -222,7 +235,7 @@ class Main():
             self.logInfo('\n\tPATCH: {0}\n\tDATA: {1}\n\tHEADERS: {2}'.format(restApi, data, self.jsonHeader))
 
         try:
-            response = requests.patch(restApi, data=json.dumps(data), headers=self.jsonHeader)
+            response = requests.patch(restApi, data=json.dumps(data), headers=self.jsonHeader, verify=self.verifySsl)
             if silentMode == False:
                 self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
 
@@ -252,7 +265,7 @@ class Main():
             self.logInfo('\n\tDELETE: {0}\n\tDATA: {1}\n\tHEADERS: {2}'.format(restApi, data, self.jsonHeader))
 
         try:
-            response = requests.delete(restApi, data=json.dumps(data), headers=self.jsonHeader)
+            response = requests.delete(restApi, data=json.dumps(data), headers=self.jsonHeader, verify=self.verifySsl)
             self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
 
             if not str(response.status_code).startswith('2'):
@@ -265,7 +278,7 @@ class Main():
     def connect(self, ixLoadVersion, timeout=90):
         # http://10.219.x.x:8080/api/v0/sessions
         response = self.post(self.httpHeader+'/api/v0/sessions', data=({'ixLoadVersion': ixLoadVersion}))
-        response = requests.get(self.httpHeader+'/api/v0/sessions')
+        response = requests.get(self.httpHeader+'/api/v0/sessions', verify=self.verifySsl)
 
         try:
             sessionId = response.json()[-1]['sessionId']
@@ -277,7 +290,6 @@ class Main():
 
         # Start operations
         response = self.post(self.sessionIdUrl+'/operations/start')
-        # response.json()['location'] = /api/v0/sessions/20/operations/start/20
 
         self.logInfo('\n\n', timestamp=False)
         for counter in range(1,90+1):
@@ -332,11 +344,6 @@ class Main():
 
     def refreshConnection(self, locationUrl):
         url = self.httpHeader+locationUrl+'/operations/refreshConnection'
-        response = self.post(url)
-        self.verifyStatus(self.httpHeader + response.headers['location'])
-
-    def refreshConnection_backup(self, objectId):
-        url = self.sessionIdUrl+'/ixload/chassischain/chassisList/'+str(objectId)+'/operations/refreshConnection'
         response = self.post(url)
         self.verifyStatus(self.httpHeader + response.headers['location'])
 
@@ -825,7 +832,7 @@ class Main():
         self.logInfo('\nUploadFile: {0} file to {1}...'.format(localPathAndFilename, ixLoadSvrPathAndFilename))
         try:
             with open(localPathAndFilename, 'rb') as f:
-                response = requests.post(url, data=f, params=params, headers=headers)
+                response = requests.post(url, data=f, params=params, headers=headers, verify=self.verifySsl)
                 if response.status_code != 200:
                     raise IxLoadRestApiException('uploadFile failed', response.json()['text'])
         except requests.exceptions.ConnectionError as e:
