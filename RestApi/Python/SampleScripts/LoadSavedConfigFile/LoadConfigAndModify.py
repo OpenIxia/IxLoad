@@ -20,33 +20,31 @@
 
 import requests, json, sys, os, time, traceback
 
-# These  modules are one level above.
-sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile', 'Modules'))))
 from IxL_RestApi import *
 
 # Choices: linux or windows 
 serverOs = 'windows'
 #
 # It is mandatory to include the exact IxLoad version.
-ixLoadVersion = '8.40.0.277'
+ixLoadVersion = '8.50.115.124'
 
 # Do you want to delete the session if the test failed and at the end of the test? True|False
-deleteSession = False
+deleteSession = True
 
 # CLI parameter input:  windows|linux
 if len(sys.argv) > 1:
     serverOs = sys.argv[1]
 
 if serverOs == 'windows':
-    # Windows settings
     apiServerIp = '192.168.70.3'
-    apiServerIpPort = '8080'
+    #apiServerIpPort = 8443 ;# https: Starting with version 8.50
+    apiServerIpPort =  8080 ;# http
     rxfFile = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 if serverOs == 'linux':
-    # Linux settings.  Comment out these variables if you are using Windows.
-    apiServerIp = '192.168.70.111'
-    apiServerIpPort = '8080'
+    apiServerIp = '192.168.70.140'
+    apiServerIpPort = 8080 ;# http
+    #apiServerIpPort = 8443 ;# https: Starting with version 8.50
     localRxfFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
     rxfFile = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
@@ -69,9 +67,9 @@ pollStatInterval = 2
 # To get the Key names: On the IxLoad GUI config, get the name of the stacks:
 # Also, could be found here: http://<ip>:8080/api/v0/sessions/<id>/ixload/test/activeTest/communityList
 communityPortList = {
-    'chassisIp': '192.168.70.11',
+    'chassisIp': '192.168.70.128',
     'Traffic1@Network1': [(1,1)],
-    'Traffic2@Network2': [(2,1)]
+    'Traffic2@Network2': [(1,2)]
 }
 
 # Set the stats to get and display at real time testing.
@@ -174,9 +172,16 @@ def pollStats(sessionIdUrl, statsDict, pollStatInterval=2, csvFile=False, csvEna
         for key in statsDict.keys():
             csvFilesDict[key]['fileObj'].close()
 
+
+if apiServerIpPort == 8443:
+    useHttps = True
+else:
+    useHttps = False
         
 try:
-    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, deleteSession=deleteSession, generateRestLogFile=False)
+    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, useHttps=useHttps,
+                   deleteSession=deleteSession, generateRestLogFile=False)
+
     restObj.connect(ixLoadVersion)
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
 
@@ -201,16 +206,16 @@ try:
 
         print('\nModifying configuraiton ...')
         # Disable HTTP Client
-        restObj.patch(restObj.sessionIdUrl+'ixLoad/test/activeTest/communityList/0/activityList/0', data={'enable': False})
+        restObj.patch(restObj.sessionIdUrl+'/ixLoad/test/activeTest/communityList/0/activityList/0', data={'enable': False})
 
         # Disable HTTP Server
-        restObj.patch(restObj.sessionIdUrl+'ixLoad/test/activeTest/communityList/1/activityList/0', data={'enable': False})
+        restObj.patch(restObj.sessionIdUrl+'/ixLoad/test/activeTest/communityList/1/activityList/0', data={'enable': False})
 
         # Enable FTP Client
-        restObj.patch(restObj.sessionIdUrl+'ixLoad/test/activeTest/communityList/0/activityList/1', data={'enable': True})
+        restObj.patch(restObj.sessionIdUrl+'/ixLoad/test/activeTest/communityList/0/activityList/1', data={'enable': True})
 
         # Enable FTP Server
-        restObj.patch(restObj.sessionIdUrl+'ixLoad/test/activeTest/communityList/1/activityList/1', data={'enable': True})
+        restObj.patch(restObj.sessionIdUrl+'/ixLoad/test/activeTest/communityList/1/activityList/1', data={'enable': True})
 
         # Show the stat names on the terminal
         restObj.getStatNames()
