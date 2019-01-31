@@ -4,13 +4,16 @@
 #   A sample Python REST API script to demonstrate loading a saved configuration,
 #   run traffic and getting stats.
 #
-#   This sample script supports both Windows and Linux Server. If connecting to a 
-#   Linux server, a license server running on Windows PC is still required.
+#   Supports both Windows and Linux gateway Server. If connecting to a 
+#   Linux server, a license server running on Windows PC is still required unless it is 
+#   installed in the chassis.
 #   This script will configure the license server IP and license model on the Linux server.
 #
+#   - If the saved config file is located locally, you could upload it to the gateway.
+#     Otherwise, the saved config file must be already in the Windows filesystem.
 #   - Load a saved config .rxf file
 #   - Run traffic
-#   - Get statss
+#   - Get stats
 #
 # Requirements
 #    Python2.7 minimum. (Supports Python2 and 3)
@@ -37,14 +40,21 @@ if serverOs == 'windows':
     apiServerIp = '192.168.70.3'
     apiServerIpPort = 8443 ;# https: Starting with version 8.50
     #apiServerIpPort =  8080 ;# http
-    rxfFile = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+
+    # If your API gateway is a Windows and you're running this script remotely such as on Linux, you 
+    # could upload the saved config file to the api gateway and set uploadFile = True. Otherwise, the 
+    # saved config must be already in the Windows filesystem.
+    #localFilePath = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+    upLoadFile = False
+
+    rxfFileOnServer = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.140'
     apiServerIpPort = 8080 ;# http
     #apiServerIpPort = 8443 ;# https: Starting with version 8.50
     localRxfFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
-    rxfFile = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+    rxfFileOnServer = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 licenseServerIp = '192.168.70.3'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
@@ -106,9 +116,12 @@ try:
 
     # If connecting to Linux server, must upload the config file to the server first.
     if serverOs == 'linux':
-        restObj.uploadFile(localRxfFileToUpload, rxfFile)
+        restObj.uploadFile(localRxfFileToUpload, rxfFileOnServer)
 
-    restObj.loadConfigFile(rxfFile)
+    if serverOs == 'windows' and upLoadFile == True:
+        restObj.uploadFile(localFilePath, rxfFileOnServer)
+
+    restObj.loadConfigFile(rxfFileOnServer)
 
     if 'communityPortList' in locals():
         restObj.assignChassisAndPorts(communityPortList)
