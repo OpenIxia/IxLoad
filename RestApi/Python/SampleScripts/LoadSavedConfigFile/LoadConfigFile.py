@@ -18,14 +18,13 @@
 
 import os, sys, time, signal, traceback
 
-sys.path.insert(0, '../../Modules')
 from IxL_RestApi import *
 
 # Choices: linux or windows 
 serverOs = 'windows'
 #
 # It is mandatory to include the exact IxLoad version.
-ixLoadVersion = '8.40.0.277'
+ixLoadVersion = '8.50.115.124'
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
@@ -35,15 +34,15 @@ if len(sys.argv) > 1:
     serverOs = sys.argv[1]
 
 if serverOs == 'windows':
-    # Windows settings
     apiServerIp = '192.168.70.3'
-    apiServerIpPort = '8080'
+    apiServerIpPort = 8443 ;# https: Starting with version 8.50
+    #apiServerIpPort =  8080 ;# http
     rxfFile = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 if serverOs == 'linux':
-    # Linux settings.  Comment out these variables if you are using Windows.
-    apiServerIp = '192.168.70.111'
-    apiServerIpPort = '8080'
+    apiServerIp = '192.168.70.140'
+    apiServerIpPort = 8080 ;# http
+    #apiServerIpPort = 8443 ;# https: Starting with version 8.50
     localRxfFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
     rxfFile = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
@@ -65,9 +64,9 @@ pollStatInterval = 2
 # Format = (cardId,portId)
 # To get the Activity names: http://<ip>:8080/api/v0/sessions/<id>/ixload/test/activeTest/communityList
 communityPortList = {
-    'chassisIp': '192.168.70.11',
+    'chassisIp': '192.168.70.128',
     'Traffic1@Network1': [(1,1)],
-    'Traffic2@Network2': [(2,1)]
+    'Traffic2@Network2': [(1,2)]
 }
 
 # Set the stats to get and display at real time testing.
@@ -86,13 +85,22 @@ statsDict = {
     'HTTPServer': ['TCP Connections Established',
                    'TCP Connection Requests Failed'
                ],
+
     #'FTPClient': ['FTP Concurrent Sessions', 
     #              'FTP Transactions'],
     #'FTPServer': ['FTP Control Conn Established']
 }
 
+
+if apiServerIpPort == 8443:
+    useHttps = True
+else:
+    useHttps = False
+
 try:
-    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, deleteSession=deleteSession, generateRestLogFile=False)
+    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, useHttps=useHttps,
+                   deleteSession=deleteSession, generateRestLogFile=True)
+
     restObj.connect(ixLoadVersion)
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
 
