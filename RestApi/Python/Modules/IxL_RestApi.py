@@ -1,3 +1,9 @@
+"""
+By Hubert Gee
+
+
+"""
+
 from __future__ import absolute_import, print_function
 import requests
 import json
@@ -8,17 +14,6 @@ import subprocess
 import os
 import re
 import datetime
-
-# 200 (OK)
-# 201 (OK. Server processed the connection)
-# 202 (Accepted)
-# 204 (Delete OK). Server successfully processed the request, but is not returning 
-#                  any content
-# 401 unauthorized
-# 403 Forbidden. Authentication failure
-# 404 Bad Request (Malformed syntax)
-# 405 Not allowed
-# 501 and 502 Errors
 
 class IxLoadRestApiException(Exception):
     def __init__(self, msg=None):
@@ -34,7 +29,7 @@ class Main():
     enableDebugLogFile = False
 
     def __init__(self, apiServerIp, apiServerIpPort, useHttps=False, apiKey=None, verifySsl=False, deleteSession=True,
-                 generateRestLogFile='ixLoadRestApiLog.txt', robotFrameworkStdout=False):
+                 osPlatform='windows', generateRestLogFile='ixLoadRestApiLog.txt', robotFrameworkStdout=False):
         """
         Description
            Initialize the class variables
@@ -45,6 +40,7 @@ class Main():
            apiKey: <str>: The apiKey to use for authentication. You only need this if you
                           enabled "enabled authentication on IxLoadGateway" during installation.
                           Then, get the apiKey from IxLoad GUI, Preferences, General, API-Key.
+           osPlatform: <str>: windows or linux
            deleteSession: <bool>: True = Delete the session after test is done.
            generateRestLogFile: <bool>: True = generate a complete log file.
                                 Filename = ixLoadRestApiLog.txt
@@ -60,7 +56,9 @@ class Main():
         from requests.packages.urllib3.exceptions import InsecureRequestWarning
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-        if useHttps:
+        self.osPlatform = osPlatform
+
+        if apiServerIpPort == 8443:
             httpHead = 'https'
         else:
             httpHead = 'http'
@@ -88,7 +86,7 @@ class Main():
         if generateRestLogFile:
             if type(generateRestLogFile) == bool and generateRestLogFile == True:
                 # Default the log file name since user didn't provide a log file name.
-                self.restLogFile = 'ixLoadRestApiLog.txt'
+                self.restLogFile = 'ixLoadRestApiLog'
                 Main.debugLogFile = self.restLogFile
 
             # User provided a log file name.
@@ -98,6 +96,47 @@ class Main():
             # Instantiate a new log file here.
             with open(self.restLogFile, 'w') as restLogFile:
                 restLogFile.write('')
+
+    # CONNECT
+    def connect(self, ixLoadVersion=None, sessionId=None, timeout=90):
+        """
+        For new session, provide the ixLoadVersion.
+        If connecting to an existing session, provide the sessionId
+        """
+        self.ixLoadVersion = ixLoadVersion
+
+        # http://10.219.x.x:8080/api/v0/sessions
+        if sessionId is None:
+            response = self.post(self.httpHeader+'/api/v0/sessions', data=({'ixLoadVersion': ixLoadVersion}))
+            response = requests.get(self.httpHeader+'/api/v0/sessions', verify=self.verifySsl)
+
+            try:
+                sessionId = response.json()[-1]['sessionId']
+            except:
+                raise IxLoadRestApiException('connect failed. No sessionId created')
+
+        self.sessionId = str(sessionId)
+        self.sessionIdUrl = self.httpHeader+'/api/v0/sessions/'+self.sessionId
+
+        # Start operations
+        if ixLoadVersion is not None:
+            response = self.post(self.sessionIdUrl+'/operations/start')
+
+            self.logInfo('\n\n', timestamp=False)
+            for counter in range(1,90+1):
+                response = self.get(self.sessionIdUrl)
+                currentStatus = response.json()['isActive']
+                self.logInfo('\tCurrentStatus: {0}'.format(currentStatus), timestamp=False)
+                if counter < timeout and currentStatus != True:
+                    self.logInfo('\tWait {0}/{1} seconds'.format(counter, timeout), timestamp=False)
+                    time.sleep(1)
+                    continue
+
+                if counter < timeout and currentStatus == True:
+                    break
+
+                if counter == timeout and currentStatus != True:
+                    raise IxLoadRestApiException('New session ID failed to become active')
 
     def logInfo(self, msg, end='\n', timestamp=True):
         """
@@ -124,6 +163,9 @@ class Main():
             self.robotLogger.log_to_console(msg)
 
     def getTime(self):
+        """
+        Returns: 13:31:44.083426
+        """
         dateAndTime = str(datetime.datetime.now()).split(' ')
         return dateAndTime[1]
 
@@ -274,45 +316,29 @@ class Main():
         except requests.exceptions.RequestException as errMsg:
             raise IxLoadRestApiException('http DELETE error: {0}\n'.format(errMsg))
 
-    # CONNECT
-    def connect(self, ixLoadVersion, timeout=90):
-        # http://10.219.x.x:8080/api/v0/sessions
-        response = self.post(self.httpHeader+'/api/v0/sessions', data=({'ixLoadVersion': ixLoadVersion}))
-        response = requests.get(self.httpHeader+'/api/v0/sessions', verify=self.verifySsl)
-
-        try:
-            sessionId = response.json()[-1]['sessionId']
-        except:
-            raise IxLoadRestApiException('connect failed. No sessionId created')
-
-        self.sessionId = str(sessionId)
-        self.sessionIdUrl = self.httpHeader+'/api/v0/sessions/'+self.sessionId
-
-        # Start operations
-        response = self.post(self.sessionIdUrl+'/operations/start')
-
-        self.logInfo('\n\n', timestamp=False)
-        for counter in range(1,90+1):
-            response = self.get(self.sessionIdUrl)
-            currentStatus = response.json()['isActive']
-            self.logInfo('\tCurrentStatus: {0}'.format(currentStatus), timestamp=False)
-            if counter < timeout and currentStatus != True:
-                self.logInfo('\tWait {0}/{1} seconds'.format(counter, timeout), timestamp=False)
-                time.sleep(1)
-                continue
-
-            if counter < timeout and currentStatus == True:
-                break
-
-            if counter == timeout and currentStatus != True:
-                raise IxLoadRestApiException('New session ID failed to become active')
 
     # VERIFY OPERATION START
-    def verifyStatus(self, url, timeout=90):
+    def verifyStatus(self, url, timeout=120):
         timeout = timeout
         for counter in range(1,timeout+1):
             response = self.get(url)
-            currentStatus = response.json()['status']
+
+            #print('\n\tverifyStatus:', response.json())
+            if 'status' in response.json():
+                currentStatus = response.json()['status']
+            elif 'state' in response.json():
+                currentStatus = response.json()['state']
+                if currentStatus == 'Error':
+                    errorMessage = 'Operation failed'
+                    if 'message' in response.json():
+                        errorMessage = response.json()['message']
+                        raise IxLoadRestApiException('verifyStatus failed: {}'.format(errorMessage))
+            else:
+                raise IxLoadRestApiException('verifyStatus failed: No status and no state in json response')
+
+            if currentStatus == 'Error' and 'error' in response.json():
+                errorMessage = response.json()['error']
+                raise IxLoadRestApiException('Operation failed: {0}'.format(errorMessage))
 
             if counter < timeout and currentStatus not in ['Successful']:
                 self.logInfo('\tCurrent status: {0}. Wait {1}/{2} seconds...'.format(currentStatus, counter, timeout),
@@ -321,7 +347,6 @@ class Main():
                 continue
  
             if counter < timeout and currentStatus in ['Successful']:
-                #self.logInfo('\t%s=%s' % (statusName, expectedStatus), timestamp=False)
                 return
 
             if counter == timeout and currentStatus not in ['Successful']:
@@ -334,6 +359,68 @@ class Main():
         # http://10.219.117.103:8080/api/v0/sessions/42/ixLoad/test/operations/loadTest/0
         operationsId = response.headers['Location']
         status = self.verifyStatus(self.httpHeader+operationsId)
+
+    def importCrfFile(self, crfFile, localCrfFileToUpload=None):
+        """
+        1> Upload the local crfFile to the gateway server.
+        2> Import the .crf config file, which will decompress the .rxf and .tst file.
+
+        Parameters
+           crfFile: The crfFile path either on the gateway server already or the path to put on the gateway server.
+                    If path is c:\\VoIP\\config.crf, then this method will add a timestamp folder in
+                    c:\\VoIP -> c:\\VoIP\\12-14-36-944630\\config.crf
+
+           localCrfFileToUpload: If the .crf file is located in a remote Linux, provide the path.
+                    Example: /home/hgee/config.crf
+        """
+        timestampFolder = str(self.getTime()).replace(':', '-').replace('.', '-')
+
+        if self.osPlatform == 'windows':
+            filename = crfFile.split('\\')[-1]
+            pathOnServer = crfFile.split('\\')[:-1]
+
+        if self.osPlatform == 'linux':
+            filename = crfFile.split('/')[-1]
+            pathOnServer = crfFile.split('/')[:-1]
+            pathOnServer = [x for x in pathOnServer if x != '']
+
+        pathOnServer.append(timestampFolder) ;# [c:, VoIP, 13-08-28-041835]
+        self.importConfigPath = pathOnServer
+
+        # To delete these timestamp folders after the test is done.
+        if self.osPlatform == 'linux':
+            self.importConfigPath = '/'.join(self.importConfigPath)
+        if self.osPlatform == 'windows':
+            self.importConfigPath = '\\'.join(self.importConfigPath)
+
+        pathOnServer.append(filename) ;# [c:, VoIP, 13-08-28-041835, VoLTE_S1S11_1UE_2APNs_8.50.crf]
+
+        if self.osPlatform == 'windows':
+            pathOnServer = '\\'.join(pathOnServer) ;# c:\\VoIP\\13-08-28-041835\\VoLTE_S1S11_1UE_2APNs_8.50.crf
+            srcFile = pathOnServer
+
+        if self.osPlatform == 'linux':
+            pathOnServer = '/'.join(pathOnServer) ;# /mnt/ixload-share/13-08-28-041835/VoLTE_S1S11_1UE_2APNs_8.50.crf
+            pathOnServer = '/'+pathOnServer
+            srcFile = pathOnServer
+
+        self.uploadFile(localCrfFileToUpload, pathOnServer)
+        destRxf = srcFile.replace('crf', 'rxf')
+        loadTestUrl = self.sessionIdUrl + '/ixLoad/test/operations/importConfig/'    
+        self.logInfo('\nimportConfig: srcFile: {}   destRxf: {}'.format(srcFile, destRxf))
+        response = self.post(loadTestUrl, data={'srcFile': srcFile, 'destRxf': destRxf})
+        operationsId = response.headers['Location']
+        status = self.verifyStatus(self.httpHeader+operationsId)
+
+    def deleteImportConfigFolder(self):
+        try:
+            sshClient = ConnectSSH(host, username, password)
+            sshClient.ssh()
+            stdout = sshClient.enterCommand('rm -rf /mnt/ixload-share/Results/17-12-20-089862')
+            print(stdout)
+            
+        except paramiko.ssh_exception.NoValidConnectionsError as errMsg:
+            print('\nSSH connection failed: {}'.format(errMsg))
 
     def configLicensePreferences(self, licenseServerIp, licenseModel='Subscription Mode'):
         """
@@ -565,7 +652,7 @@ class Main():
         runTestUrl = self.sessionIdUrl+'/ixLoad/test/operations/runTest'
         response = self.post(runTestUrl)
         operationsId = response.headers['Location']
-        self.verifyStatus(self.httpHeader+operationsId)
+        self.verifyStatus(self.httpHeader+operationsId, timeout=300)
         #return operationsId.split('/')[-1] ;# Return the number only
 
     # GET TEST STATUS
@@ -652,7 +739,7 @@ class Main():
                 csvFilesDict[key]['csvObj'].writerow(csvFilesDict[key]['columnNameList'])
 
         waitForRunningStatusCounter = 0
-        waitForRunningStatusCounterExit = 20
+        waitForRunningStatusCounterExit = 30
         while True:
             currentState = self.getActiveTestCurrentState(silentMode=True)
             self.logInfo('ActiveTest current status: %s' % currentState)
@@ -730,7 +817,6 @@ class Main():
             if currentStatus != 'Successful' and counter == timer:
                 raise IxLoadRestApiException('Test status failed to run')
 
-
     def waitForActiveTestToUnconfigure(self):
         ''' Wait for the active test state to be Unconfigured '''
         self.logInfo('\n')
@@ -738,7 +824,7 @@ class Main():
             currentState = self.getActiveTestCurrentState()
             self.logInfo('waitForActiveTestToUnconfigure current state:', currentState)
             if counter < 30 and currentState != 'Unconfigured':
-                self.logInfo('ActiveTest current state = %s\nWaiting for state = Unconfigued: Wait %s/30' % (currentState, counter), timestamp=False)
+                self.logInfo('ActiveTest current state = %s\nWaiting for state = Unconfigured: Wait %s/30' % (currentState, counter), timestamp=False)
                 time.sleep(1)
             if counter < 30 and currentState == 'Unconfigured':
                 self.logInfo('\nActiveTest is Unconfigured')
@@ -807,7 +893,9 @@ class Main():
     def getResultPath(self):
         url = self.sessionIdUrl+'/ixLoad/test'
         response = self.get(url)
-        return response.json()['runResultDirFull']
+        self.resultPath = response.json()['runResultDirFull']
+        self.resultPath = self.resultPath.replace('\\', '\\\\')
+        return self.resultPath
 
     def uploadFile(self, localPathAndFilename, ixLoadSvrPathAndFilename, overwrite=True):
         """
@@ -827,25 +915,193 @@ class Main():
         url = self.httpHeader+'/api/v0/resources'
         headers = {'Content-Type': 'multipart/form-data'}
         params = {'overwrite': overwrite, 'uploadPath': ixLoadSvrPathAndFilename}
-        #filename = ixLoadSvrPathAndFilename.split('/')[-1]
 
         self.logInfo('\nUploadFile: {0} file to {1}...'.format(localPathAndFilename, ixLoadSvrPathAndFilename))
+        self.logInfo('\n\tPOST: {0}\n\tDATA: {1}\n\tHEADERS: {2}'.format(url, params, self.jsonHeader))
         try:
             with open(localPathAndFilename, 'rb') as f:
                 response = requests.post(url, data=f, params=params, headers=headers, verify=self.verifySsl)
                 if response.status_code != 200:
                     raise IxLoadRestApiException('uploadFile failed', response.json()['text'])
+
         except requests.exceptions.ConnectionError as e:
             raise IxLoadRestApiException(
                 'Upload file failed. Received connection error. One common cause for this error is the size of the file to be uploaded.'
                 ' The web server sets a limit of 1GB for the uploaded file size. Received the following error: %s' % str(e)
             )
+
         except IOError as e:
             raise IxLoadRestApiException('Upload file failed. Received IO error: %s' % str(e))
+
         except Exception:
             raise IxLoadRestApiException('Upload file failed. Received the following error: %s' % str(e))
+
         else:
             self.logInfo('Upload file finished.')
             self.logInfo('Response status code %s' % response.status_code)
             self.logInfo('Response text %s' % response.text)
+
+    def configTimeline(self, **kwargs):
+        """
+        Modify the timeline.
+        Requires the name of the timeline in the Timeline configuration
+
+        Parameters
+           name
+           sustainTime
+           rampDownTime
+           rampUpTime
+           rampUpInterval
+           standbyTime
+
+        Return
+           True: Success
+           Exeption: Failed
+        """
+        self.logInfo('configTimeLine')
+        url = self.sessionIdUrl+'/ixLoad/test/activeTest/timelineList'
+        response = self.get(url)
+        for timelineObj in response.json():
+            if timelineObj['name'] == kwargs['name']:
+                objectId = timelineObj['objectID']
+                url = url+'/'+str(objectId)
+                self.patch(url, data=kwargs)
+                return True
+                
+        raise IxLoadRestApiException('No such name found: {}'.format(kwargs['name']))
+
+    def setResultDir(self, resultDirPath, createTimestampFolder=False):
+        """
+        Set the results directory path.
+
+        resultDirPath: For Windows gateway server, provide the c: drive and path.
+                       For Linux, must begin with path /mnt/ixload-share
+        """
+        timestampFolder = str(self.getTime()).replace(':', '-').replace('.', '-')
+        if createTimestampFolder:
+            if self.osPlatform == 'windows':
+                resultDirPath = resultDirPath+'\\'+timestampFolder
+            if self.osPlatform == 'linux':
+                resultDirPath = resultDirPath+'/'+timestampFolder
+
+        url = self.sessionIdUrl+'/ixLoad/test'
+        data = {'outputDir': True, 'runResultDirFull': resultDirPath}
+        self.patch(url, data=data)
+
+    def deleteResultDir(self):
+        """
+        Delete a directory in the API gateway server
+        """
+        url = self.sessionIdUrl+'/ixLoad/test/operations/deleteTestResultDirectory'
+
+        # This is supported starting with 8.50 update 2. 8.50.115.333
+        if self.ixLoadVersion == '8.50.115.333' or int(self.ixLoadVersion.split('.')[0]) >= 9:
+            self.logInfo('deleteResultDir')
+            response = self.post(url.replace('v0', 'v1'))
+            operationsId = response.headers['Location']
+            status = self.verifyStatus(self.httpHeader+operationsId)
+        else:
+            self.logError('\nFailed: Your IxLoadVersion does not support deleteTestResultDirectory')
+
+    def deleteLogsOnSessionClose(self):
+        """
+        Delete the logs in the IxLoad default results directory in the API gateway server.
+        """
+        self.logInfo('deleteLogsOnSessionClose')
+        url = self.sessionIdUrl
+        response = self.patch(url, data={'deleteLogsOnSessionClose': True})
+
+    def waitForAllCapturedData(self):
+        url = self.sessionIdUrl+'/ixLoad/test/operations/waitForAllCaptureData'
+        response = self.post(url)
+        operationsId = response.headers['Location']
+        status = self.verifyStatus(self.httpHeader+operationsId)
+
+    def sshSetCredentials(self, username='ixload', password='ixia123', sshPasswordFile=None, port=22, pkeyFile=None):
+        """
+        For scpFiles and deleteFolder.
+        
+        Parameters
+           username: The username to log into the IxLoad Gateway server.
+           password: The password. The Linux default password is ixia123.
+           sshPasswordFile: The file that contains the password.
+           port: The SSH port to use.
+           pkeyFile: The PKEY file to use 
+        
+        """
+        self.sshUsername = username
+        self.sshPassword = password
+        self.sshPort = port
+        self.sshPkeyFile = pkeyFile
+
+        if sshPasswordFile:
+            with open (sshPasswordFile, 'r') as pwdFile:
+                self.sshPassword = pwdFile.read().strip()
+        
+    def scpFiles(self, sourceFilePath=None, destFilePath='.', typeOfScp='download'):
+        """
+        This method is for running scripts from a Linux machine only and retreiving files off an
+        IxLoad Linux Gateway server. Does not get from Windows unless you installed SSH server.
+
+        As of 8.50, there is no Rest API to retrieve result folders off the IxLoad Gateway server
+        when the test is done.  This method will get your specified result folder out of
+        the IxLoad Gateway Server by using SCP.
+
+        If your IxLoad Gateway is Windows, you need to download and install OpenSSH.  Below link shows the steps:
+            https://openixia.amzn.keysight.com//tutorials?subject=Windows&page=sshOnWindows.html
+
+        Parameters
+           sourceFilePath: From where.
+           destFilePath:   To where. Defaults to the location where the script was executed.
+           typeOfScp:      download|upload
+
+        Usage
+            # Download Windows folder to local Linux
+            restObj.scpFiles('C:\\Results', '/home/hgee', typeOfScp='download')
+
+            # Download Linux to local Linux
+            restObj.scpFiles('/mnt/ixload-share/file', '/home/hgee', typeOfScp='download')
+
+            # Upload Linux to Windows
+            restObj.scpFiles('/home/hgee/file.txt', 'C:\\Results', typeOfScp='upload')
+
+        -v = Show debugs.
+        -rp = recursive and persistent files.
+        -p  = An estimate time.
+        -P  = Specify a port
+        -C  = Compress files on the go. Decompress on the destination to regular size.
+        """
+        if typeOfScp == 'download':
+            cmd = 'sshpass -p {} scp -P {} -rp -C {}@{}:{} {}'.format(self.sshPassword, self.sshPort, self.sshUsername,
+                                                                      self.apiServerIp, sourceFilePath, destFilePath)
+        
+        if typeOfScp == 'upload':
+            cmd = 'sshpass -p {} scp -P {} -rp -C {} {}@{}:{}'.format(self.sshPassword, self.sshPort, sourceFilePath,
+                                                                      self.sshUsername, self.apiServerIp, destFilePath)
+
+        self.logInfo('SCP Files: {} -> {}'.format(sourceFilePath, destFilePath))
+        output = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        while True:
+            output.poll()
+            line = output.stdout.readline()
+            if line:
+                print(line)
+            else:
+                break
+
+    def deleteFolder(self, filePath=None):
+        """
+        Deletes a folder on the IxLoad gateway server.
+        """
+        import sshAssistant
+
+        sshClient = sshAssistant.Connect(self.apiServerIp, self.sshUsername, self.sshPassword,
+                                           pkeyFile=self.sshPkeyFile, port=self.sshPort)
+        if self.osPlatform == 'linux':
+            stdout,stderr = sshClient.enterCommand(f'rm -rf {filePath}')
+
+        if self.osPlatform == 'windows':
+            sshClient.enterCommand(f'rmdir {filePath} /s /q')
+
+
 

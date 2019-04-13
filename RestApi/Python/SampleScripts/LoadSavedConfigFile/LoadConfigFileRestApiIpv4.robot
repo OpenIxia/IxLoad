@@ -1,10 +1,10 @@
 
 # Description
-#    Load a saved config file (FTP Client/Server)
+#    Load a saved config file
 #    Reassign chassisIp/ports, run traffic and get stats.
 #
 # Requirements
-#    Python 2.7-3+
+#    Python 2.7 or Python3
 #    requests module
 #    ../../Modules/IxL_RestApi.py module
 #
@@ -28,8 +28,8 @@ Library  IxL_RestApi.Main  apiServerIp=${apiServerIp}  apiServerIpPort=${apiServ
 *** Variables ***
 ${serverOs} =  windows
 
-# Must state the exact version you are using
-${ixLoadVersion} =  8.40.0.277
+# Must state the exact version you are using 8.40.0.277
+${ixLoadVersion} =  8.50.115.333
 ${deleteSessionAfterTest} =  True
 ${apiServerIp} =  192.168.70.3
 ${apiServerIpPort} =  8080
@@ -60,7 +60,7 @@ ${pollStatInterval} =  2
 # To get the Key names: On the IxLoad GUI config, get the name of the stacks:
 # Also, could be found here: http://<ip>:8080/api/v0/sessions/<id>/ixload/test/activeTest/communityList
 # Create a list
-${chassisIp} =  192.168.70.11
+${chassisIp} =  192.168.70.128
 @{port1} =  1  1
 @{port2} =  2  1
 @{port1List} =  ${port1}
@@ -91,7 +91,7 @@ ${chassisIp} =  192.168.70.11
 &{statsDictFtp} =  FTPClient=${ftpClient}  FTPServer=${ftpServer}
 
 *** Test Cases ***
-Test FTP Client Server
+Test HTTP/FTP Client Server
 
    # For Linux API server
    Log To Console  Connecting to IxLoad gateway. Please wait for a new session to come up
