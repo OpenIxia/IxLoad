@@ -50,7 +50,7 @@ if len(sys.argv) > 1:
 ixLoadVersion = '8.50.115.333'
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = False
+deleteSession = True
 
 if serverOs == 'windows':
     apiServerIp = '192.168.70.3'
