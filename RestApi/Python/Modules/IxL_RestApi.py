@@ -123,9 +123,10 @@ class Main():
             response = self.post(self.sessionIdUrl+'/operations/start')
 
             self.logInfo('\n\n', timestamp=False)
-            for counter in range(1,90+1):
+            for counter in range(1, timeout+1):
                 response = self.get(self.sessionIdUrl)
                 currentStatus = response.json()['isActive']
+
                 self.logInfo('\tCurrentStatus: {0}'.format(currentStatus), timestamp=False)
                 if counter < timeout and currentStatus != True:
                     self.logInfo('\tWait {0}/{1} seconds'.format(counter, timeout), timestamp=False)
@@ -1098,10 +1099,10 @@ class Main():
         sshClient = sshAssistant.Connect(self.apiServerIp, self.sshUsername, self.sshPassword,
                                            pkeyFile=self.sshPkeyFile, port=self.sshPort)
         if self.osPlatform == 'linux':
-            stdout,stderr = sshClient.enterCommand(f'rm -rf {filePath}')
+            stdout,stderr = sshClient.enterCommand('rm -rf {}'.format(filePath))
 
         if self.osPlatform == 'windows':
-            sshClient.enterCommand(f'rmdir {filePath} /s /q')
+            sshClient.enterCommand('rmdir {} /s /q'.format(filePath))
 
 
 

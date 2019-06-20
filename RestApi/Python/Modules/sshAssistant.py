@@ -64,9 +64,9 @@ class Connect:
             self.sshClient = paramiko.SSHClient()
             self.sshClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             self.sshClient.connect(hostname=self.host, username=self.username, password=self.password, port=self.port, pkey=self.pkey, timeout=self.timeout)
-            print(f'\nSuccessfully SSH to {host}')
+            print('\nSuccessfully SSH to {}'.format(host))
         except paramiko.SSHException:
-            raise Exception(f'\nSSH Failed to connect: {host}')
+            raise Exception('\nSSH Failed to connect: {}.format(host)')
 
         self.sftp = self.sshClient.open_sftp()
             
@@ -89,7 +89,7 @@ class Connect:
         self.sftp.remove(path)
    
     def transferFile(self, sourceFilePath, destFilePath):
-        print(f'\nTransferring file from: {sourceFilePath} to: {destFilePath}')
+        print('\nTransferring file from: {} to: {}'.format(sourceFilePath, destFilePath))
         ftpClient = self.sshClient.open_sftp()
         ftpClient.get(sourceFilePath, destFilePath)
         ftpClient.close()
@@ -97,7 +97,7 @@ class Connect:
     def downloadFile(self, remoteFile, localFile, directory=False):
         # Copy remoteFile to localFile. Overwriting or creating as needed.
         if directory == False:
-            print(f'\nDownloading file from: {remoteFile} to: {localFile}')
+            print('\nDownloading file from: {} to: {}'.format(remoteFile, localFile))
             self.sftp.get(remoteFile, localFile)
 
         if directory:
@@ -122,7 +122,7 @@ class Connect:
     def uploadFile(self, localFile, remoteFile, directory=False):
         # Copy localFile to remoteFile. Overwriting or creating as needed.
         if directory == False:
-            print(f'\nUploadinging file from: {localFile} to: {remoteFile}')
+            print('\nUploadinging file from: {} to: {}'.format(localFile, remoteFile))
             self.sftp.put(localFile, remoteFile)
             self.sftp.close()
 
