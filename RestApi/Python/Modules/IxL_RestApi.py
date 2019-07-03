@@ -435,43 +435,55 @@ class Main():
         response = self.post(url)
         self.verifyStatus(self.httpHeader + response.headers['location'])
 
-    def addNewChassis(self, chassisIp):
-        # Verify if chassisIp exists. If exists, no need to add new chassis.
-        url = self.sessionIdUrl+'/ixLoad/chassisChain/chassisList'
-        response = self.get(url)
+    def addNewChassis(self, chassisIpList):
+        """
+        Add a chassis to connect to.  If you have multiple chassis's, put them
+        in a list.
 
-        for eachChassisIp in response.json():
-            if eachChassisIp['name'] == chassisIp:
-                self.logInfo('\nChassis Ip exists in config. No need to add new chassis')
-                objectId = eachChassisIp['objectID']
-                # /api/v0/sessions/10/ixLoad/chassisChain/chassisList/1/docs
-                return eachChassisIp['id'], eachChassisIp['links'][0]['href'].replace('/docs', '')
+        Parameter
+           chassisIp: <list>:  One or more chassis IP addresses in a list.
+        """
+        if type(chassisIpList) == str:
+            chassisIpList = chassisIpList.split(' ')
 
-        self.logInfo('\nChassis IP does not exists')
-        self.logInfo('Adding new chassisIP: %s:\nURL: %s' % (chassisIp, url))
-        self.logInfo('Server synchronous blocking state. Please wait a few seconds ...')
-        response = self.post(url, data = {"name": chassisIp})
-        objectId = response.headers['Location'].split('/')[-1]
+        self.logInfo('addNewChassis: {}'.format(chassisIpList))
+        for chassisIp in chassisIpList:
+            # Verify if chassisIp exists. If exists, no need to add new chassis.
+            url = self.sessionIdUrl+'/ixLoad/chassisChain/chassisList'
+            response = self.get(url)
 
-        # /api/v0/sessions/2/ixLoad/chassisChain/chassisList/0
-        locationUrl = response.headers['Location']
+            for eachChassisIp in response.json():
+                if eachChassisIp['name'] == chassisIp:
+                    self.logInfo('\naddNewChassis: Chassis Ip exists in config. No need to add new chassis')
+                    objectId = eachChassisIp['objectID']
+                    # /api/v0/sessions/10/ixLoad/chassisChain/chassisList/1/docs
+                    return eachChassisIp['id'], eachChassisIp['links'][0]['href'].replace('/docs', '')
 
-        self.logInfo('\nAddNewChassis: locationUrl: %s' % locationUrl)
-        url = self.httpHeader+locationUrl
-        self.logInfo('\nAdded new chassisIp Object to chainList: %s' % url)
-        response = self.get(url)
-        newChassisId = response.json()['id']
-        self.logInfo('\nNew Chassis ID: %s' % newChassisId)
-        self.refreshConnection(locationUrl=locationUrl)
-        self.waitForChassisIpToConnect(locationUrl=locationUrl)
+            self.logInfo('addNewChassis: Chassis IP does not exists')
+            self.logInfo('addNewChassis: Adding new chassisIP: %s:\nURL: %s' % (chassisIp, url))
+            self.logInfo('addNewChassis: Server synchronous blocking state. Please wait a few seconds ...')
+            response = self.post(url, data = {"name": chassisIp})
+            objectId = response.headers['Location'].split('/')[-1]
 
-        return newChassisId,locationUrl
+            # /api/v0/sessions/2/ixLoad/chassisChain/chassisList/0
+            locationUrl = response.headers['Location']
+
+            self.logInfo('\nAddNewChassis: locationUrl: %s' % locationUrl)
+            url = self.httpHeader+locationUrl
+            self.logInfo('\nAdded new chassisIp Object to chainList: %s' % url)
+            response = self.get(url)
+            newChassisId = response.json()['id']
+            self.logInfo('\naddNewChassis: New Chassis ID: %s' % newChassisId)
+            self.refreshConnection(locationUrl=locationUrl)
+            self.waitForChassisIpToConnect(locationUrl=locationUrl)
+
+            return newChassisId,locationUrl
 
     def waitForChassisIpToConnect(self, locationUrl):
         timeout = 60
         for counter in range(1,timeout+1):
             response = self.get(self.httpHeader+locationUrl, ignoreError=True)
-            print('\nwaitForChassisIpToConnect response:', response.json())
+            self.logInfo('waitForChassisIpToConnect response: {}'.format(response.json()))
             if 'status' in response.json() and 'Request made on a locked resource' in response.json()['status']:
                 self.logInfo('API server response: Request made on a locked resource. Retrying %s/%d secs' % (counter, timeout))
                 time.sleep(1)
@@ -523,7 +535,7 @@ class Main():
                 return 1
 
             for eachTuplePort in communityPortListDict[currentCommunityName]:
-                cardId,portId = eachTuplePort
+                chassisId,cardId,portId = eachTuplePort
                 params = {'chassisId':chassisId, 'cardId':cardId, 'portId':portId}
                 self.logInfo('\nAssignPorts: {0}: {1}'.format(eachTuplePort, params))
                 url = communityListUrl+str(currentCommunityObjectId)+'/network/portList'
@@ -537,76 +549,99 @@ class Main():
             raise IxLoadRestApiException('Failed to add ports:', failedToAddList)
 
     def assignChassisAndPorts(self, communityPortListDict):
-        '''
+        """
+        Assign ports.
+
+        Parameter
+           communityPortListDict: <list>: A list of community ports.  Example shown below.
+
         Usage:
+            NOTE: Traffic#@Network# are the names from your configuration.
+                  You must know what they are.
 
-        chassisId = Pass in the chassis ID. 
-                    If you reassign chassis ID, you must pass in
-                    the new chassis ID number.
+            If all the ports are in the same chassis:
 
-        communityPortListDict should be passed in as a dictionary
-        with Community Names mapping to ports in a tuplie list.
-        communityPortListDict = {
-           'Traffic0@CltNetwork_0': [(chassisId,1,1)],
-           'SvrTraffic0@SvrNetwork_0': [(chassisId,2,1)]
-           }
-        '''
+                communityPortList = {
+                   'chassisIp': '192.168.70.128',
+                   'Traffic1@Network1': [(1,1)],
+                   'Traffic2@Network2': [(2,1)]
+                }
 
-        # Assign Chassis
-        chassisIp = communityPortListDict['chassisIp']
-        newChassisId, locationUrl = self. addNewChassis(chassisIp)
-        self.logInfo('assignChassisAndPorts: To new chassis: %s' % locationUrl, timestamp=False)
+                restObj.assignChassisAndPorts([communityPortList])
 
-        # Assign Ports
-        communityListUrl = self.sessionIdUrl+'/ixLoad/test/activeTest/communityList/'
-        communityList = self.get(communityListUrl)
 
-        self.refreshConnection(locationUrl=locationUrl)
-        self.waitForChassisIpToConnect(locationUrl=locationUrl)
+            If ports are on different chassis, create two dicts.
 
-        failedToAddList = []
-        communityNameNotFoundList = []
-        for eachCommunity in communityList.json():
-            currentCommunityObjectId = str(eachCommunity['objectID'])
-            currentCommunityName = eachCommunity['name']
-            if currentCommunityName not in communityPortListDict:
-                self.logInfo('\nNo such community name found in your stated list: %s' % currentCommunityName)
-                self.logInfo('\tYour stated list:', communityPortListDict)
-                communityNameNotFoundList.append(currentCommunityName)
-                self.logInfo('\nassignChassisAndPorts failed: communityNameNotFound: %s' % currentCommunityName)
+                communityPortList1 = {
+                   'chassisIp': '192.168.70.128',
+                   'Traffic1@Network1': [(1,1)]
+                }
 
-            if communityNameNotFoundList == []:
-                for eachTuplePort in communityPortListDict[currentCommunityName]:
-                    # Going to ignore user input chassisId. When calling addNewChassis(),
-                    # it will verify for chassisIp exists. If exists, it will return the
-                    # right chassisID.
-                    cardId,portId = eachTuplePort
-                    params = {"chassisId":int(newChassisId), "cardId":cardId, "portId":portId}
-                    url = communityListUrl+str(currentCommunityObjectId)+'/network/portList'
-                    self.logInfo('assignChassisAndPorts URL: %s' % url, timestamp=False)
-                    self.logInfo('assignChassisAndPorts Params: %s' % json.dumps(params), timestamp=False)
-                    response = self.post(url, data=params, ignoreError=True)
-                    if response.status_code != 201:
-                        portAlreadyConnectedMatch = re.search('.*has already been assigned.*', response.json()['error'])
-                        if portAlreadyConnectedMatch:
-                            self.logInfo('%s/%s is already assigned' % (cardId,portId), timestamp=False)
-                        else:
-                            failedToAddList.append((newChassisId,cardId,portId))
-                            self.logInfo('\nassignChassisAndPorts failed: %s' % response.text)
+                communityPortList2 = {
+                   'chassisIp': '192.168.70.129',
+                   'Traffic2@Network2': [(1,1),
+                }
 
-        if communityNameNotFoundList != []:
-            raise IxLoadRestApiException
-        if failedToAddList != []:
-            if self.deleteSession:
-                self.abortActiveTest()
-            raise IxLoadRestApiException('Failed to add ports to chassisIp %s: %s:' % (chassisIp, failedToAddList))
+                restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
+        """
+        if type(communityPortListDict) == dict:
+            # Make this updated API backward compatible by passing in one dict versus a list.
+            communityPortListDict = [communityPortListDict]
 
-    # ENABLE FORCE OWNERSHIP
+        for communityPorts in communityPortListDict:
+            # Assign Chassis
+            chassisIp = communityPorts['chassisIp']
+            newChassisId, locationUrl = self. addNewChassis(chassisIp)
+            self.logInfo('assignChassisAndPorts: To new chassis: %s' % locationUrl, timestamp=False)
+
+            # Assign Ports
+            communityListUrl = self.sessionIdUrl+'/ixLoad/test/activeTest/communityList/'
+            communityList = self.get(communityListUrl)
+
+            self.refreshConnection(locationUrl=locationUrl)
+            self.waitForChassisIpToConnect(locationUrl=locationUrl)
+
+            failedToAddList = []
+            communityNameNotFoundList = []
+            for eachCommunity in communityList.json():
+                currentCommunityObjectId = str(eachCommunity['objectID'])
+                currentCommunityName = eachCommunity['name']
+
+                if currentCommunityName not in communityPorts:
+                    continue
+
+                if communityNameNotFoundList == []:
+                    for eachTuplePort in communityPorts[currentCommunityName]:
+                        # Going to ignore user input chassisId. When calling addNewChassis(),
+                        # it will verify for chassisIp exists. If exists, it will return the
+                        # right chassisID.
+                        cardId,portId = eachTuplePort
+                        params = {"chassisId":int(newChassisId), "cardId":cardId, "portId":portId}
+                        url = communityListUrl+str(currentCommunityObjectId)+'/network/portList'
+                        self.logInfo('assignChassisAndPorts URL: %s' % url, timestamp=False)
+                        self.logInfo('assignChassisAndPorts Params: %s' % json.dumps(params), timestamp=False)
+                        response = self.post(url, data=params, ignoreError=True)
+                        if response.status_code != 201:
+                            portAlreadyConnectedMatch = re.search('.*has already been assigned.*', response.json()['error'])
+                            if portAlreadyConnectedMatch:
+                                self.logInfo('%s/%s is already assigned' % (cardId,portId), timestamp=False)
+                            else:
+                                failedToAddList.append((newChassisId,cardId,portId))
+                                self.logInfo('\nassignChassisAndPorts failed: %s' % response.text)
+
+            if communityNameNotFoundList != []:
+                raise IxLoadRestApiException
+
+            if failedToAddList != []:
+                if self.deleteSession:
+                    self.abortActiveTest()
+                raise IxLoadRestApiException('Failed to add ports to chassisIp %s: %s:' % (chassisIp, failedToAddList))
+
+
     def enableForceOwnership(self):
         url = self.sessionIdUrl+'/ixLoad/test/activeTest'
         response = self.patch(url, data={'enableForceOwnership': True})
 
-    # GET STAT NAMES
     def getStatNames(self):
         statsUrl = self.sessionIdUrl+'/ixLoad/stats'
         self.logInfo('\ngetStatNames: %s\n' % statsUrl)
@@ -615,12 +650,10 @@ class Main():
             self.logInfo('\t%s' % eachStatName['href'], timestamp=False)
         return response.json()
 
-    # DISABLE ALL STATS
     def disableAllStats(self, configuredStats):
         configuredStats = self.sessionIdUrl + '/' +configuredStats
         response = self.patch(configuredStats, data={"enabled":False})
                               
-    # ENABLE CERTAIN STATS
     def enableConfiguredStats(self, configuredStats, statNameList):
         '''
         Notes: Filter queries
@@ -648,7 +681,6 @@ class Main():
                                                                                            eachLogEntry['message']), 
                                  timestamp=False)
 
-    # RUN TRAFFIC
     def runTraffic(self):
         runTestUrl = self.sessionIdUrl+'/ixLoad/test/operations/runTest'
         response = self.post(runTestUrl)
@@ -656,7 +688,6 @@ class Main():
         self.verifyStatus(self.httpHeader+operationsId, timeout=300)
         #return operationsId.split('/')[-1] ;# Return the number only
 
-    # GET TEST STATUS
     def getTestStatus(self, operationsId):
         '''
         status = "Not Started|In Progress|successful"
@@ -673,7 +704,6 @@ class Main():
         if response.status_code == 200:
             return response.json()['currentState']
 
-    # GET STATS
     def getStats(self, statUrl):
         response = self.get(statUrl, silentMode=True)
         return response
@@ -1017,6 +1047,68 @@ class Main():
         response = self.post(url)
         operationsId = response.headers['Location']
         status = self.verifyStatus(self.httpHeader+operationsId)
+
+    def configIp(self, searchName, **data):
+        """
+        Modify the existing network IP.
+
+        Parameters
+           searchName:  The name of the rangeList to modify.
+           **date: <kwargs>: View below options
+
+        Path
+           /ixLoad/test/activeTest/communityList/<index>/network/stack/childrenList/<index>/childrenList/<index>/rangeList'
+
+        Options:
+           ipType = 'IPv4'
+           ipAddress = '1.1.1.1'
+           gatewayAddress = '1.1.1.2'
+           gatewayIncrement = '0.0.0.0'
+           incrementBy = '0.0.0.1'
+           prefix = 24
+           count = 100
+           enableGatewayArp = <bool>
+           name = The name of the network range to modify
+
+        Usage:
+            restObj.configIp(searchName='IP-R1', ipAddress='10.10.10.1', gatewayAddress='10.10.10.101')
+
+        """
+        searchNameExists = False
+        url = self.sessionIdUrl+'/ixLoad/test/activeTest/communityList'
+        response = self.get(url)
+        for communityList in response.json():
+            for link in communityList['links']:
+                if link['rel'] == 'network':
+                    # Get: /api/v0/sessions/15/ixLoad/test/activeTest/communityList/0/network
+                    networkHref = link['href']
+                    url = self.httpHeader + networkHref + '/stack/childrenList'
+                    response = self.get(url)
+
+                    for childrenList in response.json():
+                        for childrenListLink in childrenList['links']:
+                            if childrenListLink['rel'] == 'childrenList':
+                                childrenListHref = childrenListLink['href']
+                                url = self.httpHeader + childrenListHref
+           
+                                response = self.get(url)
+                                # GET: /ixLoad/test/activeTest/communityList/1/network/stack/childrenList/5/childrenList/6/rangeList
+                                for childrenList2 in response.json():
+                                    for childrenListLink2 in childrenList2['links']:
+                                        if childrenListLink2['rel'] == 'rangeList':
+                                            rangeListHref = childrenListLink2['href']
+                                            url = self.httpHeader + rangeListHref
+
+                                            response = self.get(url)
+                                            for ipRange in response.json():
+                                                if response.json()[0]['name'] == searchName:
+                                                    self.logInfo('configIp: {}'.format(data))
+                                                    self.patch(url, data=(data))
+                                                    searchNameExists = True
+
+        if searchNameExists == False:
+            self.logError('configIp: No name found: {}'.format(searchName))
+
 
     def sshSetCredentials(self, username='ixload', password='ixia123', sshPasswordFile=None, port=22, pkeyFile=None):
         """
