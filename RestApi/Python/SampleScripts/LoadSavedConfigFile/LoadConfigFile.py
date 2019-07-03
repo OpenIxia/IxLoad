@@ -39,8 +39,11 @@ from IxL_RestApi import *
 
 # Choices: linux or windows 
 serverOs = 'windows'
-#
+
+
 # It is mandatory to include the exact IxLoad version.
+# You could view all of your installed versions by entering on a web browser: 
+#    http://<server ip>:8080/api/v0/applicationTypes
 ixLoadVersion = '8.50.115.124'
 ixLoadVersion = '8.50.115.333'
 
@@ -53,18 +56,30 @@ if len(sys.argv) > 1:
 
 if serverOs == 'windows':
     apiServerIp = '192.168.70.3'
+
+    # Where to store all of the csv result files on the IxLoad Windows
     resultsDir = 'c:\\Results'
+
+    # Where to upload the config file or where to find it if you're not uploading it.
     rxfFileOnServer = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
-    # For SSH only. To copy results off of Windows to local filesystem.
-    sshUsername = 'hgee'
-    sshPasswordFile = '/mnt/hgfs/Utilities/vault'    
-    with open (sshPasswordFile, 'r') as pwdFile:
-        sshPassword = pwdFile.read().strip()
+    # If the config file is not in the IxLoad Windows, state the local path to upload it.
+    localConfigFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
     # Do you want to upload your saved config file to the Gateway server?
     # If not, a saved config must be already in the Windows filesystem.
-    upLoadFile = False
+    upLoadFile = True
+
+    # Optional: For SSH only. To copy results off of Windows gateway server to local filesystem.
+    sshUsername = 'hgee'
+
+    # Set sshPasswordFile to None if you don't want to SSH the results.
+    sshPasswordFile = '/mnt/hgfs/Utilities/vault'
+
+    if sshPasswordFile:
+        with open (sshPasswordFile, 'r') as pwdFile:
+            sshPassword = pwdFile.read().strip()
+
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.169'
@@ -72,8 +87,9 @@ if serverOs == 'linux':
     sshPassword = 'ixia123' ;# Leave as default if you did not change it
     resultsDir = '/mnt/ixload-share/Results' ;# Default
 
-    localRxfFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+    localConfigFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
     rxfFileOnServer = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
@@ -91,21 +107,26 @@ csvEnableFileTimestamp = False
 csvFilePrependName = None
 pollStatInterval = 2
 
-# To reassign ports, uncomment this and replace chassis and port values
+# To assign ports for testing.
 # Format = (cardId,portId)
+# Traffic1@Network1 are activity names.
 # To get the Activity names: /ixload/test/activeTest/communityList
-communityPortList = {
+communityPortList1 = {
     'chassisIp': '192.168.70.128',
     'Traffic1@Network1': [(1,1)],
-    'Traffic2@Network2': [(2,1)]
 }
 
+communityPortList2 = {
+    'chassisIp': '192.168.70.128',
+    'Traffic2@Network2': [(2,1)],
+}
+
+
 # Stat names to display at run time:
-#     https://openixia.amzn.keysight.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
+#     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 statsDict = {
     'HTTPClient': ['TCP Connections Established',
                    'HTTP Simulated Users',
-                   'HTTP Concurrent Connections',
                    'HTTP Connections',
                    'HTTP Transactions',
                    'HTTP Connection Attempts'
@@ -114,26 +135,21 @@ statsDict = {
                    'TCP Connection Requests Failed'
                ]
 }
-
 try:
     restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, osPlatform=serverOs,
                    deleteSession=deleteSession, generateRestLogFile=True)
 
-    restObj.connect(ixLoadVersion)
+    restObj.connect(ixLoadVersion, sessionId=None)
+
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
 
-    # If connecting to Linux server, must upload the config file to the server first.
-    if serverOs == 'linux':
-        restObj.uploadFile(localRxfFileToUpload, rxfFileOnServer)
-
-    if serverOs == 'windows' and upLoadFile == True:
-        restObj.uploadFile(localFilePath, rxfFileOnServer)
+    if (serverOs == 'windows' and 'upLoadFile' == True) or (serverOs == 'linux'):
+        restObj.uploadFile(localConfigFileToUpload, rxfFileOnServer)
 
     restObj.loadConfigFile(rxfFileOnServer)
 
-    if 'communityPortList' in locals():
-        restObj.assignChassisAndPorts(communityPortList)
+    restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
 
     restObj.enableForceOwnership()
 

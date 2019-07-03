@@ -69,14 +69,14 @@ if serverOs == 'windows':
     crfFileOnServer = 'c:\\VoIP\\voipSip.crf'
 
 if serverOs == 'linux':
-    apiServerIp = '192.168.70.169'
+    apiServerIp = '192.168.70.129'
     sshUsername = 'ixload'  ;# Leave as default if you did not change it
     sshPassword = 'ixia123' ;# Leave as default if you did not change it
     resultsDir = '/mnt/ixload-share/Results' ;# Default
     localCrfFileToUpload = 'voipSip.crf' ;# The .crf config file to import
 
     # Where to put it in the Linux Gateway server. Always begin with /mnt/ixload-share 
-    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf' ;# TODO: Simplify this
+    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 licenseServerIp = '192.168.70.3'
@@ -93,17 +93,23 @@ csvEnableFileTimestamp = False
 csvFilePrependName = None
 pollStatInterval = 2
 
-# To reassign ports, uncomment this and replace chassis and port values
+# Assign ports for testing.
 # Format = (cardId,portId)
+# 'Traffic1@Network1' are activity names.
 # To get the Activity names: /ixload/test/activeTest/communityList
-communityPortList = {
+communityPortList1 = {
     'chassisIp': '192.168.70.128',
     'Traffic1@Network1': [(1,1)],
-    'Traffic2@Network2': [(2,1)]
 }
 
+communityPortList2 = {
+    'chassisIp': '192.168.70.128',
+    'Traffic2@Network2': [(2,1)],
+}
+
+
 # Stat names to display at run time:
-#     https://openixia.amzn.keysight.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
+#     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 statsDict = {
     'SIP(VoIPSip)': ['SIP Requests Parsed', 'SIP Requests Matched'],
     'RTP(VoIPSip)': ['Successful Records', 'Successful Playbacks'],
@@ -114,14 +120,15 @@ try:
     restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, osPlatform=serverOs,
                    deleteSession=deleteSession, generateRestLogFile=True)
 
-    restObj.connect(ixLoadVersion)
+    restObj.connect(ixLoadVersion, timeout=120)
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
     restObj.deleteLogsOnSessionClose()
     restObj.importCrfFile(crfFileOnServer, localCrfFileToUpload)
 
-    if 'communityPortList' in locals():
-        restObj.assignChassisAndPorts(communityPortList)
+    #if 'communityPortList' in locals():
+    #    restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
+    restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
 
     restObj.enableForceOwnership()
 
