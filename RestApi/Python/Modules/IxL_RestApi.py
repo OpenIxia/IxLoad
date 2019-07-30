@@ -1140,8 +1140,18 @@ class Main():
         when the test is done.  This method will get your specified result folder out of
         the IxLoad Gateway Server by using SCP.
 
-        If your IxLoad Gateway is Windows, you need to download and install OpenSSH.  Below link shows the steps:
-            https://openixia.amzn.keysight.com//tutorials?subject=Windows&page=sshOnWindows.html
+        Requirements:
+            Install sshpass on your local Linux.
+
+            If your IxLoad Gateway is Windows, you need to download and install OpenSSH.  The link below shows the steps:
+               https://www.openixia.com/tutorials?subject=Windows&page=sshOnWindows.html
+
+        NOTE:
+            - If you get an error message: host key verification failed, this means your
+              local host doesn't have the ssh key of the ssh host that you're connecting to.
+              To create the host key, enter:
+
+              ssh-keyscan <server ip> >> ~/.ssh/known_hosts
 
         Parameters
            sourceFilePath: From where.
