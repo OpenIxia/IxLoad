@@ -33,15 +33,6 @@ Command line:
 
 import paramiko, time, sys
 
-#host = '192.168.70.169'
-#username = 'ixload'
-#password = 'ixia123'
-
-#if len(sys.argv) > 1:
-#    passwordFile = sys.argv[1]
-#    with open(passwordFile, 'r') as pwdFile:
-#        password = pwdFile.read()
-
 class Connect:
     def __init__(self, host, username, password, pkeyFile=None, port=22, timeout=10):
         self.host = host
