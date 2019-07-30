@@ -40,12 +40,11 @@ from IxL_RestApi import *
 # Choices: linux or windows 
 serverOs = 'windows'
 
-
 # It is mandatory to include the exact IxLoad version.
 # You could view all of your installed versions by entering on a web browser: 
 #    http://<server ip>:8080/api/v0/applicationTypes
-ixLoadVersion = '8.50.115.124'
 ixLoadVersion = '8.50.115.333'
+ixLoadVersion = '9.00.0.347'
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
@@ -82,7 +81,7 @@ if serverOs == 'windows':
 
 
 if serverOs == 'linux':
-    apiServerIp = '192.168.70.169'
+    apiServerIp = '192.168.70.129'
     sshUsername = 'ixload'  ;# Leave as default if you did not change it
     sshPassword = 'ixia123' ;# Leave as default if you did not change it
     resultsDir = '/mnt/ixload-share/Results' ;# Default

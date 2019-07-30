@@ -46,8 +46,8 @@ if len(sys.argv) > 1:
     serverOs = sys.argv[1]
 
 # It is mandatory to include the exact IxLoad version.
-#ixLoadVersion = '8.50.115.124'
 ixLoadVersion = '8.50.115.333'
+ixLoadVersion = '9.00.0.347'
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
@@ -79,6 +79,7 @@ if serverOs == 'linux':
     crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
+
 licenseServerIp = '192.168.70.3'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
@@ -117,6 +118,7 @@ statsDict = {
 }
 
 try:
+
     restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, osPlatform=serverOs,
                    deleteSession=deleteSession, generateRestLogFile=True)
 
@@ -126,10 +128,7 @@ try:
     restObj.deleteLogsOnSessionClose()
     restObj.importCrfFile(crfFileOnServer, localCrfFileToUpload)
 
-    #if 'communityPortList' in locals():
-    #    restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
     restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
-
     restObj.enableForceOwnership()
 
     # Modify the sustain time
