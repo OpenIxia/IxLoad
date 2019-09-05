@@ -1175,7 +1175,7 @@ class Main():
         -C  = Compress files on the go. Decompress on the destination to regular size.
         """
         if typeOfScp == 'download':
-            cmd = 'sshpass -p {} scp -P {} -rp -C {}@{}:{} {}'.format(self.sshPassword, self.sshPort, self.sshUsername,
+            cmd = 'sshpass -p {} scp -o "StrictHostKeyChecking no" -P {} -rp -C {}@{}:{} {}'.format(self.sshPassword, self.sshPort, self.sshUsername,
                                                                       self.apiServerIp, sourceFilePath, destFilePath)
         
         if typeOfScp == 'upload':
@@ -1184,11 +1184,12 @@ class Main():
 
         self.logInfo('SCP Files: {} -> {}'.format(sourceFilePath, destFilePath))
         output = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+
         while True:
             output.poll()
             line = output.stdout.readline()
             if line:
-                print(line)
+                self.logInfo('scpFiles: {}'.format(line))
             else:
                 break
 
@@ -1198,8 +1199,13 @@ class Main():
         """
         import sshAssistant
 
-        sshClient = sshAssistant.Connect(self.apiServerIp, self.sshUsername, self.sshPassword,
-                                           pkeyFile=self.sshPkeyFile, port=self.sshPort)
+        try:
+            sshClient = sshAssistant.Connect(self.apiServerIp, self.sshUsername, self.sshPassword,
+                                            pkeyFile=self.sshPkeyFile, port=self.sshPort)
+        except:
+            self.logError('\ndeleteFolder failed to ssh: {}. This is not a test failure.'.format(self.apiServerIp))
+            return
+
         if self.osPlatform == 'linux':
             stdout,stderr = sshClient.enterCommand('rm -rf {}'.format(filePath))
 
