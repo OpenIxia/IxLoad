@@ -391,6 +391,7 @@ class Main():
         # To delete these timestamp folders after the test is done.
         if self.osPlatform == 'linux':
             self.importConfigPath = '/'.join(self.importConfigPath)
+
         if self.osPlatform == 'windows':
             self.importConfigPath = '\\'.join(self.importConfigPath)
 
@@ -748,8 +749,11 @@ class Main():
             csvFilesDict = {}
             for key in statsDict.keys():
                 fileName = key
+                fileName = fileName.replace("(", '_')
+                fileName = fileName.replace(")", '_')
                 if csvFilePrependName:
                     fileName = csvFilePrependName+'_'+fileName
+
                 csvFilesDict[key] = {}
 
                 if csvEnableFileTimestamp:
@@ -764,7 +768,7 @@ class Main():
                 csvFilesDict[key]['csvObj'] = csv.writer(csvFilesDict[key]['fileObj'])
 
             # Create the csv top row column name list
-            for key,values in statsDict.items():        
+            for key,values in statsDict.items():     
                 for columnNames in values:
                     csvFilesDict[key]['columnNameList'].append(columnNames)
                 csvFilesDict[key]['csvObj'].writerow(csvFilesDict[key]['columnNameList'])
