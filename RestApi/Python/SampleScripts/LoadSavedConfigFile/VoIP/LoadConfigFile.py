@@ -14,7 +14,7 @@
 #   If you want to retrieve results from a Windows Gateway server, you must install and enable
 #   OpenSSH so the script could connect to it.
 #   Here is a link on how to install and set up OpenSSH for Windows.
-#       http://openixia.amzn.keysight.com/tutorials?subject=Windows&page=sshOnWindows.html
+#       http://openixia.com/tutorials?subject=Windows&page=sshOnWindows.html
 #
 #
 #   This will will:
@@ -39,11 +39,7 @@ sys.path.insert(0, baseDir.replace('SampleScripts/LoadSavedConfigFile', 'Modules
 from IxL_RestApi import *
 
 # Choices: linux or windows 
-serverOs = 'windows'
-
-# CLI parameter input:  windows|linux
-if len(sys.argv) > 1:
-    serverOs = sys.argv[1]
+serverOs = 'linux'
 
 # It is mandatory to include the exact IxLoad version.
 #ixLoadVersion = '8.50.115.333'
@@ -55,6 +51,8 @@ forceTakePortOwnership = True
 
 if serverOs == 'windows':
     apiServerIp = '192.168.70.3'
+
+    # Where to store the results on the Windows filesystem
     resultsDir = 'c:\\Results'
 
     # For SSH only, to copy results off of Windows to local filesystem.
@@ -75,13 +73,14 @@ if serverOs == 'linux':
     resultsDir = '/mnt/ixload-share/Results' ;# Default
 
     # Where to put the config file in the Linux Gateway server. Always begin with /mnt/ixload-share 
-    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
+    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf' ;# Default
 
-
-upLoadFile = True
+# Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
 localConfigFileToUpload = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/VoIP/voipSip.crf'
 
 scpRetrieveResults = True
+
+# Where to put SCP the csv results on your local system
 scpResultsDestPath = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/VoIP'
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
@@ -97,7 +96,7 @@ class getCsvStats:
     '''
     # If your Windows have OpenSSH installed, set csvStatFile = True                                                                                                          
     # If your Windows don't have OpenSSH installed, set csvStatFile = False  
-    csvStatFile = False
+    csvStatFile = True
 
     # Enable timestamp to prevent overwriting the previous csv file
     csvEnableFileTimestamp = False
@@ -105,6 +104,7 @@ class getCsvStats:
     # To add a custom name to the beginning of the CSV file
     csvFilePrependName = None
     pollStatInterval = 2
+
 
 # Assign ports for testing.  Format = (cardId,portId)
 # 'Traffic1@Network1' are activity names.
@@ -128,8 +128,11 @@ statsDict = {
 }
 
 try:
-    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, osPlatform=serverOs,
-                   deleteSession=deleteSession, generateRestLogFile=True)
+    restObj = Main(apiServerIp=apiServerIp,
+                   apiServerIpPort=apiServerIpPort,
+                   osPlatform=serverOs,
+                   deleteSession=deleteSession,
+                   generateRestLogFile=True)
 
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
@@ -145,8 +148,12 @@ try:
     restObj.configTimeline(name='Timeline1', sustainTime=12)
 
     runTestOperationsId = restObj.runTraffic()
-    restObj.pollStats(statsDict, pollStatInterval=getCsvStats.pollStatInterval, csvFile=getCsvStats.csvStatFile,
-                      csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp, csvFilePrependName=getCsvStats.csvFilePrependName)
+
+    restObj.pollStats(statsDict, 
+                      pollStatInterval=getCsvStats.pollStatInterval, 
+                      csvFile=getCsvStats.csvStatFile,
+                      csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp,
+                      csvFilePrependName=getCsvStats.csvFilePrependName)
 
     # Wait if your configuration has port capturing enabled
     restObj.waitForAllCapturedData()

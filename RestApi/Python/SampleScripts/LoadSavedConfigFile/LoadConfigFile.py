@@ -19,7 +19,7 @@
 #   If you want to retrieve results from a Windows Gateway server, you must install and enable
 #   OpenSSH so the script could connect to it. SSH is enabled by default if using a Linux Gateway server.
 #   Here is a link on how to install and set up OpenSSH for Windows.
-#       http://openixia.amzn.keysight.com/tutorials?subject=Windows&page=sshOnWindows.html
+#       http://openixia.com/tutorials?subject=Windows&page=sshOnWindows.html
 #
 #   - Load a saved config .rxf file
 #   - Run traffic
@@ -38,7 +38,7 @@ sys.path.insert(0, baseDir.replace('SampleScripts', 'Modules'))
 from IxL_RestApi import *
 
 # Choices: linux or windows 
-serverOs = 'linux'
+serverOs = 'windows'
 
 # Versions prior to 9.0 is mandatory to include the exact IxLoad version.
 # You could view all of your installed versions by entering on a web browser: 
@@ -49,10 +49,6 @@ ixLoadVersion = '9.00.0.347'
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
 forceTakePortOwnership = True
-
-# CLI parameter input:  windows|linux
-if len(sys.argv) > 1:
-    serverOs = sys.argv[1]
 
 if serverOs == 'windows':
     apiServerIp = '192.168.70.3'
@@ -104,7 +100,7 @@ class getCsvStats:
     '''
     # If your Windows have OpenSSH installed, set csvStatFile = True
     # If your Windows don't have OpenSSH installed, set csvStatFile = False
-    csvStatFile = False
+    csvStatFile = True
 
     # Enable timestamp to avoid overwriting the previous csv result files: True or False
     csvEnableFileTimestamp = False
@@ -142,8 +138,11 @@ statsDict = {
 }
 
 try:
-    restObj = Main(apiServerIp=apiServerIp, apiServerIpPort=apiServerIpPort, osPlatform=serverOs,
-                   deleteSession=deleteSession, generateRestLogFile=True)
+    restObj = Main(apiServerIp=apiServerIp,
+                   apiServerIpPort=apiServerIpPort,
+                   osPlatform=serverOs,
+                   deleteSession=deleteSession,
+                   generateRestLogFile=True)
 
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
 
@@ -164,8 +163,11 @@ try:
 
     runTestOperationsId = restObj.runTraffic()
 
-    restObj.pollStats(statsDict, pollStatInterval=getCsvStats.pollStatInterval, csvFile=getCsvStats.csvStatFile,
-                      csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp, csvFilePrependName=getCsvStats.csvFilePrependName)
+    restObj.pollStats(statsDict,
+                      pollStatInterval=getCsvStats.pollStatInterval,
+                      csvFile=getCsvStats.csvStatFile,
+                      csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp,
+                      csvFilePrependName=getCsvStats.csvFilePrependName)
 
     restObj.waitForActiveTestToUnconfigure()
 
