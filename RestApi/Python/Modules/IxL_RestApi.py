@@ -1132,9 +1132,16 @@ class Main():
         self.sshPkeyFile = pkeyFile
 
         if sshPasswordFile:
-            with open (sshPasswordFile, 'r') as pwdFile:
-                self.sshPassword = pwdFile.read().strip()
+            # with open (sshPasswordFile, 'r') as pwdFile:
+            #     self.sshPassword = pwdFile.read().strip()
+            self.sshPassword = self.readFile(sshPasswordFile)
         
+    def readFile(self, theFile):
+        with open (theFile, 'r') as fileObj:
+            fileContents = fileObj.read().strip()
+
+        return fileContents
+
     def scpFiles(self, sourceFilePath=None, destFilePath='.', typeOfScp='download'):
         """
         This method is for running scripts from a Linux machine only and retreiving files off an
