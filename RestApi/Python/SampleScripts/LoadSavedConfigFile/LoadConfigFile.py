@@ -32,9 +32,7 @@
 
 import os, sys, time, signal, traceback
 
-baseDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, baseDir.replace('SampleScripts', 'Modules'))
-
+sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile', 'Modules'))))
 from IxL_RestApi import *
 
 # Choices: linux or windows 
@@ -61,21 +59,15 @@ if serverOs == 'windows':
 
     # Optional: For SSH only. To copy results off of Windows gateway server to local filesystem.
     sshUsername = 'hgee'
-
-    # Set sshPasswordFile to None if you don't want to SSH the results.
     sshPasswordFile = '/mnt/hgfs/Utilities/vault'
-
-    if sshPasswordFile:
-        with open (sshPasswordFile, 'r') as pwdFile:
-            sshPassword = pwdFile.read().strip()
-
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.129'
-    sshUsername = 'ixload'  ;# Leave as default if you did not change it
-    sshPassword = 'ixia123' ;# Leave as default if you did not change it
-    resultsDir = '/mnt/ixload-share/Results' ;# Default
+    sshUsername = 'ixload'
+    sshPassword = 'ixia123' 
 
+    # Leave as defaults. For your reference only.
+    resultsDir = '/mnt/ixload-share/Results' ;# Default
     # Must be in the path /mnt/ixload-share
     rxfFileOnServer = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
@@ -98,9 +90,10 @@ class getCsvStats:
     '''
     CSV stat polling is mainly for Windows because it doesn't have OpenSSH installed.  
     '''
-    # If your Windows have OpenSSH installed, set csvStatFile = True
-    # If your Windows don't have OpenSSH installed, set csvStatFile = False
-    csvStatFile = True
+    # Set to True if you want to save results to CSV files.
+    # Mainly used when using a Windows gateway server because Windows don't come with SSH
+    # to SCP CSV result files.
+    saveStatsToCsvFile = True
 
     # Enable timestamp to avoid overwriting the previous csv result files: True or False
     csvEnableFileTimestamp = False
@@ -123,7 +116,8 @@ communityPortList2 = {
     'Traffic2@Network2': [(2,1)],
 }
 
-# Stat names to display at run time:
+# Stat names to display at run time.
+# To see how to get the stat names, go to the link below for step-by-step guidance:
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 statsDict = {
     'HTTPClient': ['TCP Connections Established',
@@ -158,14 +152,14 @@ try:
     if forceTakePortOwnership:
         restObj.enableForceOwnership()
 
-    # Modify the sustain time
+    # Optional: Modify the sustain time
     restObj.configTimeline(name='Timeline1', sustainTime=12)
 
     runTestOperationsId = restObj.runTraffic()
 
     restObj.pollStats(statsDict,
+                      csvFile=getCsvStats.saveStatsToCsvFile,
                       pollStatInterval=getCsvStats.pollStatInterval,
-                      csvFile=getCsvStats.csvStatFile,
                       csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp,
                       csvFilePrependName=getCsvStats.csvFilePrependName)
 
@@ -175,10 +169,12 @@ try:
         # SSH to the server to retrieve the csv stat results and delete them in the server.
         # SSH is enabled on a Linux Gateway, but if you're connecting a Windows gateway, more than likely,
         # you don't have OpenSSH enabled or installed in your Windows.  In this case, you need to install OpenSSH.
-        resultPath = restObj.getResultPath()
-        restObj.sshSetCredentials(sshUsername, sshPassword, sshPasswordFile=None,  port=22)
-        restObj.scpFiles(sourceFilePath=resultPath, destFilePath=scpDestPath, typeOfScp='download')
-        restObj.deleteFolder(filePath=resultPath)
+        if 'sshPasswordFile' in locals():
+            sshPassword = restObj.readFile(sshPasswordFile)
+
+        restObj.sshSetCredentials(sshUsername, sshPassword, port=22)
+        restObj.scpFiles(sourceFilePath=restObj.getResultPath(), destFilePath=scpDestPath, typeOfScp='download')
+        restObj.deleteFolder(filePath=restObj.getResultPath())
 
     if deleteSession:
         restObj.deleteSessionId()

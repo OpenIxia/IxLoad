@@ -33,9 +33,7 @@
 
 import os, sys, time, signal, traceback
 
-baseDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, baseDir.replace('SampleScripts/LoadSavedConfigFile', 'Modules'))
-
+sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile/VoIP', 'Modules'))))
 from IxL_RestApi import *
 
 # Choices: linux or windows 
@@ -58,22 +56,19 @@ if serverOs == 'windows':
     # For SSH only, to copy results off of Windows to local filesystem.
     sshUsername = 'hgee'
     sshPasswordFile = '/mnt/hgfs/Utilities/vault'
-    
-    with open (sshPasswordFile, 'r') as pwdFile:
-        sshPassword = pwdFile.read().strip()
-            
-    # IMPORTANT NOTE: For Windows: The c:\\VoIP folder must exist in the IxLoad Gateway server.
-    #                 The folder could be anywhere in your c:. Doesn't have to be c:\\VoIP
+      
+    # Where to put or get the .crf file in the Windows filesystem
     crfFileOnServer = 'c:\\VoIP\\voipSip.crf'
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.129'
-    sshUsername = 'ixload'  ;# Leave as default if you did not change it
-    sshPassword = 'ixia123' ;# Leave as default if you did not change it
-    resultsDir = '/mnt/ixload-share/Results' ;# Default
+    sshUsername = 'ixload'  
+    sshPassword = 'ixia123'
 
+    # Leave as defaults. For your reference only.
+    resultsDir = '/mnt/ixload-share/Results' ;# Default
     # Where to put the config file in the Linux Gateway server. Always begin with /mnt/ixload-share 
-    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf' ;# Default
+    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
 
 # Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
 localConfigFileToUpload = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/VoIP/voipSip.crf'
@@ -94,9 +89,10 @@ class getCsvStats:
     CSV stat polling is mainly for Windows because it doesn't have OpenSSH installed                                                                                          
     for SCP to retrieve results.                                                                                                                                              
     '''
-    # If your Windows have OpenSSH installed, set csvStatFile = True                                                                                                          
-    # If your Windows don't have OpenSSH installed, set csvStatFile = False  
-    csvStatFile = True
+    # Set to True if you want to save results to CSV files.
+    # Mainly used when using a Windows gateway server because Windows don't come with SSH
+    # to SCP CSV result files.
+    saveStatsToCsvFile = True
 
     # Enable timestamp to prevent overwriting the previous csv file
     csvEnableFileTimestamp = False
@@ -119,7 +115,8 @@ communityPortList2 = {
     'Traffic2@Network2': [(2,1)],
 }
 
-# Stat names to display at run time:
+# Stat names to display at run time.
+# To see how to get the stat names, go to the link below for step-by-step guidance:
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 statsDict = {
     'SIP(VoIPSip)': ['SIP Requests Parsed', 'SIP Requests Matched'],
@@ -149,9 +146,9 @@ try:
 
     runTestOperationsId = restObj.runTraffic()
 
-    restObj.pollStats(statsDict, 
+    restObj.pollStats(statsDict,
+                      csvFile=getCsvStats.saveStatsToCsvFile, 
                       pollStatInterval=getCsvStats.pollStatInterval, 
-                      csvFile=getCsvStats.csvStatFile,
                       csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp,
                       csvFilePrependName=getCsvStats.csvFilePrependName)
 
@@ -163,10 +160,12 @@ try:
         # SSH to the server to retrieve the csv stat results and delete them in the server.                                                                                   
         # SSH is enabled on a Linux Gateway, but if you're connecting a Windows gateway, more than likely,                                                                    
         # you don't have OpenSSH enabled or installed in your Windows.  In this case, you need to install OpenSSH.                                                            
-        resultPath = restObj.getResultPath()
-        restObj.sshSetCredentials(sshUsername, sshPassword, sshPasswordFile=None,  port=22)
-        restObj.scpFiles(sourceFilePath=resultPath, destFilePath=scpResultsDestPath, typeOfScp='download')
-        restObj.deleteFolder(filePath=resultPath)
+        if 'sshPasswordFile' in locals():
+            sshPassword = restObj.readFile(sshPasswordFile)
+
+        restObj.sshSetCredentials(sshUsername, sshPassword, port=22)
+        restObj.scpFiles(sourceFilePath=restObj.getResultPath(), destFilePath=scpResultsDestPath, typeOfScp='download')
+        restObj.deleteFolder(filePath=restObj.getResultPath())
 
     if deleteSession:
         restObj.deleteSessionId()
