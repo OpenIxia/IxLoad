@@ -36,16 +36,16 @@ sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScr
 from IxL_RestApi import *
 
 # Choices: linux or windows 
-serverOs = 'windows'
+serverOs = 'linux'
 
-# Versions prior to 9.0 is mandatory to include the exact IxLoad version.
-# You could view all of your installed versions by entering on a web browser: 
+# Prior to 9.0, it is mandatory to include the exact IxLoad version.
+# To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
 ixLoadVersion = '8.50.115.333'
 ixLoadVersion = '9.00.0.347'
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = True
+deleteSession = False
 forceTakePortOwnership = True
 
 if serverOs == 'windows':
@@ -59,7 +59,9 @@ if serverOs == 'windows':
 
     # Optional: For SSH only. To copy results off of Windows gateway server to local filesystem.
     sshUsername = 'hgee'
-    sshPasswordFile = '/mnt/hgfs/Utilities/vault'
+    sshPassword = os.environ['windowsPasswd']
+    #sshPasswordFile = '/mnt/hgfs/Utilities/vault' ;# Alternative password retreival
+
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.129'
@@ -67,7 +69,8 @@ if serverOs == 'linux':
     sshPassword = 'ixia123' 
 
     # Leave as defaults. For your reference only.
-    resultsDir = '/mnt/ixload-share/Results' ;# Default
+    resultsDir = '/mnt/ixload-share/Results'
+
     # Must be in the path /mnt/ixload-share
     rxfFileOnServer = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 

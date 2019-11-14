@@ -17,7 +17,7 @@
 #       http://openixia.com/tutorials?subject=Windows&page=sshOnWindows.html
 #
 #
-#   This will will:
+#   What the script will do:
 #     - Import the .crf config file. 
 #     - Reassign ports 
 #     - Run traffic
@@ -39,12 +39,14 @@ from IxL_RestApi import *
 # Choices: linux or windows 
 serverOs = 'linux'
 
-# It is mandatory to include the exact IxLoad version.
+# Prior to 9.0, it is mandatory to include the exact IxLoad version.
+# To view all the installed versions, go on a web browser and enter: 
+#    http://<server ip>:8080/api/v0/applicationTypes
 #ixLoadVersion = '8.50.115.333'
 ixLoadVersion = '9.00.0.347'
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = True
+deleteSession = False
 forceTakePortOwnership = True
 
 if serverOs == 'windows':
@@ -55,8 +57,9 @@ if serverOs == 'windows':
 
     # For SSH only, to copy results off of Windows to local filesystem.
     sshUsername = 'hgee'
-    sshPasswordFile = '/mnt/hgfs/Utilities/vault'
-      
+    sshPassword = os.environ['windowsPasswd']
+    #sshPasswordFile = '/mnt/hgfs/Utilities/vault' ;# Alternative password retreiving method
+    
     # Where to put or get the .crf file in the Windows filesystem
     crfFileOnServer = 'c:\\VoIP\\voipSip.crf'
 
@@ -66,7 +69,8 @@ if serverOs == 'linux':
     sshPassword = 'ixia123'
 
     # Leave as defaults. For your reference only.
-    resultsDir = '/mnt/ixload-share/Results' ;# Default
+    resultsDir = '/mnt/ixload-share/Results' 
+
     # Where to put the config file in the Linux Gateway server. Always begin with /mnt/ixload-share 
     crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
 
@@ -119,8 +123,8 @@ communityPortList2 = {
 # To see how to get the stat names, go to the link below for step-by-step guidance:
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 statsDict = {
-    'SIP(VoIPSip)': ['SIP Requests Parsed', 'SIP Requests Matched'],
-    'RTP(VoIPSip)': ['Successful Records', 'Successful Playbacks'],
+    'SIP(VoIPSip)':       ['SIP Requests Parsed', 'SIP Requests Matched'],
+    'RTP(VoIPSip)':       ['Successful Records', 'Successful Playbacks'],
     'Signaling(VoIPSip)': ['Received Calls', 'Answered Calls']
 }
 
