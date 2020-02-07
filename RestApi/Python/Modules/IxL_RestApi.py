@@ -209,6 +209,7 @@ class Main():
             self.logInfo('\n\tGET: {0}\n\tHEADERS: {1}'.format(restApi, self.jsonHeader))
 
         try:
+            
             response = requests.get(restApi, headers=self.jsonHeader, verify=self.verifySsl)
             if silentMode is False:
                 self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
@@ -710,7 +711,7 @@ class Main():
         return response
 
     def pollStats(self, statsDict=None, pollStatInterval=2, csvFile=False,
-                  csvEnableFileTimestamp=False, csvFilePrependName=None):
+                  csvEnableFileTimestamp=True, csvFilePrependName=None):
         '''
         sessionIdUrl = http://192.168.70.127:8080/api/v0/sessions/20
 
@@ -743,6 +744,11 @@ class Main():
         csvFilePrependName: To prepend a name of your choice to the csv file for visual identification and if you need 
                             to restart the test, a new csv file will be created. Prepending a name will group the csv files.
         '''
+        versionMatch = re.match('([0-9]+\.[0-9]+)', self.ixLoadVersion)
+        if float(versionMatch.group(1)) < float(8.5):
+            # If ixLoad version is < 8.50, there is no rest api to download stats.
+            # Default to creating csv stats from real time stats.
+            csvFile = True
 
         if csvFile:
             import csv
@@ -759,7 +765,7 @@ class Main():
                 if csvEnableFileTimestamp:
                     import datetime
                     timestamp = datetime.datetime.now().strftime('%H%M%S')
-                    fileName = fileName+'_'+timestamp
+                    fileName = timestamp+'_'+fileName
 
                 fileName = fileName+'.csv'
                 csvFilesDict[key]['filename'] = fileName
@@ -1223,5 +1229,30 @@ class Main():
         if self.osPlatform == 'windows':
             sshClient.enterCommand('rmdir {} /s /q'.format(filePath))
 
+    def downloadResults(self):
+        """
+        Get the test results path and download all the CSV results to the local system.
 
+        Syntax:
+            https://ip:8443/api/v1/downloadResource?localPath=/mnt/ixload-share/<Folder>&zipName=results.zip
+        """
+        versionMatch = re.match('([0-9]+\.[0-9]+)', self.ixLoadVersion)
+        if float((versionMatch.group(1))) < float(8.5):
+            self.logInfo('Your IxLoad version {} does not have the rest api to download csv stats. However, real time stats are saved in csv files in your local system'.format(self.ixLoadVersion))
+            return
 
+        resultsPath = self.getResultPath()
+        if '/' in resultsPath:
+            # Linux path 
+            destinationZipFileName = resultsPath.split('/')[-1]
+        else:
+            # Windows path
+            destinationZipFileName = resultsPath.split('\\')[-1]
+
+        zipFile = 'ixLoadResults_{}.zip'.format(destinationZipFileName)
+
+        self.logInfo('downloadResults: {}'.format(resultsPath))
+        url = '{}/api/v1/downloadResource?localPath={}&zipName={}'.format(self.httpHeader, resultsPath, zipFile)
+
+        response = requests.get(url, verify=self.verifySsl)
+        open(zipFile, 'wb').write(response.content)

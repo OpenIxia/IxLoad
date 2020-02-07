@@ -6,27 +6,16 @@
 #   In the IxLoad GUI, "export" the VoIP config to a .crf file
 #   This script will use the rest api /operations/importConfig to load the .crf file.
 #   Which will decompress the .crf file and comes with the .rxf and .tst files.
-#   
-#   This sample script also has SSH capabilities to retrieve all the statistic csv result
-#   files to anywhere on your local file system and optionally, you could also delete them in the Gateway
-#   server as clean up.
-#
-#   If you want to retrieve results from a Windows Gateway server, you must install and enable
-#   OpenSSH so the script could connect to it.
-#   Here is a link on how to install and set up OpenSSH for Windows.
-#       http://openixia.com/tutorials?subject=Windows&page=sshOnWindows.html
-#
 #
 #   What the script will do:
 #     - Import the .crf config file. 
 #     - Reassign ports 
 #     - Run traffic
 #     - Get stats
-#     - Optinal: Retrieves the results folder to your local Linux filesystem.
+#     - Download csv result stats
 #
 # Requirements
 #    - IxL_RestApi.py libary file.
-#    - sshAssistant.py
 #    - .crf config file
 #    - For Windows: The VoIP folder must exists in the c:\VoIP.
 #   
@@ -39,14 +28,14 @@ from IxL_RestApi import *
 # Choices: linux or windows 
 serverOs = 'linux'
 
-# Prior to 9.0, it is mandatory to include the exact IxLoad version.
+# Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
 #ixLoadVersion = '8.50.115.333'
 ixLoadVersion = '9.00.0.347'
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = False
+deleteSession = True
 forceTakePortOwnership = True
 
 if serverOs == 'windows':
@@ -55,18 +44,11 @@ if serverOs == 'windows':
     # Where to store the results on the Windows filesystem
     resultsDir = 'c:\\Results'
 
-    # For SSH only, to copy results off of Windows to local filesystem.
-    sshUsername = 'hgee'
-    sshPassword = os.environ['windowsPasswd']
-    #sshPasswordFile = '/mnt/hgfs/Utilities/vault' ;# Alternative password retreiving method
-    
     # Where to put or get the .crf file in the Windows filesystem
     crfFileOnServer = 'c:\\VoIP\\voipSip.crf'
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.129'
-    sshUsername = 'ixload'  
-    sshPassword = 'ixia123'
 
     # Leave as defaults. For your reference only.
     resultsDir = '/mnt/ixload-share/Results' 
@@ -74,37 +56,22 @@ if serverOs == 'linux':
     # Where to put the config file in the Linux Gateway server. Always begin with /mnt/ixload-share 
     crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
 
+
 # Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
 localConfigFileToUpload = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/VoIP/voipSip.crf'
 
-scpRetrieveResults = True
+# For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
+# Set to True if you want to save realtime results to CSV files.
+saveStatsToCsvFile = False
 
 # Where to put SCP the csv results on your local system
 scpResultsDestPath = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/VoIP'
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
-licenseServerIp = '192.168.70.3'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
-
-class getCsvStats:
-    '''                                                                                                                                                                       
-    CSV stat polling is mainly for Windows because it doesn't have OpenSSH installed                                                                                          
-    for SCP to retrieve results.                                                                                                                                              
-    '''
-    # Set to True if you want to save results to CSV files.
-    # Mainly used when using a Windows gateway server because Windows don't come with SSH
-    # to SCP CSV result files.
-    saveStatsToCsvFile = True
-
-    # Enable timestamp to prevent overwriting the previous csv file
-    csvEnableFileTimestamp = False
-
-    # To add a custom name to the beginning of the CSV file
-    csvFilePrependName = None
-    pollStatInterval = 2
-
+licenseServerIp = '192.168.70.3'
 
 # Assign ports for testing.  Format = (cardId,portId)
 # 'Traffic1@Network1' are activity names.
@@ -151,25 +118,16 @@ try:
     runTestOperationsId = restObj.runTraffic()
 
     restObj.pollStats(statsDict,
-                      csvFile=getCsvStats.saveStatsToCsvFile, 
-                      pollStatInterval=getCsvStats.pollStatInterval, 
-                      csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp,
-                      csvFilePrependName=getCsvStats.csvFilePrependName)
+                      csvFile=saveStatsToCsvFile, 
+                      pollStatInterval=2, 
+                      csvEnableFileTimestamp=True,
+                      csvFilePrependName=None)
 
     # Wait if your configuration has port capturing enabled
     restObj.waitForAllCapturedData()
     restObj.waitForActiveTestToUnconfigure()
 
-    if scpRetrieveResults:
-        # SSH to the server to retrieve the csv stat results and delete them in the server.                                                                                   
-        # SSH is enabled on a Linux Gateway, but if you're connecting a Windows gateway, more than likely,                                                                    
-        # you don't have OpenSSH enabled or installed in your Windows.  In this case, you need to install OpenSSH.                                                            
-        if 'sshPasswordFile' in locals():
-            sshPassword = restObj.readFile(sshPasswordFile)
-
-        restObj.sshSetCredentials(sshUsername, sshPassword, port=22)
-        restObj.scpFiles(sourceFilePath=restObj.getResultPath(), destFilePath=scpResultsDestPath, typeOfScp='download')
-        restObj.deleteFolder(filePath=restObj.getResultPath())
+    restObj.downloadResults()
 
     if deleteSession:
         restObj.deleteSessionId()

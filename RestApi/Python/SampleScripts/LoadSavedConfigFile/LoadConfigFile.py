@@ -12,23 +12,14 @@
 #   If the saved config file is located locally, you could upload it to the gateway.
 #   Otherwise, the saved config file must be already in the Windows filesystem.
 #
-#   This sample script also has SSH capabilities to retrieve all the statistic csv result
-#   files to anywhere on your local file system and optionally, you could also delete them in the Gateway
-#   server as clean up.
-
-#   If you want to retrieve results from a Windows Gateway server, you must install and enable
-#   OpenSSH so the script could connect to it. SSH is enabled by default if using a Linux Gateway server.
-#   Here is a link on how to install and set up OpenSSH for Windows.
-#       http://openixia.com/tutorials?subject=Windows&page=sshOnWindows.html
-#
 #   - Load a saved config .rxf file
 #   - Run traffic
 #   - Get stats
-#
+#   - Download csv result stat
+
 # Requirements
 #    Python2.7 and Python3
 #    IxL_RestApi.py 
-#    Optional: sshAssistant.py
 
 import os, sys, time, signal, traceback
 
@@ -38,7 +29,7 @@ from IxL_RestApi import *
 # Choices: linux or windows 
 serverOs = 'linux'
 
-# Prior to 9.0, it is mandatory to include the exact IxLoad version.
+# Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
 ixLoadVersion = '8.50.115.333'
@@ -57,21 +48,13 @@ if serverOs == 'windows':
     # Where to upload the config file or where to find it if you're not uploading it.
     rxfFileOnServer = 'C:\\Results\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
-    # Optional: For SSH only. To copy results off of Windows gateway server to local filesystem.
-    sshUsername = 'hgee'
-    sshPassword = os.environ['windowsPasswd']
-    #sshPasswordFile = '/mnt/hgfs/Utilities/vault' ;# Alternative password retreival
-
-
 if serverOs == 'linux':
     apiServerIp = '192.168.70.129'
-    sshUsername = 'ixload'
-    sshPassword = 'ixia123' 
 
     # Leave as defaults. For your reference only.
     resultsDir = '/mnt/ixload-share/Results'
 
-    # Must be in the path /mnt/ixload-share
+    # The config file must be uploaded or stored in the path /mnt/ixload-share
     rxfFileOnServer = '/mnt/ixload-share/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 
@@ -80,31 +63,17 @@ if serverOs == 'linux':
 upLoadFile = True
 localConfigFileToUpload = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
-scpRetrieveResults = True
 scpDestPath = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile'
+
+# For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
+# Set to True if you want to save realtime results to CSV files.
+saveStatsToCsvFile = False
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
 licenseServerIp = '192.168.70.3'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
-
-class getCsvStats:
-    '''
-    CSV stat polling is mainly for Windows because it doesn't have OpenSSH installed.  
-    '''
-    # Set to True if you want to save results to CSV files.
-    # Mainly used when using a Windows gateway server because Windows don't come with SSH
-    # to SCP CSV result files.
-    saveStatsToCsvFile = True
-
-    # Enable timestamp to avoid overwriting the previous csv result files: True or False
-    csvEnableFileTimestamp = False
-
-    # To add a custom name to the beginning of the CSV file
-    csvFilePrependName = None
-    pollStatInterval = 2
-
 
 # To assign ports for testing.  Format = (cardId,portId)
 # Traffic1@Network1 are activity names.
@@ -141,6 +110,7 @@ try:
                    deleteSession=deleteSession,
                    generateRestLogFile=True)
 
+    # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
 
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
@@ -161,23 +131,12 @@ try:
     runTestOperationsId = restObj.runTraffic()
 
     restObj.pollStats(statsDict,
-                      csvFile=getCsvStats.saveStatsToCsvFile,
-                      pollStatInterval=getCsvStats.pollStatInterval,
-                      csvEnableFileTimestamp=getCsvStats.csvEnableFileTimestamp,
-                      csvFilePrependName=getCsvStats.csvFilePrependName)
+                      csvFile=saveStatsToCsvFile,
+                      pollStatInterval=2,
+                      csvFilePrependName=None)
 
     restObj.waitForActiveTestToUnconfigure()
-
-    if scpRetrieveResults:
-        # SSH to the server to retrieve the csv stat results and delete them in the server.
-        # SSH is enabled on a Linux Gateway, but if you're connecting a Windows gateway, more than likely,
-        # you don't have OpenSSH enabled or installed in your Windows.  In this case, you need to install OpenSSH.
-        if 'sshPasswordFile' in locals():
-            sshPassword = restObj.readFile(sshPasswordFile)
-
-        restObj.sshSetCredentials(sshUsername, sshPassword, port=22)
-        restObj.scpFiles(sourceFilePath=restObj.getResultPath(), destFilePath=scpDestPath, typeOfScp='download')
-        restObj.deleteFolder(filePath=restObj.getResultPath())
+    restObj.downloadResults()
 
     if deleteSession:
         restObj.deleteSessionId()
