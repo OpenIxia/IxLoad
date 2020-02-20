@@ -20,12 +20,17 @@
 #    - For Windows: The VoIP folder must exists in the c:\VoIP.
 #   
 
-import os, sys, time, signal, traceback
+import os, sys, time, signal, traceback, platform
 
-sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile/VoIP', 'Modules'))))
+# Insert the Modules path to the system's memory in order to import IxL_RestApi.py
+if platform.system() == 'Windows':
+    sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts\\LoadSavedConfigFile\\VoIP', 'Modules'))))
+else:
+    sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile/VoIP', 'Modules'))))
+
 from IxL_RestApi import *
 
-# Choices: linux or windows 
+# Choices of IxLoad Gateway server OS: linux or windows 
 serverOs = 'linux'
 
 # Which IxLoad version are you using for your test?
@@ -58,14 +63,15 @@ if serverOs == 'linux':
 
 
 # Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
-localConfigFileToUpload = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/VoIP/voipSip.crf'
+# In this example, get it from the current folder.
+localConfigFileToUpload = 'voipSip.crf'
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save realtime results to CSV files.
 saveStatsToCsvFile = False
 
-# Where to put SCP the csv results on your local system
-scpResultsDestPath = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/VoIP'
+# Where to put the csv results on your local system. This example puts it in the current directory.
+scpResultsDestPath = os.path.dirname(os.path.abspath(__file__))
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 

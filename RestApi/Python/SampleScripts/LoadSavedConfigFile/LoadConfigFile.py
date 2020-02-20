@@ -32,7 +32,7 @@ else:
 from IxL_RestApi import *
 
 # Choices of IxLoad Gateway server OS: linux or windows 
-serverOs = 'windows'
+serverOs = 'linux'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
@@ -64,11 +64,11 @@ if serverOs == 'linux':
 
 
 # Do you need to upload your saved config file to the server?
-# If not, a saved config must be already in the Windows filesystem.
+# If not, a saved config must be already in the IxLoad gateway server filesystem.
 upLoadFile = True
 
 # The path to the saved config file. In this example, get it from the current folder
-localConfigFileToUpload = os.path.dirname(os.path.abspath(__file__)) + '/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+localConfigFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 # The path where you want to download the csv result files to.  This is mostly used if using a Linux Gateway server.
 # If you're using IxLoad in Windows, SSH must be installed.  Otherwise, this variable will be ignored.
