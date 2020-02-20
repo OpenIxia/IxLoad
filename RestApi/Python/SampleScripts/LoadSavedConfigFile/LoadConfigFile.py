@@ -21,13 +21,18 @@
 #    Python2.7 and Python3
 #    IxL_RestApi.py 
 
-import os, sys, time, signal, traceback
+import os, sys, time, signal, traceback, platform
 
-sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile', 'Modules'))))
+# Insert the Modules path to the system's memory in order to import IxL_RestApi.py
+if platform.system() == 'Windows':
+    sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts\\LoadSavedConfigFile', 'Modules'))))
+else:
+    sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile', 'Modules'))))
+
 from IxL_RestApi import *
 
-# Choices: linux or windows 
-serverOs = 'linux'
+# Choices of IxLoad Gateway server OS: linux or windows 
+serverOs = 'windows'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
@@ -36,7 +41,7 @@ ixLoadVersion = '8.50.115.333'
 ixLoadVersion = '9.00.0.347'
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = False
+deleteSession = True
 forceTakePortOwnership = True
 
 if serverOs == 'windows':
@@ -61,9 +66,13 @@ if serverOs == 'linux':
 # Do you need to upload your saved config file to the server?
 # If not, a saved config must be already in the Windows filesystem.
 upLoadFile = True
-localConfigFileToUpload = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
-scpDestPath = '/home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile'
+# The path to the saved config file. In this example, get it from the current folder
+localConfigFileToUpload = os.path.dirname(os.path.abspath(__file__)) + '/IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+
+# The path where you want to download the csv result files to.  This is mostly used if using a Linux Gateway server.
+# If you're using IxLoad in Windows, SSH must be installed.  Otherwise, this variable will be ignored.
+scpDestPath = os.path.dirname(os.path.abspath(__file__))
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save realtime results to CSV files.
