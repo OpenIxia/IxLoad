@@ -16,7 +16,7 @@
 #
 # Requirements
 #    - IxL_RestApi.py libary file.
-#    - .crf config file
+#    - A saved VoIP .crf config file
 #    - For Windows: The VoIP folder must exists in the c:\VoIP.
 #   
 
@@ -24,14 +24,14 @@ import os, sys, time, signal, traceback, platform
 
 # Insert the Modules path to the system's memory in order to import IxL_RestApi.py
 if platform.system() == 'Windows':
-    sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts\\LoadSavedConfigFile\\VoIP', 'Modules'))))
+    sys.path.insert(0, (os.getcwd().replace('SampleScripts\\LoadSavedConfigFile\\VoIP', 'Modules')))
 else:
-    sys.path.insert(0, (os.path.dirname(os.path.abspath(__file__).replace('SampleScripts/LoadSavedConfigFile/VoIP', 'Modules'))))
+    sys.path.insert(0, (os.getcwd().replace('SampleScripts/LoadSavedConfigFile/VoIP', 'Modules')))
 
 from IxL_RestApi import *
 
 # Choices of IxLoad Gateway server OS: linux or windows 
-serverOs = 'linux'
+serverOs = 'windows'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
@@ -71,7 +71,7 @@ localConfigFileToUpload = 'voipSip.crf'
 saveStatsToCsvFile = False
 
 # Where to put the csv results on your local system. This example puts it in the current directory.
-scpResultsDestPath = os.path.dirname(os.path.abspath(__file__))
+scpResultsDestPath = os.getcwd()
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
