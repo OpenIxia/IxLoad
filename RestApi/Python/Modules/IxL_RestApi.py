@@ -287,6 +287,7 @@ class Main():
                 self.logError('Patch error:')
                 raise IxLoadRestApiException('http PATCH error: {0}\n'.format(response.text))
             return response
+
         except requests.exceptions.RequestException as errMsg:
             raise IxLoadRestApiException('http PATCH error: {0}\n'.format(errMsg))
 
@@ -688,7 +689,6 @@ class Main():
         response = self.post(runTestUrl)
         operationsId = response.headers['Location']
         self.verifyStatus(self.httpHeader+operationsId, timeout=300)
-        #return operationsId.split('/')[-1] ;# Return the number only
 
     def getTestStatus(self, operationsId):
         '''
@@ -711,7 +711,7 @@ class Main():
         return response
 
     def pollStats(self, statsDict=None, pollStatInterval=2, csvFile=False,
-                  csvEnableFileTimestamp=True, csvFilePrependName=None):
+                  csvEnableFileTimestamp=True, csvFilePrependName=None, exitAfterPollingIteration=None):
         '''
         sessionIdUrl = http://192.168.70.127:8080/api/v0/sessions/20
 
@@ -743,6 +743,10 @@ class Main():
 
         csvFilePrependName: To prepend a name of your choice to the csv file for visual identification and if you need 
                             to restart the test, a new csv file will be created. Prepending a name will group the csv files.
+
+        exitAfterPollingIteration: Stop polling for stats after the specified iteration. 
+                                   Default = None, which polls for stats until the test is done.
+                                   An iteration means a cycle of all the stats.
         '''
         versionMatch = re.match('([0-9]+\.[0-9]+)', self.ixLoadVersion)
         if float(versionMatch.group(1)) < float(8.5):
@@ -781,9 +785,11 @@ class Main():
 
         waitForRunningStatusCounter = 0
         waitForRunningStatusCounterExit = 30
+        pollStatCounter = 0
+
         while True:
             currentState = self.getActiveTestCurrentState(silentMode=True)
-            self.logInfo('ActiveTest current status: %s' % currentState)
+            self.logInfo('ActiveTest current status: %s. ' % currentState)
             if currentState == 'Running':
                 if statsDict == None:
                     time.sleep(1)
@@ -803,6 +809,7 @@ class Main():
 
                         if int(eachTimestamp) > highestTimestamp:
                             highestTimestamp = int(eachTimestamp)
+
                     if highestTimestamp == 0:
                         time.sleep(3)
                         continue
@@ -825,8 +832,16 @@ class Main():
                             csvFilesDict[statType]['csvObj'].writerow(csvFilesDict[statType]['rowValueList']) 
 
                 time.sleep(pollStatInterval)
+
+                if exitAfterPollingIteration and pollStatCounter >= exitAfterPollingIteration:
+                    self.logInfo('pollStats exitAfterPollingIteration is set to {} iterations. Current runtime iteration is {}. Exiting PollStats'.format(exitAfterPollingIteration, pollStatCounter))
+                    return
+
+                pollStatCounter += 1
+
             elif currentState == "Unconfigured":
                 break
+
             else:
                 # If currentState is "Stopping Run" or Cleaning
                 if waitForRunningStatusCounter < waitForRunningStatusCounterExit:
@@ -834,6 +849,7 @@ class Main():
                     self.logInfo('\tWaiting {0}/{1} seconds'.format(waitForRunningStatusCounter, waitForRunningStatusCounterExit), timestamp=False)
                     time.sleep(1)
                     continue
+
                 if waitForRunningStatusCounter == waitForRunningStatusCounterExit:
                     return 1
 
@@ -982,10 +998,43 @@ class Main():
             self.logInfo('Response status code %s' % response.status_code)
             self.logInfo('Response text %s' % response.text)
 
+    def configCommunityAttributes(self, name, **kwargs):
+        """
+        Config any attributes in the the path of: /ixLoad/test/activeTest/communityList/<id>
+
+        This function will loop through each communityList for the 
+        communityName and set the attribute(s) that you defined.
+
+        Parameter
+           name: The name of the Community object.
+           **kwargs: All the attributes to configure in a community object.
+
+        Usage
+           restObj.configCommunityAttributes(name='Traffic1@Network1', totalUserObjectiveValue=505)
+
+        Raise Exception
+           If the community name wasn't found.
+
+        """
+        self.logInfo('configCommunityAttributes')
+        url = self.sessionIdUrl+'/ixLoad/test/activeTest/communityList'
+        response = self.get(url)
+        for communityObj in response.json():
+            if communityObj['name'] == name:
+                communityUrl = url + '/' + str(communityObj['objectID'])
+                self.patch(communityUrl, data=kwargs)
+                return
+                
+        raise IxLoadRestApiException('No such name found in configCommunityAttributes: {}'.format(name))
+
     def configTimeline(self, **kwargs):
         """
         Modify the timeline.
         Requires the name of the timeline in the Timeline configuration
+
+        Requirement:
+           You must include the 'name' of the timeline in the **kwargs.
+           It is most likely Timeline1.
 
         Parameters
            name
@@ -1000,6 +1049,9 @@ class Main():
            Exeption: Failed
         """
         self.logInfo('configTimeLine')
+        if 'name' not in kwargs:
+            raise IxLoadRestApiException('configTimeLine: You must include the name parameter and value')
+
         url = self.sessionIdUrl+'/ixLoad/test/activeTest/timelineList'
         response = self.get(url)
         for timelineObj in response.json():
@@ -1009,7 +1061,50 @@ class Main():
                 self.patch(url, data=kwargs)
                 return True
                 
-        raise IxLoadRestApiException('No such name found: {}'.format(kwargs['name']))
+        raise IxLoadRestApiException('No such name found in Timeline: {}'.format(kwargs['name']))
+
+    def configActivityAttributes(self, communityName, activityName, attributes):
+        """
+        Config any attributes in the the path of: /ixLoad/test/activeTest/communityList/<id>/actvity/<id>.
+
+        This function will loop through each communityList and its activityList for the 
+        communityName and activityName values and set the attribute(s) that you defined.
+
+        For user simulated objective value, steps to view this in IxLoad GUI:
+           Apply the configuration. Go to Statview.  In the "Data" tab, click the last button on the ribbon
+           "Hide Objective Panel".
+
+        Parameter
+           communityName: The name of the community: Ex: Network1, Network2
+           activityName: The name of the activity under the community.
+                          Example: Network1 (community name)
+                                      Traffic1
+                                         HTTPClient1 (activity name)
+
+           attributes: A dict of attributes and values.
+
+        Usage
+            restObj.configActivityAttributes(communityName='Traffic1@Network1', activityName='HTTPClient1',
+                                              attributes={'userObjectiveValue': 405})
+
+        Raise Exception
+           If the activityName wasn't found.
+
+        """
+        self.logInfo('setUserObjectiveValue')
+        url = self.sessionIdUrl+'/ixLoad/test/activeTest/communityList'
+        response = self.get(url)
+        for communityObj in response.json():
+            if communityObj['name'] == communityName:
+                activityUrl = url + '/' + str(communityObj['objectID']) + '/activityList'
+                response = self.get(activityUrl)
+                for activityObj in response.json():
+                    if activityObj['name'] == activityName:
+                        activityUrl = activityUrl + '/' + str(activityObj['objectID'])
+                        self.patch(activityUrl, data=attributes)
+                        return
+                
+        raise IxLoadRestApiException('configActivityAttributes error')
 
     def setResultDir(self, resultDirPath, createTimestampFolder=False):
         """
