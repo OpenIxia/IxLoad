@@ -1,24 +1,20 @@
 
 
 # Description
-#   A sample Python REST API script on loading a saved configuration,
-#   run traffic and getting stats.
+#   A sample Python REST API script to:
+#      - Load a saved configuration file
+#      - Enable port analyzer
+#      - Run traffic
+#      - Get stats to local folder.
+#      - Retrieve port capture files to local folder.
 #
 #   Supports both Windows and Linux gateway Server. If connecting to a 
-#   Linux server, a license server running on Windows PC is still required unless it is 
-#   installed in the chassis.
-#   This script will configure the license server IP and license model on the Linux server.
 #
-#   If the saved config file is located locally, you could upload it to the gateway.
-#   Otherwise, the saved config file must be already in the Windows filesystem.
+#   If the saved config file is located on a remote pc, this script could upload it to the gateway.
+#   Otherwise, the saved config file must be already in the IxLoad API gateway server.
 #
-#   - Load a saved config .rxf file
-#   - Run traffic
-#   - Get stats
-#   - Download csv result stat
-
 # Requirements
-#    Python2.7 and Python3
+#    Python2.7 or Python3
 #    IxL_RestApi.py 
 
 import os, sys, time, signal, traceback, platform
@@ -32,13 +28,14 @@ else:
 from IxL_RestApi import *
 
 # Choices of IxLoad Gateway server OS: linux or windows 
-serverOs = 'windows'
+serverOs = 'linux'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
 ixLoadVersion = '8.50.115.333'
-ixLoadVersion = '9.00.0.347'
+ixLoadVersion = '9.00.0.347'    ;# EA
+#ixLoadVersion = '9.00.115.204' ;# Update-2
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
@@ -134,18 +131,28 @@ try:
     if forceTakePortOwnership:
         restObj.enableForceOwnership()
 
+    restObj.enableAnalyzerOnAssignedPorts()
+
     # Optional: Modify the sustain time
     restObj.configTimeline(name='Timeline1', sustainTime=12)
+
+    # Example on how to use the configActivityAttribute function to modify
+    # some of its attributes.
+    restObj.configActivityAttributes(communityName='Traffic1@Network1',
+                                     activityName='HTTPClient1',
+                                     attributes={'userObjectiveValue': 100})
 
     runTestOperationsId = restObj.runTraffic()
 
     restObj.pollStats(statsDict,
                       csvFile=saveStatsToCsvFile,
+                      csvFilePrependName=None,
                       pollStatInterval=2,
-                      csvFilePrependName=None)
-
+                      exitAfterPollingIteration=None)
+    
     restObj.waitForActiveTestToUnconfigure()
     restObj.downloadResults()
+    restObj.retreivePortCaptureFileForAssignedPorts(os.getcwd())
 
     if deleteSession:
         restObj.deleteSessionId()
