@@ -194,7 +194,7 @@ class Main():
         if self.robotFrameworkStdout:
             self.robotStdout.log_to_console(msg)
 
-    def get(self, restApi, data={}, silentMode=False, ignoreError=False):
+    def get(self, restApi, data={}, silentMode=False, downloadStream=False, ignoreError=False):
         """
         Description
            A HTTP GET function to send REST APIs.
@@ -209,8 +209,11 @@ class Main():
             self.logInfo('\n\tGET: {0}\n\tHEADERS: {1}'.format(restApi, self.jsonHeader))
 
         try:
-            
-            response = requests.get(restApi, headers=self.jsonHeader, verify=self.verifySsl)
+            if downloadStream:
+                response = requests.get(restApi, headers=self.jsonHeader, stream=True, verify=self.verifySsl, allow_redirects=True)
+            else:
+                response = requests.get(restApi, headers=self.jsonHeader, verify=self.verifySsl, allow_redirects=True)
+
             if silentMode is False:
                 self.logInfo('\tSTATUS CODE: %s' % response.status_code, timestamp=False)
 
@@ -784,7 +787,7 @@ class Main():
                 csvFilesDict[key]['csvObj'].writerow(csvFilesDict[key]['columnNameList'])
 
         waitForRunningStatusCounter = 0
-        waitForRunningStatusCounterExit = 30
+        waitForRunningStatusCounterExit = 120
         pollStatCounter = 0
 
         while True:
@@ -874,10 +877,10 @@ class Main():
             if currentStatus != 'Successful' and counter == timer:
                 raise IxLoadRestApiException('Test status failed to run')
 
-    def waitForActiveTestToUnconfigure(self):
+    def waitForActiveTestToUnconfigure(self, timeout=60):
         ''' Wait for the active test state to be Unconfigured '''
         self.logInfo('\n')
-        for counter in range(1,31):
+        for counter in range(1,timeout):
             currentState = self.getActiveTestCurrentState()
             self.logInfo('waitForActiveTestToUnconfigure current state:', currentState)
             if counter < 30 and currentState != 'Unconfigured':
@@ -1098,6 +1101,7 @@ class Main():
             if communityObj['name'] == communityName:
                 activityUrl = url + '/' + str(communityObj['objectID']) + '/activityList'
                 response = self.get(activityUrl)
+
                 for activityObj in response.json():
                     if activityObj['name'] == activityName:
                         activityUrl = activityUrl + '/' + str(activityObj['objectID'])
@@ -1152,6 +1156,60 @@ class Main():
         response = self.post(url)
         operationsId = response.headers['Location']
         status = self.verifyStatus(self.httpHeader+operationsId)
+
+    def enableAnalyzerOnAssignedPorts(self):
+        """
+        Enable Analyzer for all assigned ports
+        """
+        communtiyListUrl = "%s/ixload/test/activeTest/communityList" % self.sessionIdUrl
+        response = self.get(communtiyListUrl)
+        communityList = response.json()
+
+        for community in communityList:
+            communityObjectId = community['objectID']
+            portListUrl = "%s/%s/network/portList" % (communtiyListUrl, communityObjectId)
+            self.patch(portListUrl, data={"enableCapture" : "true"})
+
+    def retreivePortCaptureFileForAssignedPorts(self, destinationFolder):
+        """
+        Retrieve the port captured files to the specified destinationFolder.
+
+        Parameter:
+           destinationFolder: The folder location on where to store the captured files
+        """
+        communtiyListUrl = "%s/ixload/test/activeTest/communityList" % self.sessionIdUrl
+        response = self.get(communtiyListUrl)
+        communityList = response.json()
+        destinationFolder = destinationFolder.replace("\\\\", "\\")
+
+        for community in communityList:
+            communityObjectId = community['objectID']
+            portListUrl = "%s/%s/network/portList" % (communtiyListUrl, communityObjectId)
+            response = self.get(portListUrl)
+            portList = response.json()
+
+            for port in portList:
+                portObjectId = port['objectID']
+                portId = port['id']
+                captureUrl = portListUrl + "/%s/restCaptureFile" % portObjectId
+                capturePayload = self.get(captureUrl, downloadStream=True)
+                captureName = "Capture_%s_%s.cap" % (communityObjectId, portId)
+                captureFile = '/'.join([destinationFolder, captureName])
+                fileHandle = None
+
+                self.logInfo('retreivePortCaptureFileForAssignedPorts: destinationFolder:{}'.format(destinationFolder))
+                try:
+                    with open(captureFile, 'wb') as fileHandle:
+                        for chunk in capturePayload.iter_content(chunk_size=1024):
+                            fileHandle.write(chunk)
+
+                except IOError:
+                    self.logError("retreivePortCaptureFileForAssignedPorts: Could not open or create file, please check path and/or permissions")
+                    return 2
+
+                finally:
+                    if fileHandle:
+                        fileHandle.close()
 
     def configIp(self, searchName, **data):
         """
