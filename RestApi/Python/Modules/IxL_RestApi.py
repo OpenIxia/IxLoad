@@ -29,7 +29,7 @@ class Main():
     enableDebugLogFile = False
 
     def __init__(self, apiServerIp, apiServerIpPort, useHttps=False, apiKey=None, verifySsl=False, deleteSession=True,
-                 osPlatform='windows', generateRestLogFile='ixLoadRestApiLog.txt', robotFrameworkStdout=False):
+                 osPlatform='windows', generateRestLogFile='ixLoad_testLog.txt', robotFrameworkStdout=False):
         """
         Description
            Initialize the class variables
@@ -70,6 +70,7 @@ class Main():
         self.verifySsl = verifySsl
         self.generateRestLogFile = generateRestLogFile
         self.robotFrameworkStdout = robotFrameworkStdout
+        self.testResults = None ;# This is set in pollStatsAndCheckStatResults()
         Main.debugLogFile = self.generateRestLogFile
         Main.enableDebugLogFile = self.generateRestLogFile
 
@@ -86,7 +87,7 @@ class Main():
         if generateRestLogFile:
             if type(generateRestLogFile) == bool and generateRestLogFile == True:
                 # Default the log file name since user didn't provide a log file name.
-                self.restLogFile = 'ixLoadRestApiLog'
+                self.restLogFile = 'ixLoad_testLog.txt'
                 Main.debugLogFile = self.restLogFile
 
             # User provided a log file name.
@@ -713,6 +714,226 @@ class Main():
         response = self.get(statUrl, silentMode=True)
         return response
 
+    def getTestResults(self):
+        """
+        To get test results, you must call pollStatsAndCheckStats() from the script.
+        Test results are set in pollStatsAndCheckStatResults()
+        
+            result: Passed
+
+            HTTPClient
+                Passed: TCP Connections Established
+                Passed: HTTP Simulated Users
+                Passed: HTTP Connections
+                Passed: HTTP Transactions
+                Passed: HTTP Connection Attempts
+
+            HTTPServer
+                Passed: TCP Connections Established
+                Passed: TCP Connection Requests Failed
+
+        Return
+            A dictionary of all the statNames and passed/failed results
+        """
+        if self.testResults is None:
+            return
+        
+        self.logInfo('\nTEST RESULTS:\n-------------\n', timestamp=False)
+        for statType in self.testResults.keys():
+            if statType == 'result':
+                self.logInfo('\n{}: {}'.format(statType, self.testResults['result']), timestamp=False)
+            else:
+                self.logInfo('\n{}'.format(statType), timestamp=False)
+            
+            if isinstance((self.testResults[statType]), dict):
+                for statName,result in self.testResults[statType].items():
+                    self.logInfo('\t{}: {}'.format(result, statName), timestamp=False)   
+      
+        return self.testResults
+    
+    def pollStatsAndCheckStatResults(self, statsDict=None, pollStatInterval=2, csvFile=False,
+                                    csvEnableFileTimestamp=True, csvFilePrependName=None, exitAfterPollingIteration=None):
+        '''
+        Get runtime stats and check for stat value expectations.
+
+        statsDict = 
+            This API will poll stats based on the dictionary statsDict that you passed in.
+            Example how statsDict should look like:
+
+            Example:
+            # operators: <, >, =, !=, <=, >=
+                statsDict = {
+                    'HTTPClient': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 60},
+                                   {'caption': 'HTTP Simulated Users', 'operator': None, 'expect': None},
+                                   {'caption': 'HTTP Connections', 'operator': '>', 'expect': 300},
+                                   {'caption': 'HTTP Transactions', 'operator': '>', 'expect': 190},
+                                   {'caption': 'HTTP Connection Attempts', 'operator': '>', 'expect': 300}
+                                  ],
+                    'HTTPServer': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 1000},
+                                   {'caption': 'TCP Connection Requests Failed', 'operator': '=', 'expect': 0}
+                                  ]
+                    }
+ 
+            The exact name of the above stats could be found in the API browser or by doing a ScriptGen on the GUI.
+            If doing by ScriptGen, do a wordsearch for "statlist".  Copy and Paste the stats that you want.
+
+        csvFile: To enable or disable recording stats on csv file: True or False
+
+        csvEnableFileTimestamp: To append a timestamp on the csv file so they don't overwrite each other: True or False
+
+        csvFilePrependName: To prepend a name of your choice to the csv file for visual identification and if you need 
+                            to restart the test, a new csv file will be created. Prepending a name will group the csv files.
+
+        exitAfterPollingIteration: Stop polling for stats after the specified iteration. 
+                                   Default = None, which polls for stats until the test is done.
+                                   An iteration means a cycle of all the stats.
+        '''
+        self.testResults = dict()
+        # Make all stats as passed.  If any stat failed at runtime, 
+        # the stat results will be overwritten with 'Failed'
+        self.testResults['result'] = 'Passed'
+        for statType in statsDict.keys():
+            self.testResults[statType] = dict()
+            for captionMetas in statsDict[statType]:
+                # CAPTION: {'caption': 'TCP Connections Established', 'operator': '>', 'expect': 60}
+                self.testResults[statType].update({captionMetas['caption']: 'Passed'})
+        
+        import operator
+        operators = {'>': operator.gt,
+                     '<': operator.lt,
+                     '=': operator.eq,
+                     '!=': operator.ne,
+                     '<=': operator.le,
+                    ' >=': operator.ge
+                 }
+        
+        versionMatch = re.match('([0-9]+\.[0-9]+)', self.ixLoadVersion)
+        if float(versionMatch.group(1)) < float(8.5):
+            # If ixLoad version is < 8.50, there is no rest api to download stats.
+            # Default to creating csv stats from real time stats.
+            csvFile = True
+        
+        if csvFile:
+            import csv
+            csvFilesDict = {}
+            for key in statsDict.keys():
+                fileName = key
+                fileName = fileName.replace("(", '_')
+                fileName = fileName.replace(")", '_')
+                if csvFilePrependName:
+                    fileName = csvFilePrependName+'_'+fileName
+
+                csvFilesDict[key] = {}
+
+                if csvEnableFileTimestamp:
+                    import datetime
+                    timestamp = datetime.datetime.now().strftime('%H%M%S')
+                    fileName = '{}_{}'.format(fileName, timestamp)
+
+                fileName = fileName+'.csv'
+                csvFilesDict[key]['filename'] = fileName
+                csvFilesDict[key]['columnNameList'] = []
+                csvFilesDict[key]['fileObj'] = open(fileName, 'w')
+                csvFilesDict[key]['csvObj'] = csv.writer(csvFilesDict[key]['fileObj'])
+
+            # Create the csv top row column name list
+            for statType in statsDict.keys():
+                for captionMetas in statsDict[statType]:    
+                    csvFilesDict[statType]['columnNameList'].append(captionMetas['caption'])
+                csvFilesDict[statType]['csvObj'].writerow(csvFilesDict[statType]['columnNameList'])
+
+        waitForRunningStatusCounter = 0
+        waitForRunningStatusCounterExit = 120
+        pollStatCounter = 0
+
+        while True:
+            currentState = self.getActiveTestCurrentState(silentMode=True)
+            self.logInfo('ActiveTest current status: %s. ' % currentState)
+            if currentState == 'Running':
+                if statsDict == None:
+                    time.sleep(1)
+                    continue
+
+                # statType:  HTTPClient or HTTPServer (Just a example using HTTP.)
+                # statNameList: transaction success, transaction failures, ...
+                for statType in statsDict.keys():
+                    #for statType,statNameList in statsDict.items():
+                    self.logInfo('\n%s:' % statType, timestamp=False)
+                    statUrl = self.sessionIdUrl+'/ixLoad/stats/'+statType+'/values'
+                    response = self.getStats(statUrl)
+                    highestTimestamp = 0
+                    # Each timestamp & statnames: values                
+                    for eachTimestamp,valueList in response.json().items():
+                        if eachTimestamp == 'error':
+                            raise IxLoadRestApiException('pollStats error: Probable cause: Misconfigured stat names to retrieve.')
+
+                        if int(eachTimestamp) > highestTimestamp:
+                            highestTimestamp = int(eachTimestamp)
+
+                    if highestTimestamp == 0:
+                        time.sleep(3)
+                        continue
+
+                    if csvFile:
+                        csvFilesDict[statType]['rowValueList'] = []
+                    
+                    # Get the interested stat names only
+                    for captionMetas in statsDict[statType]:
+                        statName = captionMetas['caption']
+                        #for statName in statNameList:
+                        if statName in response.json()[str(highestTimestamp)]:
+                            statValue = response.json()[str(highestTimestamp)][statName]
+                            self.logInfo('\t%s: %s' % (statName, statValue), timestamp=False)
+                            if csvFile:
+                                csvFilesDict[statType]['rowValueList'].append(statValue)
+                            
+                            # Verify passed/failed objectives
+                            if captionMetas['operator'] is not None or captionMetas['expect'] is not None:
+                                op = operators.get(captionMetas['operator'])
+                                
+                                # Check user defined operator for expectation
+                                if op(int(statValue), captionMetas['expect']) == False:
+                                    self.logInfo('\t\tFailed: Expecting: {}{}\n'.format(captionMetas['operator'], captionMetas['expect']), timestamp=False)
+                                    self.testResults['result'] = 'Failed'
+                                    self.testResults[statType].update({statName: 'Failed'})
+                                
+                                if op(int(statValue), captionMetas['expect']) == True:
+                                    self.logInfo('\t\tPassed: Expecting: {}{}\n'.format(captionMetas['operator'], captionMetas['expect']), timestamp=False)
+                            else:
+                                self.logInfo('\t\tNo expectation defined\n', timestamp=False)     
+                        else:
+                            self.logError('\tStat name not found. Check spelling and case sensitivity: %s' % statName)
+
+                    if csvFile:
+                        if csvFilesDict[statType]['rowValueList'] != []:
+                            csvFilesDict[statType]['csvObj'].writerow(csvFilesDict[statType]['rowValueList']) 
+
+                time.sleep(pollStatInterval)
+
+                if exitAfterPollingIteration and pollStatCounter >= exitAfterPollingIteration:
+                    self.logInfo('pollStats exitAfterPollingIteration is set to {} iterations. Current runtime iteration is {}. Exiting PollStats'.format(exitAfterPollingIteration, pollStatCounter))
+                    return
+
+                pollStatCounter += 1
+
+            elif currentState == "Unconfigured":
+                break
+
+            else:
+                # If currentState is "Stopping Run" or Cleaning
+                if waitForRunningStatusCounter < waitForRunningStatusCounterExit:
+                    waitForRunningStatusCounter += 1
+                    self.logInfo('\tWaiting {0}/{1} seconds'.format(waitForRunningStatusCounter, waitForRunningStatusCounterExit), timestamp=False)
+                    time.sleep(1)
+                    continue
+
+                if waitForRunningStatusCounter == waitForRunningStatusCounterExit:
+                    return 1
+
+        if csvFile:
+            for key in statsDict.keys():
+                csvFilesDict[key]['fileObj'].close()
+                
     def pollStats(self, statsDict=None, pollStatInterval=2, csvFile=False,
                   csvEnableFileTimestamp=True, csvFilePrependName=None, exitAfterPollingIteration=None):
         '''
@@ -772,7 +993,7 @@ class Main():
                 if csvEnableFileTimestamp:
                     import datetime
                     timestamp = datetime.datetime.now().strftime('%H%M%S')
-                    fileName = timestamp+'_'+fileName
+                    fileName = '{}_{}'.format(fileName, timestamp)
 
                 fileName = fileName+'.csv'
                 csvFilesDict[key]['filename'] = fileName

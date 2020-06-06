@@ -34,8 +34,8 @@ serverOs = 'linux'
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
 ixLoadVersion = '8.50.115.333'
-ixLoadVersion = '9.00.0.347'    ;# EA
-#ixLoadVersion = '9.00.115.204' ;# Update-2
+ixLoadVersion = '9.00.0.347'   ;# EA
+ixLoadVersion = '9.00.115.204' ;# Update-2
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
@@ -73,7 +73,7 @@ scpDestPath = os.getcwd()
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save realtime results to CSV files.
-saveStatsToCsvFile = False
+saveStatsToCsvFile = True
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
@@ -141,9 +141,9 @@ try:
     restObj.configActivityAttributes(communityName='Traffic1@Network1',
                                      activityName='HTTPClient1',
                                      attributes={'userObjectiveValue': 100})
-
+    
     runTestOperationsId = restObj.runTraffic()
-
+        
     restObj.pollStats(statsDict,
                       csvFile=saveStatsToCsvFile,
                       csvFilePrependName=None,
@@ -156,7 +156,7 @@ try:
 
     if deleteSession:
         restObj.deleteSessionId()
-
+        
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
     if deleteSession:
