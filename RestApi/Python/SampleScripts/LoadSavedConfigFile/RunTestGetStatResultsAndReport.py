@@ -21,10 +21,11 @@
 import os, sys, time, signal, traceback, platform
 
 # Insert the Modules path to the system's memory in order to import IxL_RestApi.py
+currentDir = os.path.abspath(os.path.dirname(__file__))
 if platform.system() == 'Windows':
-    sys.path.insert(0, (os.getcwd().replace('SampleScripts\\LoadSavedConfigFile', 'Modules')))
+    sys.path.insert(0, (currentDir.replace('SampleScripts\\LoadSavedConfigFile', 'Modules')))
 else:
-    sys.path.insert(0, (os.getcwd().replace('SampleScripts/LoadSavedConfigFile', 'Modules')))
+    sys.path.insert(0, (currentDir.replace('SampleScripts/LoadSavedConfigFile', 'Modules')))
 
 from IxL_RestApi import *
 
@@ -66,11 +67,11 @@ if serverOs == 'linux':
 upLoadFile = True
 
 # The path to the saved config file. In this example, get it from the current folder
-localConfigFileToUpload = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+localConfigFileToUpload = '{}/IxL_Http_Ipv4Ftp_vm_8.20.rxf'.format(currentDir)
 
 # The path where you want to download the csv result files to.  This is mostly used if using a Linux Gateway server.
 # If you're using IxLoad in Windows, SSH must be installed.  Otherwise, this variable will be ignored.
-scpDestPath = os.getcwd()
+scpDestPath = currentDir
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save realtime results to CSV files.
@@ -158,7 +159,7 @@ try:
     
     restObj.waitForActiveTestToUnconfigure()
     restObj.downloadResults()
-    restObj.retreivePortCaptureFileForAssignedPorts(os.getcwd())
+    restObj.retreivePortCaptureFileForAssignedPorts(currentDir)
 
     if deleteSession:
         restObj.deleteSessionId()
