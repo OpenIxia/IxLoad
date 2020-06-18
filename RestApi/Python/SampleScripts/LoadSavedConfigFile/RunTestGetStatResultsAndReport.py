@@ -67,8 +67,11 @@ if serverOs == 'linux':
 upLoadFile = True
 
 # The path to the saved config file. In this example, get it from the current folder
-localConfigFileToUpload = '{}/IxL_Http_Ipv4Ftp_vm_8.20.rxf'.format(currentDir)
-
+if serverOs == 'windows':
+    localConfigFileToUpload = '{}\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'.format(currentDir)
+else:
+   localConfigFileToUpload = '{}/IxL_Http_Ipv4Ftp_vm_8.20.rxf'.format(currentDir)
+    
 # The path where you want to download the csv result files to.  This is mostly used if using a Linux Gateway server.
 # If you're using IxLoad in Windows, SSH must be installed.  Otherwise, this variable will be ignored.
 scpDestPath = currentDir
@@ -101,15 +104,15 @@ communityPortList2 = {
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 #
 # Get run time stat results by stating an operator and the expected value
-# operators: <, >, =, !=, <=, >=
+# operators:  >,<, =, !=, <=, >=
 statsDict = {
     'HTTPClient': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 60},
-                   {'caption': 'HTTP Simulated Users', 'operator': None, 'expect': None},
-                   {'caption': 'HTTP Connections', 'operator': '>', 'expect': 300},
-                   {'caption': 'HTTP Transactions', 'operator': '>', 'expect': 190},
-                   {'caption': 'HTTP Connection Attempts', 'operator': '>', 'expect': 300}
+                   {'caption': 'HTTP Simulated Users',        'operator': None, 'expect': None},
+                   {'caption': 'HTTP Connections',            'operator': '>', 'expect': 300},
+                   {'caption': 'HTTP Transactions',           'operator': '>', 'expect': 190},
+                   {'caption': 'HTTP Connection Attempts',    'operator': '>', 'expect': 300}
                ],
-    'HTTPServer': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 1000},
+    'HTTPServer': [{'caption': 'TCP Connections Established',    'operator': '>', 'expect': 1000},
                    {'caption': 'TCP Connection Requests Failed', 'operator': '=', 'expect': 0}
                ]
 }
