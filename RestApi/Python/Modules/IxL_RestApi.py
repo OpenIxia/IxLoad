@@ -892,13 +892,13 @@ class Main():
                                 op = operators.get(captionMetas['operator'])
                                 
                                 # Check user defined operator for expectation
-                                if op(int(statValue), captionMetas['expect']) == False:
-                                    self.logInfo('\t\tFailed: Expecting: {}{}\n'.format(captionMetas['operator'], captionMetas['expect']), timestamp=False)
+                                if op(int(statValue), int(captionMetas['expect'])) == False:
+                                    self.logInfo('\t\tFailed: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                     self.testResults['result'] = 'Failed'
                                     self.testResults[statType].update({statName: 'Failed'})
                                 
-                                if op(int(statValue), captionMetas['expect']) == True:
-                                    self.logInfo('\t\tPassed: Expecting: {}{}\n'.format(captionMetas['operator'], captionMetas['expect']), timestamp=False)
+                                if op(int(statValue), int(captionMetas['expect'])) == True:
+                                    self.logInfo('\t\tPassed: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                             else:
                                 self.logInfo('\t\tNo expectation defined\n', timestamp=False)     
                         else:
@@ -1175,7 +1175,13 @@ class Main():
         url = self.sessionIdUrl+'/ixLoad/test'
         response = self.get(url)
         self.resultPath = response.json()['runResultDirFull']
-        self.resultPath = self.resultPath.replace('\\', '\\\\')
+        if self.resultPath.startswith('/'):
+            # A Linux path 
+            self.resultPath = self.resultPath.replace('\\', '/')
+        else:
+            # A Windows path
+            self.resultPath = self.resultPath.replace('\\', '\\\\')
+            
         return self.resultPath
 
     def uploadFile(self, localPathAndFilename, ixLoadSvrPathAndFilename, overwrite=True):
@@ -1391,7 +1397,7 @@ class Main():
             portListUrl = "%s/%s/network/portList" % (communtiyListUrl, communityObjectId)
             self.patch(portListUrl, data={"enableCapture" : "true"})
 
-    def retreivePortCaptureFileForAssignedPorts(self, destinationFolder):
+    def retrievePortCaptureFileForAssignedPorts(self, destinationFolder):
         """
         Retrieve the port captured files to the specified destinationFolder.
 
@@ -1418,14 +1424,14 @@ class Main():
                 captureFile = '/'.join([destinationFolder, captureName])
                 fileHandle = None
 
-                self.logInfo('retreivePortCaptureFileForAssignedPorts: destinationFolder:{}'.format(destinationFolder))
+                self.logInfo('retrievePortCaptureFileForAssignedPorts: destinationFolder:{}'.format(destinationFolder))
                 try:
                     with open(captureFile, 'wb') as fileHandle:
                         for chunk in capturePayload.iter_content(chunk_size=1024):
                             fileHandle.write(chunk)
 
                 except IOError:
-                    self.logError("retreivePortCaptureFileForAssignedPorts: Could not open or create file, please check path and/or permissions")
+                    self.logError("retrievePortCaptureFileForAssignedPorts: Could not open or create file, please check path and/or permissions")
                     return 2
 
                 finally:
@@ -1524,7 +1530,7 @@ class Main():
 
     def scpFiles(self, sourceFilePath=None, destFilePath='.', typeOfScp='download'):
         """
-        This method is for running scripts from a Linux machine only and retreiving files off an
+        This method is for running scripts from a Linux machine only and retrivving files off an
         IxLoad Linux Gateway server. Does not get from Windows unless you installed SSH server.
 
         As of 8.50, there is no Rest API to retrieve result folders off the IxLoad Gateway server
@@ -1616,6 +1622,7 @@ class Main():
             return
 
         resultsPath = self.getResultPath()
+        
         if '/' in resultsPath:
             # Linux path 
             destinationZipFileName = resultsPath.split('/')[-1]
