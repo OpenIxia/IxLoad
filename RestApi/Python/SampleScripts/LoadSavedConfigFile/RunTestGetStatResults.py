@@ -40,7 +40,7 @@ ixLoadVersion = '9.00.0.347'   ;# EA
 ixLoadVersion = '9.00.115.204' ;# Update-2
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = True
+deleteSession = False
 forceTakePortOwnership = True
 
 if serverOs == 'windows':
@@ -162,7 +162,7 @@ try:
     
     restObj.waitForActiveTestToUnconfigure()
     restObj.downloadResults()
-    restObj.retreivePortCaptureFileForAssignedPorts(currentDir)
+    restObj.retrievePortCaptureFileForAssignedPorts(currentDir)
 
     if deleteSession:
         restObj.deleteSessionId()

@@ -137,7 +137,7 @@ try:
     restObj.configTimeline(name='Timeline1', sustainTime=12)
 
     # Example on how to use the configActivityAttribute function to modify
-    # some of its attributes.
+    # some of its attributes.  Pass in the names of community and activity from your configuration.
     restObj.configActivityAttributes(communityName='Traffic1@Network1',
                                      activityName='HTTPClient1',
                                      attributes={'userObjectiveValue': 100})
@@ -152,7 +152,7 @@ try:
     
     restObj.waitForActiveTestToUnconfigure()
     restObj.downloadResults()
-    restObj.retreivePortCaptureFileForAssignedPorts(os.getcwd())
+    restObj.retrievePortCaptureFileForAssignedPorts(os.getcwd())
 
     if deleteSession:
         restObj.deleteSessionId()
