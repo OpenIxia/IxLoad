@@ -100,14 +100,14 @@ communityPortList2 = {
 # Get run time stat results by stating an operator and the expected value
 # operators:  >,<, =, !=, <=, >=
 statsDict = {
-    'SIP(VoIPSip)': [{'caption': 'SIP Requests Parsed',  'operator': '>', 'expect': 1},
-                     {'caption': 'SIP Requests Matched', 'operator': '>', 'expect': 1},
+    'SIP(VoIPSip)': [{'caption': 'SIP Requests Parsed',  'operator': '>=', 'expect': 1},
+                     {'caption': 'SIP Requests Matched', 'operator': '>=', 'expect': 1},
                     ],
-    'RTP(VoIPSip)': [{'caption': 'Successful Records',   'operator': '>', 'expect': 1},
+    'RTP(VoIPSip)': [{'caption': 'Successful Records',   'operator': '>=', 'expect': 1},
                      {'caption': 'Successful Playbacks', 'operator': '=', 'expect': 1}
                     ],
-    'Signaling(VoIPSip)': [{'caption': 'Received Calls', 'operator': '>', 'expect': 1},
-                           {'caption': 'Answered Calls', 'operator': '>', 'expect': 1}
+    'Signaling(VoIPSip)': [{'caption': 'Received Calls', 'operator': '>=', 'expect': 1},
+                           {'caption': 'Answered Calls', 'operator': '>=', 'expect': 1}
                           ]
 }
 

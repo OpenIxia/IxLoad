@@ -804,7 +804,7 @@ class Main():
                      '=': operator.eq,
                      '!=': operator.ne,
                      '<=': operator.le,
-                    ' >=': operator.ge
+                     '>=': operator.ge
                  }
         
         versionMatch = re.match('([0-9]+\.[0-9]+)', self.ixLoadVersion)
@@ -883,6 +883,9 @@ class Main():
                         #for statName in statNameList:
                         if statName in response.json()[str(highestTimestamp)]:
                             statValue = response.json()[str(highestTimestamp)][statName]
+                            if statValue == "N/A":
+                                continue
+                            
                             self.logInfo('\t%s: %s' % (statName, statValue), timestamp=False)
                             if csvFile:
                                 csvFilesDict[statType]['rowValueList'].append(statValue)
@@ -890,8 +893,10 @@ class Main():
                             # Verify passed/failed objectives
                             if captionMetas['operator'] is not None or captionMetas['expect'] is not None:
                                 op = operators.get(captionMetas['operator'])
+                                print('----- op:', op, int(statValue), int(captionMetas['expect']))
                                 
                                 # Check user defined operator for expectation
+                                # Example: operator.ge(3,3)
                                 if op(int(statValue), int(captionMetas['expect'])) == False:
                                     self.logInfo('\t\tFailed: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                     self.testResults['result'] = 'Failed'
