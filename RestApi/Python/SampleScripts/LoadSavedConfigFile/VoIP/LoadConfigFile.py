@@ -24,14 +24,15 @@ import os, sys, time, signal, traceback, platform
 
 # Insert the Modules path to the system's memory in order to import IxL_RestApi.py
 currentDir = os.path.abspath(os.path.dirname(__file__))
+
 if platform.system() == 'Windows':
-    sys.path.insert(0, (currentDir).replace('SampleScripts\\LoadSavedConfigFile\\VoIP', 'Modules')))
+    sys.path.insert(0, (currentDir.replace('SampleScripts\\LoadSavedConfigFile\\VoIP', 'Modules')))
 else:
     sys.path.insert(0, (currentDir.replace('SampleScripts/LoadSavedConfigFile/VoIP', 'Modules')))
 
 from IxL_RestApi import *
 
-# Choices of IxLoad Gateway server OS: linux or windows 
+# Choices of IxLoad Gateway server: linux or windows 
 serverOs = 'windows'
 
 # Which IxLoad version are you using for your test?
@@ -44,31 +45,34 @@ ixLoadVersion = '9.00.0.347'
 deleteSession = True
 forceTakePortOwnership = True
 
+# The saved config file to load
+crfFile = 'voipSip.crf'
+
 if serverOs == 'windows':
     apiServerIp = '192.168.70.3'
 
-    # Where to store the results on the Windows filesystem
+    # Where to store the csv stat results on the Windows filesystem
     resultsDir = 'c:\\Results'
 
     # Where to put or get the .crf file in the Windows filesystem
-    crfFileOnServer = 'c:\\VoIP\\voipSip.crf'
+    crfFileOnServer = 'c:\\VoIP\\{}'.format(crfFile)
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.129'
 
-    # Leave as defaults. For your reference only.
+    # Leave as default. For your reference only.
     resultsDir = '/mnt/ixload-share/Results' 
 
-    # Where to put the config file in the Linux Gateway server. Always begin with /mnt/ixload-share 
-    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
+    # Leave as default
+    crfFileOnServer = '/mnt/ixload-share/VoIP/{}'.format(crfFile)
 
 
 # Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
 # In this example, get it from the current folder.
-localConfigFileToUpload = '{}/{}'.format(currentDir, 'voipSip.crf')
+localConfigFileToUpload = '{}/{}'.format(currentDir, crfFile)
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
-# Set to True if you want to save realtime results to CSV files.
+# Set to True if you want to save run time results to CSV files.
 saveStatsToCsvFile = False
 
 # Where to put the csv results on your local system. This example puts it in the current directory.
@@ -145,6 +149,7 @@ except (IxLoadRestApiException, Exception) as errMsg:
     if deleteSession:
         restObj.abortActiveTest()
         restObj.deleteSessionId()
+        
     sys.exit(errMsg)
 
 except KeyboardInterrupt:

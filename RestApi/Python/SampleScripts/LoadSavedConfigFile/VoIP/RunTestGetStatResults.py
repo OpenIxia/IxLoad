@@ -24,6 +24,7 @@ import os, sys, time, signal, traceback, platform
 
 # Insert the Modules path to the system's memory in order to import IxL_RestApi.py
 currentDir = os.path.abspath(os.path.dirname(__file__))
+
 if platform.system() == 'Windows':
     sys.path.insert(0, (currentDir.replace('SampleScripts\\LoadSavedConfigFile\\VoIP', 'Modules')))
 else:
@@ -42,8 +43,10 @@ ixLoadVersion = '9.00.0.347'
 ixLoadVersion = '9.00.115.204' ;# Update-2
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = False
+deleteSession = True
 forceTakePortOwnership = True
+
+crfFile = 'voipSip.crf'
 
 if serverOs == 'windows':
     apiServerIp = '192.168.70.3'
@@ -51,8 +54,8 @@ if serverOs == 'windows':
     # Where to store the results on the Windows filesystem
     resultsDir = 'c:\\Results'
 
-    # Where to put or get the .crf file in the Windows filesystem
-    crfFileOnServer = 'c:\\VoIP\\voipSip.crf'
+    # Where to put the crf file or where to tell IxLoad the location in the Windows filesystem
+    crfFileOnServer = 'c:\\VoIP\\{}'.format(crfFile)
 
 if serverOs == 'linux':
     apiServerIp = '192.168.70.129'
@@ -60,13 +63,13 @@ if serverOs == 'linux':
     # Leave as defaults. For your reference only.
     resultsDir = '/mnt/ixload-share/Results' 
 
-    # Where to put the config file in the Linux Gateway server. Always begin with /mnt/ixload-share 
-    crfFileOnServer = '/mnt/ixload-share/VoIP/voipSip.crf'
+    # Leave as default
+    crfFileOnServer = '/mnt/ixload-share/VoIP/{}'.format(crfFile)
 
 
 # Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
 # In this example, get it from the current folder.
-localConfigFileToUpload = '{}/{}'.format(currentDir, 'voipSip.crf')
+localConfigFileToUpload = '{}/{}'.format(currentDir, crfFile)
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save realtime results to CSV files.
@@ -99,7 +102,7 @@ communityPortList2 = {
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 #
 # Get run time stat results by stating an operator and the expected value
-# operators:  >,<, =, !=, <=, >=
+# operators:  None, >, <, =, !=, <=, >=
 statsDict = {
     'SIP(VoIPSip)': [{'caption': 'SIP Requests Parsed',  'operator': '>=', 'expect': 1},
                      {'caption': 'SIP Requests Matched', 'operator': '>=', 'expect': 1},
