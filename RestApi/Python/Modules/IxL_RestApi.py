@@ -63,6 +63,7 @@ class Main():
         else:
             httpHead = 'http'
 
+        self.apiVersion = 'v0'
         self.apiServerIp = apiServerIp
         self.deleteSession = deleteSession
         self.httpHeader = '{0}://{1}:{2}'.format(httpHead, apiServerIp, apiServerIpPort)
@@ -98,6 +99,9 @@ class Main():
             with open(self.restLogFile, 'w') as restLogFile:
                 restLogFile.write('')
 
+    def getApiVersion(self, connection):
+        return connection.url.split("/")[-1]
+
     # CONNECT
     def connect(self, ixLoadVersion=None, sessionId=None, timeout=90):
         """
@@ -108,8 +112,8 @@ class Main():
 
         # http://10.219.x.x:8080/api/v0/sessions
         if sessionId is None:
-            response = self.post(self.httpHeader+'/api/v0/sessions', data=({'ixLoadVersion': ixLoadVersion}))
-            response = requests.get(self.httpHeader+'/api/v0/sessions', verify=self.verifySsl)
+            response = self.post(self.httpHeader+'/api/{}/sessions'.format(self.apiVersion), data=({'ixLoadVersion': ixLoadVersion}))
+            response = requests.get(self.httpHeader+'/api/{}/sessions'.format(self.apiVersion), verify=self.verifySsl)
 
             try:
                 sessionId = response.json()[-1]['sessionId']
@@ -117,8 +121,8 @@ class Main():
                 raise IxLoadRestApiException('connect failed. No sessionId created')
 
         self.sessionId = str(sessionId)
-        self.sessionIdUrl = self.httpHeader+'/api/v0/sessions/'+self.sessionId
-
+        self.sessionIdUrl = '{}/api/{}/sessions/{}'.format(self.httpHeader, self.apiVersion, self.sessionId)
+        
         # Start operations
         if ixLoadVersion is not None:
             response = self.post(self.sessionIdUrl+'/operations/start')
@@ -359,13 +363,26 @@ class Main():
             if counter == timeout and currentStatus not in ['Successful']:
                 raise IxLoadRestApiException('Operation failed: {0}'.format(url))
 
+    def extractDataModelToFile(self, extractToFilename='dataModel.txt', timeout=120):
+        """
+        Extract the configuration's data model to a file.
+        """
+        url = self.sessionIdUrl + '/ixload/operations/extractDataModelToFile'
+        if self.osPlatform == 'linux':
+            response = self.post(url, data={'fullPath': '/mnt/ixload-share/{}'.format(extractToFilename)})
+        else:
+            response = self.post(url, data={'fullPath': 'c:\\Results\\{}'.format(extractToFilename)})
+            
+        operationsId = response.headers['location']
+        self.verifyStatus(self.httpHeader+operationsId, timeout=timeout)
+    
     # LOAD CONFIG FILE
     def loadConfigFile(self, rxfFile):
         loadTestUrl = self.sessionIdUrl + '/ixLoad/test/operations/loadTest/'
         response = self.post(loadTestUrl, data={'fullPath': rxfFile})
         # http://10.219.117.103:8080/api/v0/sessions/42/ixLoad/test/operations/loadTest/0
         operationsId = response.headers['Location']
-        status = self.verifyStatus(self.httpHeader+operationsId)
+        status = self.verifyStatus(self.httpHeader + operationsId)
 
     def importCrfFile(self, crfFile, localCrfFileToUpload=None):
         """
@@ -893,7 +910,6 @@ class Main():
                             # Verify passed/failed objectives
                             if captionMetas['operator'] is not None or captionMetas['expect'] is not None:
                                 op = operators.get(captionMetas['operator'])
-                                print('----- op:', op, int(statValue), int(captionMetas['expect']))
                                 
                                 # Check user defined operator for expectation
                                 # Example: operator.ge(3,3)
@@ -1642,3 +1658,38 @@ class Main():
 
         response = requests.get(url, verify=self.verifySsl)
         open(zipFile, 'wb').write(response.content)
+        
+    def downloadFile(self, localOS, srcPathAndFilename, targetLocation, targetFilename):
+        """
+        Download a file from the IxLoad gateway server.
+        For IxLoad version 8.50+
+
+        Syntax:
+            https://ip:8443/api/v1/downloadResource?localPath=/mnt/ixload-share/<File>
+            
+        Parameters:
+           localOS: Linux | Windows: The operating system of the machine that you're running the script. 
+           srcPathAndFilename: The src path from where to download the file
+           targetLocation: The path to download the file to
+           targetFilename: The filename for the downloaded file
+        """
+        versionMatch = re.match('([0-9]+\.[0-9]+)', self.ixLoadVersion)
+        if float((versionMatch.group(1))) < float(8.5):
+            self.logInfo('Your IxLoad version {} does not have the rest api to download files. You need version 8.50 or greater'.format(self.ixLoadVersion))
+            return
+
+        self.logInfo('downloadFile src:{} -> {} -> {}'.format(srcPathAndFilename, targetLocation, targetFilename))
+        url = '{}/api/{}/downloadResource?localPath={}'.format(self.httpHeader, self.apiVersion, srcPathAndFilename)
+        
+        if localOS == 'Linux':
+            targetFileLocation = '{}/{}'.format(targetLocation, targetFilename)
+        else:
+            targetFileLocation = '{}\\{}'.format(targetLocation, targetFilename)
+
+        with self.get(url, downloadStream=True) as response:
+            response.raise_for_status()
+            with open(targetFileLocation,'wb')as fileObj:
+                for chunk in response.iter_content(chunk_size=8192):
+                    fileObj.write(chunk)
+
+
