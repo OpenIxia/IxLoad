@@ -7,7 +7,11 @@ Description
 
    Note: This script supports Windows and Linux IxLoad gateway.  
          You will see if conditions for Windows or Linux throughout this script.
-         
+
+Requirement:
+   - IxL_RestApi.py library module
+   - It is located in the ../Modules folder
+        
 Steps:
    - Connect to IxLoad Gateway server to create a session.
    - Upload the saved config to the gateway server.
