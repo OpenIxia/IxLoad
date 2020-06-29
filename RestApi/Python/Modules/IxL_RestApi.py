@@ -1659,7 +1659,7 @@ class Main():
         response = requests.get(url, verify=self.verifySsl)
         open(zipFile, 'wb').write(response.content)
         
-    def downloadFile(self, localOS, srcPathAndFilename, targetLocation, targetFilename):
+    def downloadFile(self, srcPathAndFilename, targetLocation, targetFilename):
         """
         Download a file from the IxLoad gateway server.
         For IxLoad version 8.50+
@@ -1678,10 +1678,12 @@ class Main():
             self.logInfo('Your IxLoad version {} does not have the rest api to download files. You need version 8.50 or greater'.format(self.ixLoadVersion))
             return
 
+
         self.logInfo('downloadFile src:{} -> {} -> {}'.format(srcPathAndFilename, targetLocation, targetFilename))
         url = '{}/api/{}/downloadResource?localPath={}'.format(self.httpHeader, self.apiVersion, srcPathAndFilename)
         
-        if localOS == 'Linux':
+        import platform
+        if platform.system() == 'Linux':
             targetFileLocation = '{}/{}'.format(targetLocation, targetFilename)
         else:
             targetFileLocation = '{}\\{}'.format(targetLocation, targetFilename)
