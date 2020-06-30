@@ -64,6 +64,8 @@ if serverOs == 'linux':
     # Leave as default
     rxfFileOnServer = '/mnt/ixload-share/{}'.format(rxfFile)
 
+# Where to put the downloaded csv results
+saveResultsInPath = currentDir
 
 # Do you need to upload your saved config file to the server?
 # If not, a saved config must be already in the IxLoad gateway server filesystem.
@@ -156,7 +158,7 @@ try:
                       exitAfterPollingIteration=None)
     
     restObj.waitForActiveTestToUnconfigure()
-    restObj.downloadResults()
+    restObj.downloadResults(targetPath=saveResultsInPath)
     restObj.retrievePortCaptureFileForAssignedPorts(os.getcwd())
 
     if deleteSession:

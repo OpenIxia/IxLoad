@@ -14,6 +14,7 @@ import subprocess
 import os
 import re
 import datetime
+import platform
 
 class IxLoadRestApiException(Exception):
     def __init__(self, msg=None):
@@ -1193,6 +1194,9 @@ class Main():
         return activeSessionCounter
 
     def getResultPath(self):
+        """
+        The path where the results are saved in the IxLoad gateway server
+        """
         url = self.sessionIdUrl+'/ixLoad/test'
         response = self.get(url)
         self.resultPath = response.json()['runResultDirFull']
@@ -1630,9 +1634,14 @@ class Main():
         if self.osPlatform == 'windows':
             sshClient.enterCommand('rmdir {} /s /q'.format(filePath))
 
-    def downloadResults(self):
+    def downloadResults(self, targetPath=None):
         """
         Get the test results path and download all the CSV results to the local system.
+        
+        Parameter
+           targetPath: The path to store the downloaded result file.
+                       Defaults to the path where the script was executed.
+                       If saving on Windows OS, provide two backslashes for the path. Ex: c:\\Results 
 
         Syntax:
             https://ip:8443/api/v1/downloadResource?localPath=/mnt/ixload-share/<Folder>&zipName=results.zip
@@ -1642,6 +1651,9 @@ class Main():
             self.logInfo('Your IxLoad version {} does not have the rest api to download csv stats. However, real time stats are saved in csv files in your local system'.format(self.ixLoadVersion))
             return
 
+        if targetPath is None:
+            targetPath = os.path.abspath(os.path.dirname(__file__))
+            
         resultsPath = self.getResultPath()
         
         if '/' in resultsPath:
@@ -1653,7 +1665,12 @@ class Main():
 
         zipFile = 'ixLoadResults_{}.zip'.format(destinationZipFileName)
 
-        self.logInfo('downloadResults: {}'.format(resultsPath))
+        if platform.system() == 'Linux':
+            zipFile = '{}/{}'.format(targetPath, zipFile)
+        else:  
+            zipFile = '{}\\{}'.format(targetPath, zipFile)
+
+        self.logInfo('downloadResults: Saving results to: {}'.format(targetPath))
         url = '{}/api/v1/downloadResource?localPath={}&zipName={}'.format(self.httpHeader, resultsPath, zipFile)
 
         response = requests.get(url, verify=self.verifySsl)
@@ -1678,11 +1695,9 @@ class Main():
             self.logInfo('Your IxLoad version {} does not have the rest api to download files. You need version 8.50 or greater'.format(self.ixLoadVersion))
             return
 
-
         self.logInfo('downloadFile src:{} -> {} -> {}'.format(srcPathAndFilename, targetLocation, targetFilename))
         url = '{}/api/{}/downloadResource?localPath={}'.format(self.httpHeader, self.apiVersion, srcPathAndFilename)
         
-        import platform
         if platform.system() == 'Linux':
             targetFileLocation = '{}/{}'.format(targetLocation, targetFilename)
         else:

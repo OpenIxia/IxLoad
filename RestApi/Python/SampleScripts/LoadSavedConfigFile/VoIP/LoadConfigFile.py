@@ -66,6 +66,8 @@ if serverOs == 'linux':
     # Leave as default
     crfFileOnServer = '/mnt/ixload-share/VoIP/{}'.format(crfFile)
 
+# Where to put the downloaded saved csv results
+saveResultsInPath = currentDir
 
 # Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
 # In this example, get it from the current folder.
@@ -138,7 +140,7 @@ try:
     restObj.waitForAllCapturedData()
     restObj.waitForActiveTestToUnconfigure()
 
-    restObj.downloadResults()
+    restObj.downloadResults(targetPath=saveResultsInPath)
 
     if deleteSession:
         restObj.deleteSessionId()
