@@ -898,10 +898,10 @@ class Main():
                     # Get the interested stat names only
                     for captionMetas in statsDict[statType]:
                         statName = captionMetas['caption']
-                        #for statName in statNameList:
+
                         if statName in response.json()[str(highestTimestamp)]:
                             statValue = response.json()[str(highestTimestamp)][statName]
-                            if statValue == "N/A":
+                            if statValue == "N/A" or not statValue:
                                 continue
                             
                             self.logInfo('\t%s: %s' % (statName, statValue), timestamp=False)
@@ -911,7 +911,7 @@ class Main():
                             # Verify passed/failed objectives
                             if captionMetas['operator'] is not None or captionMetas['expect'] is not None:
                                 op = operators.get(captionMetas['operator'])
-                                
+
                                 # Check user defined operator for expectation
                                 # Example: operator.ge(3,3)
                                 if op(int(statValue), int(captionMetas['expect'])) == False:
