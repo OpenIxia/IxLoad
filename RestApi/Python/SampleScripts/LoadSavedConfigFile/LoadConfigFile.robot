@@ -34,7 +34,7 @@ Library  IxL_RestApi.Main  apiServerIp=${apiServerIp}  apiServerIpPort=${apiServ
 ${serverOs} =  linux
 
 # Must state the exact version you are using
-${ixLoadVersion} =  9.00.115.204
+${ixLoadVersion} =  9.10.0.311
 
 ${apiServerIp} =  192.168.70.129
 ${apiServerIpPort} =  8080
@@ -56,7 +56,7 @@ ${linuxRxfFileLocation} =   /mnt/ixload-share/${configFilename}
 ${windowsRxfFileLocation} =  C:\\Results\\${configFilename}
 
 # The IP address of the IxLoad license server
-${licenseServerIp} =  192.168.70.3
+${licenseServerIp} =  192.168.70.99
 
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 ${licenseModel} =  Subscription Mode
@@ -76,9 +76,9 @@ ${pollStatInterval} =  2
 #    To get the Key names: On the IxLoad GUI config, get the name of the stacks:
 #    Also, could be found here: http://<ip>:8080/api/v0/sessions/<id>/ixload/test/activeTest/communityList
 # Create a list
-${chassisIp} =  192.168.70.128
+${chassisIp} =  192.168.70.15
 @{port1} =  1  1
-@{port2} =  2  1
+@{port2} =  1  2
 @{port1List} =  ${port1}
 @{port2List} =  ${port2}
 

@@ -1,5 +1,3 @@
-
-
 # Description
 #   A sample Python REST API script to:
 #      - Load a saved configuration file
@@ -36,12 +34,11 @@ serverOs = 'linux'
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
-ixLoadVersion = '8.50.115.333'
-ixLoadVersion = '9.00.0.347'   ;# EA
 ixLoadVersion = '9.00.115.204' ;# Update-2
+ixLoadVersion = '9.10.0.311'   ;# EA
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = True
+deleteSession = False
 forceTakePortOwnership = True
 
 # The saved config file to load
@@ -86,7 +83,7 @@ saveStatsToCsvFile = True
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
-licenseServerIp = '192.168.70.3'
+licenseServerIp = '192.168.70.99'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
 
@@ -94,13 +91,13 @@ licenseModel = 'Subscription Mode'
 # Traffic1@Network1 are activity names.
 # To get the Activity names, got to: /ixload/test/activeTest/communityList
 communityPortList1 = {
-    'chassisIp': '192.168.70.128',
+    'chassisIp': '192.168.70.15',
     'Traffic1@Network1': [(1,1)],
 }
 
 communityPortList2 = {
-    'chassisIp': '192.168.70.128',
-    'Traffic2@Network2': [(2,1)],
+    'chassisIp': '192.168.70.15',
+    'Traffic2@Network2': [(1,2)],
 }
 
 # Stat names to display at run time.

@@ -27,7 +27,10 @@ if platform.system() == 'Windows':
 else:
     sys.path.insert(0, (currentDir.replace('SampleScripts/LoadSavedConfigFile', 'Modules')))
 
-from IxL_RestApi import *
+#from IxL_RestApi import *
+
+import IxL_RestApi
+from myIxLoadApiModule import *
 
 # Choices of IxLoad Gateway server OS: linux or windows 
 serverOs = 'linux'
@@ -40,7 +43,7 @@ ixLoadVersion = '9.00.0.347'   ;# EA
 ixLoadVersion = '9.00.115.204' ;# Update-2
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = True
+deleteSession = False
 forceTakePortOwnership = True
 
 # The saved config file to load
@@ -117,7 +120,13 @@ statsDict = {
 }
 
 try:
-    restObj = Main(apiServerIp=apiServerIp,
+    # restObj = Main(apiServerIp=apiServerIp,
+    #                apiServerIpPort=apiServerIpPort,
+    #                osPlatform=serverOs,
+    #                deleteSession=deleteSession,
+    #                generateRestLogFile=True)
+        
+    restObj = CustomAPI(apiServerIp=apiServerIp,
                    apiServerIpPort=apiServerIpPort,
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
@@ -125,7 +134,8 @@ try:
 
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
-
+    restObj.myAPI()
+    
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
 
@@ -164,7 +174,7 @@ try:
     if deleteSession:
         restObj.deleteSessionId()
         
-except (IxLoadRestApiException, Exception) as errMsg:
+except (IxL_RestApi.IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
     if deleteSession:
         restObj.abortActiveTest()
