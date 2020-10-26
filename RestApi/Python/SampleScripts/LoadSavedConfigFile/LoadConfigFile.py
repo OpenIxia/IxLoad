@@ -1,5 +1,3 @@
-
-
 # Description
 #   A sample Python REST API script to:
 #      - Load a saved configuration file
@@ -27,10 +25,7 @@ if platform.system() == 'Windows':
 else:
     sys.path.insert(0, (currentDir.replace('SampleScripts/LoadSavedConfigFile', 'Modules')))
 
-#from IxL_RestApi import *
-
-import IxL_RestApi
-from myIxLoadApiModule import *
+from IxL_RestApi import *
 
 # Choices of IxLoad Gateway server OS: linux or windows 
 serverOs = 'linux'
@@ -41,9 +36,10 @@ serverOs = 'linux'
 ixLoadVersion = '8.50.115.333'
 ixLoadVersion = '9.00.0.347'   ;# EA
 ixLoadVersion = '9.00.115.204' ;# Update-2
+ixLoadVersion = '9.10.0.311'   ;# EA
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = False
+deleteSession = True
 forceTakePortOwnership = True
 
 # The saved config file to load
@@ -95,13 +91,13 @@ licenseModel = 'Subscription Mode'
 #    Traffic1@Network1 are activity names.
 #    To get the Activity names, go to: /ixload/test/activeTest/communityList
 communityPortList1 = {
-    'chassisIp': '192.168.70.128',
+    'chassisIp': '192.168.70.15',
     'Traffic1@Network1': [(1,1)],
 }
 
 communityPortList2 = {
-    'chassisIp': '192.168.70.128',
-    'Traffic2@Network2': [(2,1)],
+    'chassisIp': '192.168.70.15',
+    'Traffic2@Network2': [(1,2)],
 }
 
 # Stat names to display at run time.
@@ -120,21 +116,14 @@ statsDict = {
 }
 
 try:
-    # restObj = Main(apiServerIp=apiServerIp,
-    #                apiServerIpPort=apiServerIpPort,
-    #                osPlatform=serverOs,
-    #                deleteSession=deleteSession,
-    #                generateRestLogFile=True)
-        
-    restObj = CustomAPI(apiServerIp=apiServerIp,
+    restObj = Main(apiServerIp=apiServerIp,
                    apiServerIpPort=apiServerIpPort,
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
                    generateRestLogFile=True)
-
+        
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
-    restObj.myAPI()
     
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
@@ -174,7 +163,7 @@ try:
     if deleteSession:
         restObj.deleteSessionId()
         
-except (IxL_RestApi.IxLoadRestApiException, Exception) as errMsg:
+except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
     if deleteSession:
         restObj.abortActiveTest()

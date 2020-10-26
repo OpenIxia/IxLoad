@@ -33,8 +33,10 @@ Library  IxL_RestApi.Main  apiServerIp=${apiServerIp}  apiServerIpPort=${apiServ
 # windows | linux
 ${serverOs} =  linux
 
-# Must state the exact version you are using
-${ixLoadVersion} =  9.00.115.204
+# Which IxLoad version are you using for your test?
+# To view all the installed versions, go on a web browser and enter: 
+#    http://<server ip>:8080/api/v0/applicationTypes
+${ixLoadVersion} =  9.10.0.311
 
 ${apiServerIp} =  192.168.70.129
 ${apiServerIpPort} =  8080
@@ -76,9 +78,9 @@ ${pollStatInterval} =  2
 #    To get the Key names: On the IxLoad GUI config, get the name of the stacks:
 #    Also, could be found here: http://<ip>:8080/api/v0/sessions/<id>/ixload/test/activeTest/communityList
 # Create a list
-${chassisIp} =  192.168.70.128
+${chassisIp} =  192.168.70.15
 @{port1} =  1  1
-@{port2} =  2  1
+@{port2} =  1  2
 @{port1List} =  ${port1}
 @{port2List} =  ${port2}
 

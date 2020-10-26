@@ -38,7 +38,7 @@ ixLoadVersion = '9.00.115.204' ;# Update-2
 ixLoadVersion = '9.10.0.311'   ;# EA
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = False
+deleteSession = True
 forceTakePortOwnership = True
 
 # The saved config file to load
@@ -83,7 +83,7 @@ saveStatsToCsvFile = True
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
-licenseServerIp = '192.168.70.99'
+licenseServerIp = '192.168.70.3'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
 
