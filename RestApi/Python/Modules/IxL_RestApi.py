@@ -807,14 +807,14 @@ class Main():
                                    An iteration means a cycle of all the stats.
         '''
         self.testResults = dict()
-        # Make all stats as passed.  If any stat failed at runtime, 
-        # the stat results will be overwritten with 'Failed'
-        self.testResults['result'] = 'Passed'
+        # Make all stats as failed.  If stat hits the expected value,
+        # then result is changed to passed.
+        self.testResults['result'] = 'Failed'
         for statType in statsDict.keys():
             self.testResults[statType] = dict()
             for captionMetas in statsDict[statType]:
                 # CAPTION: {'caption': 'TCP Connections Established', 'operator': '>', 'expect': 60}
-                self.testResults[statType].update({captionMetas['caption']: 'Passed'})
+                self.testResults[statType].update({captionMetas['caption']: 'Failed'})
         
         import operator
         operators = {'>': operator.gt,
@@ -915,12 +915,18 @@ class Main():
                                 # Check user defined operator for expectation
                                 # Example: operator.ge(3,3)
                                 if op(int(statValue), int(captionMetas['expect'])) == False:
-                                    self.logInfo('\t\tFailed: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
-                                    self.testResults['result'] = 'Failed'
-                                    self.testResults[statType].update({statName: 'Failed'})
+                                    if self.testResults[statType][statName] is 'Failed':
+                                        self.logInfo('\t\tValue not reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                    if self.testResults[statType][statName] == 'Passed':
+                                        self.logInfo('\t\tValue reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                 
                                 if op(int(statValue), int(captionMetas['expect'])) == True:
-                                    self.logInfo('\t\tPassed: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                    if self.testResults[statType][statName] is 'Failed':
+                                        self.logInfo('\t\tValue reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                    if self.testResults[statType][statName] == 'Passed':
+                                        self.logInfo('\t\tValue reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                        
+                                    self.testResults[statType].update({statName: 'Passed'})
                             else:
                                 self.logInfo('\t\tNo expectation defined\n', timestamp=False)     
                         else:
