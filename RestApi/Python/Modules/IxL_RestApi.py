@@ -86,19 +86,17 @@ class Main():
 
         # GenerateRestLogFile could be a filename or boolean
         # If True, create default log file name: restApiLog.txt
-        if generateRestLogFile:
-            if type(generateRestLogFile) == bool and generateRestLogFile == True:
-                # Default the log file name since user didn't provide a log file name.
-                self.restLogFile = 'ixLoad_testLog.txt'
-                Main.debugLogFile = self.restLogFile
+        if generateRestLogFile == True:
+            # Default the log file name since user didn't provide a log file name.
+            self.restLogFile = 'ixLoad_testLog.txt'
+            Main.debugLogFile = self.restLogFile
 
-            # User provided a log file name.
-            if type(generateRestLogFile) != bool:
-                self.restLogFile = generateRestLogFile
+        # User provided a log file name.
+        if type(generateRestLogFile) != bool:
+            self.restLogFile = generateRestLogFile
 
-            # Instantiate a new log file here.
-            with open(self.restLogFile, 'w') as restLogFile:
-                restLogFile.write('')
+        # Instantiate a new log file here.
+        open(self.restLogFile, 'w').close()
 
     def getApiVersion(self, connection):
         return connection.url.split("/")[-1]
@@ -327,7 +325,6 @@ class Main():
             return response
         except requests.exceptions.RequestException as errMsg:
             raise IxLoadRestApiException('http DELETE error: {0}\n'.format(errMsg))
-
 
     # VERIFY OPERATION START
     def verifyStatus(self, url, timeout=120):
