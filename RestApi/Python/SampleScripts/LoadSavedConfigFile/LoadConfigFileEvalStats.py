@@ -4,7 +4,7 @@
 #      - Enable port analyzer
 #      - Set runtime stats
 #      - Run traffic
-#      - Get stats and evaluate for passed/failed.
+#      - Get stats and evaluate for user defined expected stat values.
 #      - Retrieve port capture files to local folder.
 #      - Get test result
 #
@@ -105,6 +105,10 @@ communityPortList2 = {
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 #
 # Get run time stat results with an operator and the expected value for the stat
+# Due to stats going through ramp up and ramp down, stats will fluctuate.
+# Once the stat hits the expected value, the stat is marked as passed.
+# If this logic is not what you need, use PollStats in sample script LoadConfigFile.py
+#
 # operators:  None, >, <, =, !=, <=, >=
 statsDict = {
     'HTTPClient': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 60},
