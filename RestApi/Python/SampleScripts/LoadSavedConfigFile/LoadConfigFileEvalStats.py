@@ -68,11 +68,12 @@ saveResultsInPath = currentDir
 upLoadFile = True
 
 # The path to the saved config file. In this example, get it from the current folder
-if serverOs == 'windows':
-    localConfigFileToUpload = '{}\\{}'.format(currentDir, rxfFile)
-else:
+#if serverOs == 'windows':
+if platform.system() == 'Linux':
     localConfigFileToUpload = '{}/{}'.format(currentDir, rxfFile)
-    
+else:
+    localConfigFileToUpload = '{}\\{}'.format(currentDir, rxfFile)
+
 # The path where you want to download the csv result files to.  This is mostly used if using a Linux Gateway server.
 # If you're using IxLoad in Windows, SSH must be installed.  Otherwise, this variable will be ignored.
 scpDestPath = currentDir
@@ -127,11 +128,12 @@ try:
                    apiServerIpPort=apiServerIpPort,
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
+                   pollStatusInterval=5,
                    generateRestLogFile=True)
 
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
-
+    
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
 
