@@ -751,8 +751,6 @@ class Main():
         """
         To get test results, you must call pollStatsAndCheckStats() from the script.
         Test results are set in pollStatsAndCheckStatResults()
-        
-            result: Passed
 
             HTTPClient
                 Passed: TCP Connections Established
@@ -765,23 +763,30 @@ class Main():
                 Passed: TCP Connections Established
                 Passed: TCP Connection Requests Failed
 
+            Result: Passed|Failed
+            
         Return
             A dictionary of all the statNames and passed/failed results
         """
         if self.testResults is None:
             return
         
-        self.logInfo('\nTEST RESULTS:\n-------------\n', timestamp=False)
+        finalResult = 'Passed'
+                
+        self.logInfo('\nTest result for each statistic:\n{}'.format('-'*31), timestamp=False)
+        
         for statType in self.testResults.keys():
             if statType == 'result':
-                self.logInfo('\n{}: {}'.format(statType, self.testResults['result']), timestamp=False)
-            else:
-                self.logInfo('\n{}'.format(statType), timestamp=False)
+                continue
             
+            self.logInfo('\n{}'.format(statType), timestamp=False)
             if isinstance((self.testResults[statType]), dict):
                 for statName,result in self.testResults[statType].items():
-                    self.logInfo('\t{}: {}'.format(result, statName), timestamp=False)   
+                    self.logInfo('\t{}: {}'.format(result, statName), timestamp=False)
+                    if result == 'Failed':
+                        finalResult = 'Failed'  
       
+        self.logInfo('\nFinal Result: {}'.format(finalResult), timestamp=False)
         return self.testResults
     
     def pollStatsAndCheckStatResults(self, statsDict=None, pollStatInterval=2, csvFile=False,
@@ -1144,7 +1149,6 @@ class Main():
 
     def waitForActiveTestToUnconfigure(self, timeout=60):
         ''' Wait for the active test state to be Unconfigured '''
-        self.logInfo('\n')
 
         counter = 0
         while True:
@@ -1476,7 +1480,7 @@ class Main():
                 captureFile = '/'.join([destinationFolder, captureName])
                 fileHandle = None
 
-                self.logInfo('retrievePortCaptureFileForAssignedPorts: destinationFolder:{}'.format(destinationFolder))
+                self.logInfo('retrievePortCaptureFileForAssignedPorts: Saved as: {}'.format(captureFile))
                 try:
                     with open(captureFile, 'wb') as fileHandle:
                         for chunk in capturePayload.iter_content(chunk_size=1024):
@@ -1694,23 +1698,25 @@ class Main():
             # Windows path
             destinationZipFileName = resultsPath.split('\\')[-1]
 
-        zipFile = 'ixLoadResults_{}.zip'.format(destinationZipFileName)
+        zipFileName = 'ixLoadResults_{}.zip'.format(destinationZipFileName)
 
         if platform.system() == 'Linux':
-            zipFile = '{}/{}'.format(targetPath, zipFile)
+            zipFile = '{}/{}'.format(targetPath, zipFileName)
         else:  
-            zipFile = '{}\\{}'.format(targetPath, zipFile)
+            zipFile = '{}\\{}'.format(targetPath, zipFileName)
+        
+        # The zipName parameter will be ignored if this rest api is executed by a script.
+        # zipName is used if this rest api is entered on a web browser or postman.  The zipName will be used
+        # as the download zip file.
+        url = '{}/api/v1/downloadResource?localPath={}&zipName={}'.format(self.httpHeader, resultsPath, 'zipFileName')
 
         self.logInfo('downloadResults: Saving results from {} to: {}'.format(resultsPath, zipFile))
-        url = '{}/api/v1/downloadResource?localPath={}&zipName={}'.format(self.httpHeader, resultsPath, 'tempFile.zip')
-
         response = self.get(url, downloadStream=True)
         
         with open(zipFile, 'wb') as fileHandle:
             for chunk in response.iter_content(chunk_size=1024):
                 fileHandle.write(chunk)
-    
-            
+           
     def downloadFile(self, srcPathAndFilename, targetLocation, targetFilename):
         """
         Download a file from the IxLoad gateway server.
