@@ -786,6 +786,7 @@ class Main():
                     if result == 'Failed':
                         finalResult = 'Failed'  
       
+        self.testResults['result'] = finalResult
         self.logInfo('\nFinal Result: {}'.format(finalResult), timestamp=False)
         return self.testResults
     
@@ -915,13 +916,14 @@ class Main():
                     if csvFile:
                         csvFilesDict[statType]['rowValueList'] = []
                     
-                    # Get the interested stat names only
+                    # Get the interested stat names only                 
                     for captionMetas in statsDict[statType]:
-                        statName = captionMetas['caption']
-
+                        # HTTPServer: [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 1000},
+                        #              {'caption': 'TCP Connection Requests Failed', 'operator': '=', 'expect': 0}]
+                        statName = captionMetas['caption']   
                         if statName in response.json()[str(highestTimestamp)]:
                             statValue = response.json()[str(highestTimestamp)][statName]
-                            if statValue == "N/A" or not statValue:
+                            if statValue == "N/A" or statValue == "":
                                 continue
                             
                             self.logInfo('\t%s: %s' % (statName, statValue), timestamp=False)
@@ -933,7 +935,7 @@ class Main():
                                 op = operators.get(captionMetas['operator'])
 
                                 # Check user defined operator for expectation
-                                # Example: operator.ge(3,3)
+                                # Example: operator.ge(3,3) 
                                 if op(int(statValue), int(captionMetas['expect'])) == False:
                                     if self.testResults[statType][statName] == 'Failed':
                                         self.logInfo('\t\tThreshold not reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
@@ -1716,7 +1718,7 @@ class Main():
         with open(zipFile, 'wb') as fileHandle:
             for chunk in response.iter_content(chunk_size=1024):
                 fileHandle.write(chunk)
-           
+       
     def downloadFile(self, srcPathAndFilename, targetLocation, targetFilename):
         """
         Download a file from the IxLoad gateway server.
@@ -1750,4 +1752,10 @@ class Main():
                 for chunk in response.iter_content(chunk_size=8192):
                     fileObj.write(chunk)
 
+    def gracefulStopRun(self):
+        url = self.sessionIdUrl+'/ixLoad/test/operations/gracefulStopRun'
+        response = self.post(url, ignoreError=True)
+        if response.status_code != 202:
+            self.deleteSessionId()
+            raise IxLoadRestApiException('gracefulStopRun failed')
 
