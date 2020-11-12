@@ -461,6 +461,15 @@ class Main():
         self.patch(self.sessionIdUrl+'/ixLoad/preferences',
                    data = {'licenseServer': licenseServerIp, 'licenseModel': licenseModel})
 
+    def setPreferences(self, params):
+        """
+        Use the IxLoad API browser for parameters
+        
+        Example usage:
+            params = {'enableRestStatViewsCsvLogging': True, 'enableL23RestStatViews': True}
+        """
+        self.patch(self.sessionIdUrl+'/ixLoad/preferences', data=params)
+        
     def refreshConnection(self, locationUrl):
         url = self.httpHeader+locationUrl+'/operations/refreshConnection'
         response = self.post(url)
@@ -1700,7 +1709,8 @@ class Main():
         with open(zipFile, 'wb') as fileHandle:
             for chunk in response.iter_content(chunk_size=1024):
                 fileHandle.write(chunk)
-               
+    
+            
     def downloadFile(self, srcPathAndFilename, targetLocation, targetFilename):
         """
         Download a file from the IxLoad gateway server.
