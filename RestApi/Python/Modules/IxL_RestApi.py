@@ -921,13 +921,13 @@ class Main():
                                 # Check user defined operator for expectation
                                 # Example: operator.ge(3,3)
                                 if op(int(statValue), int(captionMetas['expect'])) == False:
-                                    if self.testResults[statType][statName] is 'Failed':
+                                    if self.testResults[statType][statName] == 'Failed':
                                         self.logInfo('\t\tThreshold not reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                     if self.testResults[statType][statName] == 'Passed':
                                         self.logInfo('\t\tThreshold reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                 
                                 if op(int(statValue), int(captionMetas['expect'])) == True:
-                                    if self.testResults[statType][statName] is 'Failed':
+                                    if self.testResults[statType][statName] == 'Failed':
                                         self.logInfo('\t\tThreshold reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                     if self.testResults[statType][statName] == 'Passed':
                                         self.logInfo('\t\tThreshold reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
