@@ -30,7 +30,7 @@ class Main():
     enableDebugLogFile = False
 
     def __init__(self, apiServerIp, apiServerIpPort, useHttps=False, apiKey=None, verifySsl=False, deleteSession=True,
-                 osPlatform='windows', generateRestLogFile='ixLoad_testLog.txt', robotFrameworkStdout=False):
+                 osPlatform='windows', generateRestLogFile='ixLoad_testLog.txt', pollStatusInterval=1, robotFrameworkStdout=False):
         """
         Description
            Initialize the class variables
@@ -46,6 +46,9 @@ class Main():
            generateRestLogFile: <bool>: True = generate a complete log file.
                                 Filename = ixLoadRestApiLog.txt
            robotFrameworkStdout: <bool>: True = Display print statements on stdout.
+           pollStatusInterval: <int>: Defaults = 1 second.
+                                The delay time in seconds to poll for operation status like 
+                                starting a new session, load config file, graceful shutdown, getting stats, etc.
         """
         from requests.exceptions import ConnectionError
         from requests.packages.urllib3.connection import HTTPConnection
@@ -73,6 +76,7 @@ class Main():
         self.generateRestLogFile = generateRestLogFile
         self.robotFrameworkStdout = robotFrameworkStdout
         self.testResults = None ;# This is set in pollStatsAndCheckStatResults()
+        self.pollStatusInterval = pollStatusInterval
         Main.debugLogFile = self.generateRestLogFile
         Main.enableDebugLogFile = self.generateRestLogFile
 
@@ -127,20 +131,23 @@ class Main():
             response = self.post(self.sessionIdUrl+'/operations/start')
 
             self.logInfo('\n\n', timestamp=False)
-            for counter in range(1, timeout+1):
+
+            counter = 0
+            while True:
                 response = self.get(self.sessionIdUrl)
                 currentStatus = response.json()['isActive']
 
                 self.logInfo('\tCurrentStatus: {0}'.format(currentStatus), timestamp=False)
-                if counter < timeout and currentStatus != True:
+                if counter <= timeout and currentStatus != True:
                     self.logInfo('\tWait {0}/{1} seconds'.format(counter, timeout), timestamp=False)
-                    time.sleep(1)
+                    time.sleep(self.pollStatusInterval)
+                    counter += self.pollStatusInterval
                     continue
 
-                if counter < timeout and currentStatus == True:
+                if counter <= timeout and currentStatus == True:
                     break
 
-                if counter == timeout and currentStatus != True:
+                if counter >= timeout and currentStatus != True:
                     raise IxLoadRestApiException('New session ID failed to become active')
 
     def logInfo(self, msg, end='\n', timestamp=True):
@@ -191,6 +198,7 @@ class Main():
             msg = '\nError: {0}'.format(msg)
 
         print('{0}'.format(msg), end=end)
+            
         if self.generateRestLogFile:
             with open(self.restLogFile, 'a') as restLogFile:
                 restLogFile.write('Error: '+msg+end)
@@ -328,8 +336,8 @@ class Main():
 
     # VERIFY OPERATION START
     def verifyStatus(self, url, timeout=120):
-        timeout = timeout
-        for counter in range(1,timeout+1):
+        counter = 0
+        while True:
             response = self.get(url)
 
             #print('\n\tverifyStatus:', response.json())
@@ -349,16 +357,17 @@ class Main():
                 errorMessage = response.json()['error']
                 raise IxLoadRestApiException('Operation failed: {0}'.format(errorMessage))
 
-            if counter < timeout and currentStatus not in ['Successful']:
+            if counter <= timeout and currentStatus not in ['Successful']:
                 self.logInfo('\tCurrent status: {0}. Wait {1}/{2} seconds...'.format(currentStatus, counter, timeout),
                              timestamp=False)
-                time.sleep(1)
+                time.sleep(self.pollStatusInterval)
+                counter += self.pollStatusInterval
                 continue
  
-            if counter < timeout and currentStatus in ['Successful']:
+            if counter <= timeout and currentStatus in ['Successful']:
                 return
 
-            if counter == timeout and currentStatus not in ['Successful']:
+            if counter >= timeout and currentStatus not in ['Successful']:
                 raise IxLoadRestApiException('Operation failed: {0}'.format(url))
 
     def extractDataModelToFile(self, extractToFilename='dataModel.txt', timeout=120):
@@ -913,15 +922,15 @@ class Main():
                                 # Example: operator.ge(3,3)
                                 if op(int(statValue), int(captionMetas['expect'])) == False:
                                     if self.testResults[statType][statName] is 'Failed':
-                                        self.logInfo('\t\tValue not reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                        self.logInfo('\t\tThreshold not reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                     if self.testResults[statType][statName] == 'Passed':
-                                        self.logInfo('\t\tValue reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                        self.logInfo('\t\tThreshold reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                 
                                 if op(int(statValue), int(captionMetas['expect'])) == True:
                                     if self.testResults[statType][statName] is 'Failed':
-                                        self.logInfo('\t\tValue reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                        self.logInfo('\t\tThreshold reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                     if self.testResults[statType][statName] == 'Passed':
-                                        self.logInfo('\t\tValue reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                        self.logInfo('\t\tThreshold reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                         
                                     self.testResults[statType].update({statName: 'Passed'})
                             else:
@@ -949,7 +958,8 @@ class Main():
                 if waitForRunningStatusCounter < waitForRunningStatusCounterExit:
                     waitForRunningStatusCounter += 1
                     self.logInfo('\tWaiting {0}/{1} seconds'.format(waitForRunningStatusCounter, waitForRunningStatusCounterExit), timestamp=False)
-                    time.sleep(1)
+                    time.sleep(self.pollStatusInterval)
+                    waitForRunningStatusCounter += self.pollStatusInterval
                     continue
 
                 if waitForRunningStatusCounter == waitForRunningStatusCounterExit:
@@ -1126,16 +1136,21 @@ class Main():
     def waitForActiveTestToUnconfigure(self, timeout=60):
         ''' Wait for the active test state to be Unconfigured '''
         self.logInfo('\n')
-        for counter in range(1,timeout):
+
+        counter = 0
+        while True:
             currentState = self.getActiveTestCurrentState()
             self.logInfo('waitForActiveTestToUnconfigure current state:', currentState)
-            if counter < 30 and currentState != 'Unconfigured':
+            if counter <= timeout and currentState != 'Unconfigured':
                 self.logInfo('ActiveTest current state = %s\nWaiting for state = Unconfigured: Wait %s/30' % (currentState, counter), timestamp=False)
-                time.sleep(1)
-            if counter < 30 and currentState == 'Unconfigured':
+                time.sleep(self.pollStatusInterval)
+                counter += self.pollStatusInterval
+                
+            if counter <= timeout and currentState == 'Unconfigured':
                 self.logInfo('\nActiveTest is Unconfigured')
                 return 0
-            if counter == 30 and currentState != 'Unconfigured':
+            
+            if counter >= timeout and currentState != 'Unconfigured':
                 raise IxLoadRestApiException('ActiveTest is stuck at: {0}'.format(currentState))
 
     def applyConfiguration(self):
@@ -1640,7 +1655,11 @@ class Main():
     def downloadResults(self, targetPath=None):
         """
         Get the test results path and download all the CSV results to the local system.
+        Works in both Windows and Linux gateways
         
+        Requirements
+           Must be using IxLoad version > 8.5
+           
         Parameter
            targetPath: The path to store the downloaded result file.
                        Defaults to the path where the script was executed.
@@ -1673,12 +1692,16 @@ class Main():
         else:  
             zipFile = '{}\\{}'.format(targetPath, zipFile)
 
-        self.logInfo('downloadResults: Saving results to: {}'.format(targetPath))
-        url = '{}/api/v1/downloadResource?localPath={}&zipName={}'.format(self.httpHeader, resultsPath, zipFile)
+        self.logInfo('downloadResults: Saving results from {} to: {}'.format(resultsPath, zipFile))
+        url = '{}/api/v1/downloadResource?localPath={}&zipName={}'.format(self.httpHeader, resultsPath, 'tempFile.zip')
+        parameters = { "localPath": resultsPath, "zipName": zipFile }
 
-        response = requests.get(url, verify=self.verifySsl)
-        open(zipFile, 'wb').write(response.content)
+        response = self.get(url, downloadStream=True)
         
+        with open(zipFile, 'wb') as fileHandle:
+            for chunk in response.iter_content(chunk_size=1024):
+                fileHandle.write(chunk)
+               
     def downloadFile(self, srcPathAndFilename, targetLocation, targetFilename):
         """
         Download a file from the IxLoad gateway server.
