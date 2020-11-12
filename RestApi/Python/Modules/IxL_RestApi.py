@@ -1694,7 +1694,6 @@ class Main():
 
         self.logInfo('downloadResults: Saving results from {} to: {}'.format(resultsPath, zipFile))
         url = '{}/api/v1/downloadResource?localPath={}&zipName={}'.format(self.httpHeader, resultsPath, 'tempFile.zip')
-        parameters = { "localPath": resultsPath, "zipName": zipFile }
 
         response = self.get(url, downloadStream=True)
         
