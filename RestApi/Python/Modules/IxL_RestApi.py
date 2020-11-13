@@ -61,8 +61,8 @@ class Main():
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
         self.osPlatform = osPlatform
-
-        if apiServerIpPort == 8443:
+    
+        if apiServerIpPort in [8443, '8443']:
             httpHead = 'https'
         else:
             httpHead = 'http'
@@ -793,23 +793,27 @@ class Main():
     def pollStatsAndCheckStatResults(self, statsDict=None, pollStatInterval=2, csvFile=False,
                                     csvEnableFileTimestamp=True, csvFilePrependName=None, exitAfterPollingIteration=None):
         '''
-        Get runtime stats and check for stat value expectations.
+        Get run time stats and evaluate the stats with an operator and the expected value.
+        Due to stats going through ramp up and ramp down, stats will fluctuate.
+        Once the stat hits and maintains the expected threshold value, the stat is marked as passed.
+        
+        If evaluating stats at run time is not what you need, use PollStats() instead shown.
 
         statsDict = 
             This API will poll stats based on the dictionary statsDict that you passed in.
             Example how statsDict should look like:
 
             Example:
-            # operators: <, >, =, !=, <=, >=
+            # operator options: <, >, <=, >=
                 statsDict = {
                     'HTTPClient': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 60},
                                    {'caption': 'HTTP Simulated Users', 'operator': None, 'expect': None},
-                                   {'caption': 'HTTP Connections', 'operator': '>', 'expect': 300},
+                                   {'caption': 'HTTP Connections', 'operator': '>=', 'expect': 300},
                                    {'caption': 'HTTP Transactions', 'operator': '>', 'expect': 190},
                                    {'caption': 'HTTP Connection Attempts', 'operator': '>', 'expect': 300}
                                   ],
                     'HTTPServer': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 1000},
-                                   {'caption': 'TCP Connection Requests Failed', 'operator': '=', 'expect': 0}
+                                   {'caption': 'TCP Connection Requests Failed', 'operator': '<', 'expect': 1}
                                   ]
                     }
  
@@ -838,10 +842,11 @@ class Main():
                 self.testResults[statType].update({captionMetas['caption']: 'Failed'})
         
         import operator
+        # Not going to handle = and != because the intention is to handle hitting and maintaining the expected threshold only
         operators = {'>': operator.gt,
                      '<': operator.lt,
-                     '=': operator.eq,
-                     '!=': operator.ne,
+                     #'=': operator.eq,
+                     #'!=': operator.ne,
                      '<=': operator.le,
                      '>=': operator.ge
                  }
@@ -896,7 +901,6 @@ class Main():
                 # statType:  HTTPClient or HTTPServer (Just a example using HTTP.)
                 # statNameList: transaction success, transaction failures, ...
                 for statType in statsDict.keys():
-                    #for statType,statNameList in statsDict.items():
                     self.logInfo('\n%s:' % statType, timestamp=False)
                     statUrl = self.sessionIdUrl+'/ixLoad/stats/'+statType+'/values'
                     response = self.getStats(statUrl)
@@ -935,20 +939,23 @@ class Main():
                                 op = operators.get(captionMetas['operator'])
 
                                 # Check user defined operator for expectation
-                                # Example: operator.ge(3,3) 
-                                if op(int(statValue), int(captionMetas['expect'])) == False:
+                                # Example: operator.ge(3,3)
+                                if op(int(statValue), int(captionMetas['expect'])) == False:                                     
                                     if self.testResults[statType][statName] == 'Failed':
                                         self.logInfo('\t\tThreshold not reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                    
                                     if self.testResults[statType][statName] == 'Passed':
-                                        self.logInfo('\t\tThreshold reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                        self.logInfo('\t\tThreshold reached and sustaining: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                 
                                 if op(int(statValue), int(captionMetas['expect'])) == True:
                                     if self.testResults[statType][statName] == 'Failed':
                                         self.logInfo('\t\tThreshold reached: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                    
                                     if self.testResults[statType][statName] == 'Passed':
-                                        self.logInfo('\t\tThreshold reached already: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
+                                        self.logInfo('\t\tThreshold reached and sustaining: Expecting: {}{}\n'.format(captionMetas['operator'], int(captionMetas['expect'])), timestamp=False)
                                         
                                     self.testResults[statType].update({statName: 'Passed'})
+                                    
                             else:
                                 self.logInfo('\t\tNo expectation defined\n', timestamp=False)     
                         else:
@@ -1670,7 +1677,7 @@ class Main():
     def downloadResults(self, targetPath=None):
         """
         Get the test results path and download all the CSV results to the local system.
-        Works in both Windows and Linux gateways
+        Works in both Windows and Linux IxLoad sgateways
         
         Requirements
            Must be using IxLoad version > 8.5
@@ -1687,15 +1694,21 @@ class Main():
         if float((versionMatch.group(1))) < float(8.5):
             self.logInfo('Your IxLoad version {} does not have the rest api to download csv stats. However, real time stats are saved in csv files in your local system'.format(self.ixLoadVersion))
             return
-
+        
         if targetPath is None:
+            # /OpenIxiaGit/IxLoad/RestApi/Python/Modules
             targetPath = os.path.abspath(os.path.dirname(__file__))
-            
+        
         resultsPath = self.getResultPath()
         
         if '/' in resultsPath:
             # Linux path 
             destinationZipFileName = resultsPath.split('/')[-1]
+            # /mnt/ixload-share/9.10.0.311/Results/IxL_Http_Ipv4Ftp_vm_8.20_20201113_190931
+            # Purpose: Shorten the filename
+            match = re.search('.*_([0-9]+_[0-9]+)', destinationZipFileName)
+            if match:
+                destinationZipFileName = match.group(1) 
         else:
             # Windows path
             destinationZipFileName = resultsPath.split('\\')[-1]
