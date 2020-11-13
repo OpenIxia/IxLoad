@@ -5,7 +5,7 @@
 #    Enable port capturing
 #    Run traffic
 #    Get run time stats and evaluate run time stats with expected stats
-#    Retrieve csv stats (For Linux gateway only)
+#    Retrieve csv stats (Minimum IxLoad version 9.0)
 #
 # Requirements
 #    Python 2.7 or Python3
@@ -18,7 +18,7 @@
 #   - pip install robotframework
 #
 # Usage:
-#    robot RunTestGetStatResults.robot
+#    robot LoadConfigFileEvalStats.robot
 
 
 *** Settings ***
@@ -39,7 +39,9 @@ ${serverOs} =  linux
 ${ixLoadVersion} =  9.10.0.311
 
 ${apiServerIp} =  192.168.70.129
-${apiServerIpPort} =  8080
+
+# 8080 or 8443
+${apiServerIpPort} =  8443
 ${deleteSessionAfterTest} =  True
 
 # Upload the config file to the IxLoad Gateway server
@@ -102,6 +104,7 @@ ${chassisIp} =  192.168.70.15
 #       - More help: https://www.openixia.com/tutorials?subject=ixLoad/getStatNames&page=fromApiBrowserForRestApi.html
 
 # Create a dictionary for each stat
+# operator options:  None, >, <, <=, >=
 &{httpClient1} =  caption=TCP Connections Established   operator=>        expect=60
 &{httpClient2} =  caption=HTTP Simulated Users          operator=${null}  expect=${null}
 &{httpClient3} =  caption=HTTP Concurrent Connections   operator=>        expect=300
@@ -113,7 +116,7 @@ ${chassisIp} =  192.168.70.15
 
 # Create stats to get for HTTP Server
 &{httpServer1} =  caption=TCP Connections Established     operator=>  expect=1000
-&{httpServer2} =  caption=TCP Connection Requests Failed  operator==  expect=0
+&{httpServer2} =  caption=TCP Connection Requests Failed  operator=<  expect=1
 @{combinedHttpServer} =  &{httpServer1}  &{httpServer2}
 
 # Finally, create a dictionary of the two stats
@@ -121,6 +124,7 @@ ${chassisIp} =  192.168.70.15
 
 
 *** Test Cases ***
+
 Test HTTP/FTP Client Server
    # For Linux API server
    Log To Console  Connecting to IxLoad gateway. Please wait for a new session to come up
@@ -166,9 +170,11 @@ Test HTTP/FTP Client Server
 
    # Linux has SSH installed.  Windows don't come with SSH.
    # If you are using Windows and if you want CSV stat results at the end of the test, set csvStatFile to True.
-   Run Keyword If  "${serverOs}"=="linux"  RunKeywords
-   ...  Log To Console  Download CSV stat result files
-   ...  AND  ixlObj.Download Results
+   #Run Keyword If  "${serverOs}"=="linux"  RunKeywords
+   #...  Log To Console  Download CSV stat result files
+   #...  AND  ixlObj.Download Results
+   Log To Console  Download CSV stat result files
+   ixlObj.Download Results
 
    Log To Console  Retrieving port capture file
    ixlObj.Retrieve Port Capture File For Assigned Ports  ${CURDIR}

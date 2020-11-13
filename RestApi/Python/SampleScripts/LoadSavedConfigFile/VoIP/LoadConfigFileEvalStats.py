@@ -42,7 +42,7 @@ ixLoadVersion = '9.00.115.204' ;# Update-2
 ixLoadVersion = '9.10.0.311'   ;# EA
 
 # Do you want to delete the session at the end of the test or if the test failed?
-deleteSession = False
+deleteSession = True
 forceTakePortOwnership = True
 
 crfFile = 'voipSip.crf'
@@ -83,7 +83,7 @@ apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.
 
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
-licenseServerIp = '192.168.70.99'
+licenseServerIp = '192.168.70.3'
 
 # Assign ports for testing.  Format = (cardId,portId)
 # 'Traffic1@Network1' are activity names.
@@ -102,26 +102,33 @@ communityPortList2 = {
 # To see how to get the stat names, go to the link below for step-by-step guidance:
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 #
-# Get run time stat results by stating an operator and the expected value
-# operators:  None, >, <, =, !=, <=, >=
+# What this does: 
+#    Get run time stats and evaluate the stats with an operator and the expected value.
+#    Due to stats going through ramp up and ramp down, stats will fluctuate.
+#    Once the stat hits and maintains the expected threshold value, the stat is marked as passed.
+#    
+#    If evaluating stats at run time is not what you need, use PollStats() instead shown
+#    in sample script LoadConfigFile.py
+#
+# operator options:  None, >, <, <=, >=
 statsDict = {
     'SIP(VoIPSip)': [{'caption': 'SIP Requests Parsed',  'operator': '>=', 'expect': 1},
                      {'caption': 'SIP Requests Matched', 'operator': '>=', 'expect': 1},
                     ],
     'RTP(VoIPSip)': [{'caption': 'Successful Records',   'operator': '>=', 'expect': 1},
-                     {'caption': 'Successful Playbacks', 'operator': '=', 'expect': 1}
+                     {'caption': 'Successful Playbacks', 'operator': '>=', 'expect': 1}
                     ],
     'Signaling(VoIPSip)': [{'caption': 'Received Calls', 'operator': '>=', 'expect': 1},
-                           {'caption': 'Answered Calls', 'operator': '>=', 'expect': 1}
+                           {'caption': 'Answered Calls', 'operator': '>', 'expect': 1}
                           ]
 }
-
 
 try:
     restObj = Main(apiServerIp=apiServerIp,
                    apiServerIpPort=apiServerIpPort,
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
+                   pollStatusInterval=1,
                    generateRestLogFile=True)
 
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
@@ -134,7 +141,7 @@ try:
     if forceTakePortOwnership:
         restObj.enableForceOwnership()
 
-    # Modify the sustain time
+    # Optional: Modify the sustain time
     restObj.configTimeline(name='Timeline1', sustainTime=12)
 
     runTestOperationsId = restObj.runTraffic()
@@ -156,6 +163,9 @@ try:
     if deleteSession:
         restObj.deleteSessionId()
 
+    if testResult['result'] == 'Failed':
+        sys.exit(1)
+        
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
 

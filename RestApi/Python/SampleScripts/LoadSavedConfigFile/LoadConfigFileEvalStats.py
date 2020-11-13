@@ -105,21 +105,24 @@ communityPortList2 = {
 # To see how to get the stat names, go to the link below for step-by-step guidance:
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 #
-# Get run time stat results with an operator and the expected value for the stat
-# Due to stats going through ramp up and ramp down, stats will fluctuate.
-# Once the stat hits the expected value, the stat is marked as passed.
-# If this logic is not what you need, use PollStats in sample script LoadConfigFile.py
+# What this does: 
+#    Get run time stats and evaluate the stats with an operator and the expected value.
+#    Due to stats going through ramp up and ramp down, stats will fluctuate.
+#    Once the stat hits and maintains the expected threshold value, the stat is marked as passed.
+#    
+#    If evaluating stats at run time is not what you need, use PollStats() instead shown
+#    in sample script LoadConfigFile.py
 #
-# operators:  None, >, <, =, !=, <=, >=
+# operator options:  None, >, <, <=, >=
 statsDict = {
     'HTTPClient': [{'caption': 'TCP Connections Established', 'operator': '>', 'expect': 60},
-                   {'caption': 'HTTP Simulated Users',        'operator': '>=', 'expect': 100},
+                   {'caption': 'HTTP Simulated Users',        'operator': '>', 'expect': 100},
                    {'caption': 'HTTP Connections',            'operator': '>', 'expect': 300},
                    {'caption': 'HTTP Transactions',           'operator': '>', 'expect': 190},
                    {'caption': 'HTTP Connection Attempts',    'operator': '>', 'expect': 300}
                ],
-    'HTTPServer': [{'caption': 'TCP Connections Established',    'operator': '>', 'expect': 1000},
-                   {'caption': 'TCP Connection Requests Failed', 'operator': '=', 'expect': 0}
+    'HTTPServer': [{'caption': 'TCP Connections Established',    'operator': '>=', 'expect': 1000},
+                   {'caption': 'TCP Connection Requests Failed', 'operator': '<', 'expect': 1}
                ]
 }
 
@@ -128,7 +131,7 @@ try:
                    apiServerIpPort=apiServerIpPort,
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
-                   pollStatusInterval=5,
+                   pollStatusInterval=1,
                    generateRestLogFile=True)
 
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
@@ -147,7 +150,7 @@ try:
         restObj.enableForceOwnership()
 
     restObj.enableAnalyzerOnAssignedPorts()
-
+    
     # Optional: Modify the sustain time
     restObj.configTimeline(name='Timeline1', sustainTime=12)
 
@@ -166,7 +169,7 @@ try:
                                          exitAfterPollingIteration=None)
     
     testResult = restObj.getTestResults()
-    
+        
     restObj.waitForActiveTestToUnconfigure()
     restObj.downloadResults(targetPath=saveResultsInPath)
     restObj.retrievePortCaptureFileForAssignedPorts(currentDir)
@@ -174,6 +177,9 @@ try:
     if deleteSession:
         restObj.deleteSessionId()
 
+    if testResult['result'] == 'Failed':
+        sys.exit(1)
+        
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
     if deleteSession:
