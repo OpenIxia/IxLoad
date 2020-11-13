@@ -113,6 +113,7 @@ try:
                    apiServerIpPort=apiServerIpPort,
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
+                   pollStatusInterval=1,
                    generateRestLogFile=True)
 
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)

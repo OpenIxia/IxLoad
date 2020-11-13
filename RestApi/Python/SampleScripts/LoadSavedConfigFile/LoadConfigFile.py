@@ -120,6 +120,7 @@ try:
                    apiServerIpPort=apiServerIpPort,
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
+                   pollStatusInterval=1,
                    generateRestLogFile=True)
         
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
