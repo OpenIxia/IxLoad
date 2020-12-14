@@ -1,19 +1,21 @@
 # Description
 #   A sample Python REST API script to:
 #      - Load a saved configuration file
-#      - Set runtime stats
 #      - Run traffic
 #      - Get stats and evaluate for user defined expected stat values.
-#      - Retrieve port capture files to local folder.
 #      - Get test result
 #
-#   For IxLoad Gateway running in Windows only.  Linux Gateway is not supported at this time.
+#   - For IxLoad Gateway running in Windows only.  Linux Gateway is not supported at this time.
+#   - This script will set the license model to "Perpetual Mode".  This is a 5G requirement.
 #
 #   If the saved config file is located on a remote pc, this script could upload it to the gateway.
 #   Otherwise, the saved config file must be already in the IxLoad API gateway server.
 #
 # Requirements
 #    IxL_RestApi.py
+#    Air Mosaic installed in the Windows OS where IxLoad is installed
+#    The Air Mosaic version must be the same version as IxLoad for compatibility
+#    5G cell
 
 import os, sys, time, signal, traceback, platform
 

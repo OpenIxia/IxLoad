@@ -8,19 +8,20 @@
 #      - Retrieve port capture files to local folder.
 #      - Get test result
 #
-#   Supports both Windows and Linux gateway Server. If connecting to a 
+#   Supports both Windows and Linux gateway Server. If connecting to a
 #
 #   If the saved config file is located on a remote pc, this script could upload it to the gateway.
 #   Otherwise, the saved config file must be already in the IxLoad API gateway server.
 #
 # Requirements
-#    IxL_RestApi.py 
+#    IxL_RestApi.py
 
 import os, sys, time, signal, traceback, platform
 
 # Insert the Modules path to env in order to import IxL_RestApi.py
 currentDir = os.path.abspath(os.path.dirname(__file__))
 
+# Automatically create the os path to the IxL_RestApi.py module for this script to use
 if platform.system() == 'Windows':
     sys.path.insert(0, (currentDir.replace('SampleScripts\\LoadSavedConfigFile', 'Modules')))
 else:
@@ -28,24 +29,26 @@ else:
 
 from IxL_RestApi import *
 
-# Choices of IxLoad Gateway server OS: linux or windows 
-serverOs = 'linux'
+# Choices of IxLoad Gateway server OS: linux or windows
+serverOs = 'windows'
 
 # Which IxLoad version are you using for your test?
-# To view all the installed versions, go on a web browser and enter: 
+# To view all the installed versions, go on a web browser and enter:
 #    http://<server ip>:8080/api/v0/applicationTypes
-ixLoadVersion = '9.00.115.204' ;# Update-2
-ixLoadVersion = '9.10.0.311'   ;# EA
+ixLoadVersion = '9.10.115.43'   ;# EA
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
 forceTakePortOwnership = True
 
+# API-Key: Use your user API-Key if you want added security
+apiKey = None
+
 # The saved config file to load
-rxfFile = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+rxfFile = 'IxL_Http_910_update1.rxf'
 
 if serverOs == 'windows':
-    apiServerIp = '192.168.70.3'
+    apiServerIp = '192.168.129.6'
 
     # Where to store all of the csv result files in Windows
     resultsDir = 'c:\\Results'
@@ -54,7 +57,7 @@ if serverOs == 'windows':
     rxfFileOnServer = 'C:\\Results\\{}'.format(rxfFile)
 
 if serverOs == 'linux':
-    apiServerIp = '192.168.70.129'
+    apiServerIp = '192.168.129.24'
 
     # Leave the 2 lines as default. For your reference only.
     resultsDir = '/mnt/ixload-share/Results'
@@ -62,13 +65,13 @@ if serverOs == 'linux':
 
 # Where to put the downloaded csv results
 saveResultsInPath = currentDir
-    
+
 # Do you need to upload your saved config file to the server?
 # If not, a saved config must be already in the IxLoad gateway server filesystem.
 upLoadFile = True
 
+# On the local host where you are running this script.
 # The path to the saved config file. In this example, get it from the current folder
-#if serverOs == 'windows':
 if platform.system() == 'Linux':
     localConfigFileToUpload = '{}/{}'.format(currentDir, rxfFile)
 else:
@@ -84,7 +87,8 @@ saveStatsToCsvFile = True
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
-licenseServerIp = '192.168.70.3'
+licenseServerIp = '192.168.129.6'
+
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
 
@@ -92,12 +96,12 @@ licenseModel = 'Subscription Mode'
 # Traffic1@Network1 are activity names.
 # To get the Activity names, got to: /ixload/test/activeTest/communityList
 communityPortList1 = {
-    'chassisIp': '192.168.70.15',
+    'chassisIp': '192.168.129.15',
     'Traffic1@Network1': [(1,1)],
 }
 
 communityPortList2 = {
-    'chassisIp': '192.168.70.15',
+    'chassisIp': '192.168.129.15',
     'Traffic2@Network2': [(1,2)],
 }
 
@@ -105,11 +109,11 @@ communityPortList2 = {
 # To see how to get the stat names, go to the link below for step-by-step guidance:
 #     https://www.openixia.com/tutorials?subject=ixLoad/getStatName&page=fromApiBrowserForRestApi.html
 #
-# What this does: 
+# What this does:
 #    Get run time stats and evaluate the stats with an operator and the expected value.
 #    Due to stats going through ramp up and ramp down, stats will fluctuate.
 #    Once the stat hits and maintains the expected threshold value, the stat is marked as passed.
-#    
+#
 #    If evaluating stats at run time is not what you need, use PollStats() instead shown
 #    in sample script LoadConfigFile.py
 #
@@ -132,11 +136,12 @@ try:
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
                    pollStatusInterval=1,
+                   apiKey=apiKey,
                    generateRestLogFile=True)
 
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
-    
+
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
 
@@ -150,7 +155,7 @@ try:
         restObj.enableForceOwnership()
 
     restObj.enableAnalyzerOnAssignedPorts()
-    
+
     # Optional: Modify the sustain time
     restObj.configTimeline(name='Timeline1', sustainTime=12)
 
@@ -159,7 +164,7 @@ try:
     restObj.configActivityAttributes(communityName='Traffic1@Network1',
                                      activityName='HTTPClient1',
                                      attributes={'userObjectiveValue': 100})
-    
+
     runTestOperationsId = restObj.runTraffic()
 
     restObj.pollStatsAndCheckStatResults(statsDict,
@@ -167,9 +172,10 @@ try:
                                          csvFilePrependName=None,
                                          pollStatInterval=2,
                                          exitAfterPollingIteration=None)
-    
+
+
     testResult = restObj.getTestResults()
-        
+
     restObj.waitForActiveTestToUnconfigure()
     restObj.downloadResults(targetPath=saveResultsInPath)
     restObj.retrievePortCaptureFileForAssignedPorts(currentDir)
@@ -177,15 +183,12 @@ try:
     if deleteSession:
         restObj.deleteSessionId()
 
-    if testResult['result'] == 'Failed':
-        sys.exit(1)
-        
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
     if deleteSession:
         restObj.abortActiveTest()
         restObj.deleteSessionId()
-        
+
     sys.exit(errMsg)
 
 except KeyboardInterrupt:
@@ -193,4 +196,4 @@ except KeyboardInterrupt:
     if deleteSession:
         restObj.abortActiveTest()
         restObj.deleteSessionId()
- 
+
