@@ -15,6 +15,8 @@
 #
 # Requirements
 #    IxL_RestApi.py
+#
+# IxL_RestApi.py and sample scripts by: Hubert Gee
 
 import os, sys, time, signal, traceback, platform
 
@@ -30,12 +32,12 @@ else:
 from IxL_RestApi import *
 
 # Choices of IxLoad Gateway server OS: linux or windows
-serverOs = 'windows'
+serverOs = 'linux'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter:
 #    http://<server ip>:8080/api/v0/applicationTypes
-ixLoadVersion = '9.10.115.43'   ;# EA
+ixLoadVersion = '9.10.115.43'
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
@@ -66,10 +68,6 @@ if serverOs == 'linux':
 # Where to put the downloaded csv results
 saveResultsInPath = currentDir
 
-# Do you need to upload your saved config file to the server?
-# If not, a saved config must be already in the IxLoad gateway server filesystem.
-upLoadFile = True
-
 # On the local host where you are running this script.
 # The path to the saved config file. In this example, get it from the current folder
 if platform.system() == 'Linux':
@@ -83,7 +81,7 @@ scpDestPath = currentDir
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save run time stat results to CSV files.
-saveStatsToCsvFile = True
+saveStatsToCsvFile = False
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
@@ -143,14 +141,14 @@ try:
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
 
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
+
+    # The folder to store the results on the IxLoad Gateway server.
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
 
-    if upLoadFile == True:
-        restObj.uploadFile(localConfigFileToUpload, rxfFileOnServer)
+    # uploadConfigFile: None or path to the config file on your local host
+    restObj.loadConfigFile(rxfFileOnServer, uploadConfigFile=localConfigFileToUpload)
 
-    restObj.loadConfigFile(rxfFileOnServer)
     restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
-
     if forceTakePortOwnership:
         restObj.enableForceOwnership()
 

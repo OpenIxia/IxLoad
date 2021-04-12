@@ -384,10 +384,29 @@ class Main():
         self.verifyStatus(self.httpHeader+operationsId, timeout=timeout)
     
     # LOAD CONFIG FILE
-    def loadConfigFile(self, rxfFile):
+    def loadConfigFile(self, rxfFile, uploadConfigFile=None):
+        """
+        Load the IxLoad .rxf config file on the gateway server.
+        If the config file does not exists on the gateway server, upload
+        the saved .rxf config file to the IxLoad Gateway server using parameter
+        uploadConfigFile.
+
+        Parameters
+           rxfFile <str>: Where is the full path .rxf file stored in the IxLoad gateway server.
+              Windows Ex: 'C:\\Results\\$rxfFile'
+
+              # Ignore if using Linux Gateway. Will always use /mnt/ixload-share as the default path.
+              Linux Gateway Ex: '/mnt/ixload-share/$rxfFile'
+
+           uploadConfigFile <None|str>: Default to None.
+                            The local host full path to the .rxf file to upload.
+        """
+        if uploadConfigFile:
+            self.uploadFile(localPathAndFilename=uploadConfigFile, ixLoadSvrPathAndFilename=rxfFile)
+            
         loadTestUrl = self.sessionIdUrl + '/ixLoad/test/operations/loadTest/'
         response = self.post(loadTestUrl, data={'fullPath': rxfFile})
-        # http://10.219.117.103:8080/api/v0/sessions/42/ixLoad/test/operations/loadTest/0
+        # http://x.x.x.x:8080/api/v0/sessions/42/ixLoad/test/operations/loadTest/0
         operationsId = response.headers['Location']
         status = self.verifyStatus(self.httpHeader + operationsId)
 
@@ -1290,8 +1309,6 @@ class Main():
 
         else:
             self.logInfo('Upload file finished.')
-            self.logInfo('Response status code %s' % response.status_code)
-            self.logInfo('Response text %s' % response.text)
 
     def configCommunityAttributes(self, name, **kwargs):
         """

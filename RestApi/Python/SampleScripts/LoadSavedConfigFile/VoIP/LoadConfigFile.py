@@ -38,8 +38,7 @@ serverOs = 'windows'
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
-#ixLoadVersion = '8.50.115.333'
-ixLoadVersion = '9.00.0.347'
+ixLoadVersion = '9.10.115.43'
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
@@ -48,8 +47,11 @@ forceTakePortOwnership = True
 # The saved config file to load
 crfFile = 'voipSip.crf'
 
+# API-Key: Use your user API-Key if you want added security
+apiKey = None
+
 if serverOs == 'windows':
-    apiServerIp = '192.168.70.3'
+    apiServerIp = '192.168.129.6'
 
     # Where to store the csv stat results on the Windows filesystem
     resultsDir = 'c:\\Results'
@@ -58,7 +60,7 @@ if serverOs == 'windows':
     crfFileOnServer = 'c:\\VoIP\\{}'.format(crfFile)
 
 if serverOs == 'linux':
-    apiServerIp = '192.168.70.129'
+    apiServerIp = '192.168.129.24'
 
     # Leave as default. For your reference only.
     resultsDir = '/mnt/ixload-share/Results' 
@@ -84,19 +86,19 @@ apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.
 
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
-licenseServerIp = '192.168.70.3'
+licenseServerIp = '192.168.129.6'
 
 # Assign ports for testing.  Format = (cardId,portId)
 # 'Traffic1@Network1' are activity names.
 # To get the Activity names, go to: /ixload/test/activeTest/communityList
 communityPortList1 = {
-    'chassisIp': '192.168.70.128',
+    'chassisIp': '192.168.129.15',
     'Traffic1@Network1': [(1,1)],
 }
 
 communityPortList2 = {
-    'chassisIp': '192.168.70.128',
-    'Traffic2@Network2': [(2,1)],
+    'chassisIp': '192.168.129.15',
+    'Traffic2@Network2': [(1,2)],
 }
 
 # Stat names to display at run time.
@@ -114,6 +116,7 @@ try:
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
                    pollStatusInterval=1,
+                   apiKey=apiKey,
                    generateRestLogFile=True)
 
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)

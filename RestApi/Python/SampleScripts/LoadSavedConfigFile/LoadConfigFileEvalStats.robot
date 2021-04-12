@@ -16,6 +16,7 @@
 #   - For Linux: Add the Module path to .bashrc PYTHONPATH env variable     
 #   - For Windows: Add c:\Program Files (x86)\Ixia\IxLoad\<version folder>
 #   - pip install robotframework
+#     Tested with robotframework version 3.1.2
 #
 # Usage:
 #    robot LoadConfigFileEvalStats.robot
@@ -36,9 +37,9 @@ ${serverOs} =  linux
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
-${ixLoadVersion} =  9.10.0.311
+${ixLoadVersion} =  9.10.115.43
 
-${apiServerIp} =  192.168.70.129
+${apiServerIp} =  192.168.129.24
 
 # 8080 or 8443
 ${apiServerIpPort} =  8443
@@ -48,7 +49,7 @@ ${deleteSessionAfterTest} =  True
 ${uploadConfigFile} =  True
 
 # The name of the saved config file
-${configFilename} =  IxL_Http_Ipv4Ftp_vm_8.20.rxf
+${configFilename} =  IxL_Http_910_update1.rxf
 
 # The path to the saved config file. In this example, the config file is in the current directory
 ${uploadRxfFile} =  ${CURDIR}/${configFilename}
@@ -60,13 +61,13 @@ ${linuxRxfFileLocation} =   /mnt/ixload-share/${configFilename}
 ${windowsRxfFileLocation} =  C:\\Results\\${configFilename}
 
 # The IP address of the IxLoad license server
-${licenseServerIp} =  192.168.70.3
+${licenseServerIp} =  192.168.129.6
 
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 ${licenseModel} =  Subscription Mode
 
 # Record stats to CSV file: True or False
-${csvStatFile} =  True
+${csvStatFile} =  False
 
 # Enable timestamp to not overwrite the previous csv file: True or False
 ${csvEnableFileTimestamp} =  True
@@ -80,7 +81,7 @@ ${pollStatInterval} =  2
 #    To get the Key names: On the IxLoad GUI config, get the name of the stacks:
 #    Also, could be found here: http://<ip>:8080/api/v0/sessions/<id>/ixload/test/activeTest/communityList
 # Create a list
-${chassisIp} =  192.168.70.15
+${chassisIp} =  192.168.129.15
 @{port1} =  1  1
 @{port2} =  1  2
 @{port1List} =  ${port1}

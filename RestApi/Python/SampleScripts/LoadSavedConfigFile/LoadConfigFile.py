@@ -33,20 +33,20 @@ serverOs = 'linux'
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
-ixLoadVersion = '8.50.115.333'
-ixLoadVersion = '9.00.0.347'   ;# EA
-ixLoadVersion = '9.00.115.204' ;# Update-2
-ixLoadVersion = '9.10.0.311'   ;# EA
+ixLoadVersion = '9.10.115.43'
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
 forceTakePortOwnership = True
 
-# The saved config file to load
-rxfFile = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
+# API-Key: Use your user API-Key if you want added security
+apiKey = None
+
+# The full path to the saved config file to load
+rxfFile = 'IxL_Http_910_update1.rxf'
 
 if serverOs == 'windows':
-    apiServerIp = '192.168.70.3'
+    apiServerIp = '192.168.129.6'
 
     # Where to store all of the csv result files in Windows
     resultsDir = 'c:\\Results'
@@ -55,7 +55,7 @@ if serverOs == 'windows':
     rxfFileOnServer = 'C:\\Results\\{}'.format(rxfFile)
 
 if serverOs == 'linux':
-    apiServerIp = '192.168.70.129'
+    apiServerIp = '192.168.129.24'
 
     # Leave as defaults. For your reference only.
     resultsDir = '/mnt/ixload-share/Results'
@@ -63,12 +63,8 @@ if serverOs == 'linux':
     # Leave as default
     rxfFileOnServer = '/mnt/ixload-share/{}'.format(rxfFile)
 
-# Where to put the downloaded csv results
+# Where to put the downloaded csv results in the IxLoad gateway server
 saveResultsInPath = currentDir
-
-# Do you need to upload your saved config file to the server?
-# If not, a saved config must be already in the IxLoad gateway server filesystem.
-upLoadFile = True
 
 # The path to the saved config file. In this example, get it from the current folder
 localConfigFileToUpload = '{}/{}'.format(currentDir, rxfFile)
@@ -79,11 +75,11 @@ scpDestPath = currentDir
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save run time stat results to CSV files.
-saveStatsToCsvFile = True
+saveStatsToCsvFile = False
 
 apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
 
-licenseServerIp = '192.168.70.3'
+licenseServerIp = '192.168.129.6'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
 
@@ -91,12 +87,12 @@ licenseModel = 'Subscription Mode'
 #    Traffic1@Network1 are activity names.
 #    To get the Activity names, go to: /ixload/test/activeTest/communityList
 communityPortList1 = {
-    'chassisIp': '192.168.70.15',
+    'chassisIp': '192.168.129.15',
     'Traffic1@Network1': [(1,1)],
 }
 
 communityPortList2 = {
-    'chassisIp': '192.168.70.15',
+    'chassisIp': '192.168.129.15',
     'Traffic2@Network2': [(1,2)],
 }
 
@@ -121,20 +117,21 @@ try:
                    osPlatform=serverOs,
                    deleteSession=deleteSession,
                    pollStatusInterval=1,
+                   apiKey=apiKey,
                    generateRestLogFile=True)
         
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
     
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
+
+    # The folder to store the results on the IxLoad Gateway server.
     restObj.setResultDir(resultsDir, createTimestampFolder=True)
 
-    if upLoadFile == True:
-        restObj.uploadFile(localConfigFileToUpload, rxfFileOnServer)
-
-    restObj.loadConfigFile(rxfFileOnServer)
+    # uploadConfigFile: None or path to the config file on your local host    
+    restObj.loadConfigFile(rxfFileOnServer, uploadConfigFile=localConfigFileToUpload)
+    
     restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
-
     if forceTakePortOwnership:
         restObj.enableForceOwnership()
 
