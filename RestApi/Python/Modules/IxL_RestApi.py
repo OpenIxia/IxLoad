@@ -697,9 +697,62 @@ class Main():
                 raise IxLoadRestApiException('Failed to add ports to chassisIp %s: %s:' % (chassisIp, failedToAddList))
 
 
-    def enableForceOwnership(self):
-        url = self.sessionIdUrl+'/ixLoad/test/activeTest'
-        response = self.patch(url, data={'enableForceOwnership': True})
+    # Control ActiveTest Parameters
+    def controlActiveTestParameters(self, modifyParametersDict={}):
+        '''
+        Description
+        ===========
+            This API will modify the activeTest parameters prior to test start.
+
+                Example on how "modifyParametersDict" should look like:
+
+                modifyParametersDict = {
+                    "statViewThroughputUnits": "Kbps",
+                    "showNetworkDiagnosticsFromApplyConfig": False,
+                    "csvThroughputScalingFactor": 1000,
+                    "activitiesGroupedByObjective": False,
+                    "resetNetworkDiagnosticsAtStartRun": false,
+                    "testRunError": "",
+                    "enableForceNetworkUpdateCloud": False,
+                    "restObjectType": "ixTestEnvelope",
+                    "enableFrameSizeDistributionStats": False,
+                    "enableTcpAdvancedStats": False,
+                    "showNetworkDiagnosticsAfterRunStops": False,
+                    "enableResetPorts": True,
+                    "enableNetworkDiagnosticsLogging": False,
+                    "csvInterval": 1,
+                    "name": "Main Core",
+                    "downgradeAppLibFlowsToLatestValidVersion": True,
+                    "statsRequired": True,
+                    "isFrameSizeDistributionViewSupported": False,
+                    "enableForceOwnership": True,
+                    "enableNetworkDiagnostics": False,
+                    "allowMixedObjectiveTypes": False,
+                }
+        Returns
+        =======
+            N/A
+
+        Raises
+        ======
+            "IxLoadRestApiException" in case of setting value failure
+
+        '''
+
+        if not modifyParametersDict:
+            # Run test with the default values
+            print("\nMethod called with an empty parameters' "
+                "dictionary: ", modifyParametersDict)
+        else:
+            url = self.sessionIdUrl+'ixLoad/test/activeTest'
+            for item in modifyParametersDict:
+                response = self.patch(url, data={item: modifyParametersDict[item]})
+                if response.status_code != 204:
+                    # ActiveTest item has not been successfully modified
+                    raise IxLoadRestApiException('Failed to modify parameter {param}\n'.format(param=item))
+                else:
+                    print("ActiveTest parameter '{param}' has been successfully set to '{val}'".format(
+                        param=item, val=modifyParametersDict[item]))
 
     def getStatNames(self):
         statsUrl = self.sessionIdUrl+'/ixLoad/stats'
