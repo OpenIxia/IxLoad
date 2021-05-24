@@ -1328,7 +1328,8 @@ class Main():
         """
         Configure any attributes in the path: /ixLoad/test
         
-        
+        Parameters
+           kwargs: {any_attribute: value}
         """
         self.logInfo('configActiveTest')
         url = self.sessionIdUrl+'/ixLoad/test/activeTest'
