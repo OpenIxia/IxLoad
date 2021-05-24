@@ -48,6 +48,7 @@ apiKey = None
 
 # The saved config file to load
 rxfFile = 'IxL_Http_910_update1.rxf'
+rxfFile = 'IxL_Http_Ipv4Ftp_vm_8.20.rxf'
 
 if serverOs == 'windows':
     apiServerIp = '192.168.129.6'
@@ -70,10 +71,10 @@ saveResultsInPath = currentDir
 
 # On the local host where you are running this script.
 # The path to the saved config file. In this example, get it from the current folder
-if platform.system() == 'Linux':
-    localConfigFileToUpload = '{}/{}'.format(currentDir, rxfFile)
-else:
+if platform.system() == 'Windows':
     localConfigFileToUpload = '{}\\{}'.format(currentDir, rxfFile)
+else:
+    localConfigFileToUpload = '{}/{}'.format(currentDir, rxfFile)
 
 # The path where you want to download the csv result files to.  This is mostly used if using a Linux Gateway server.
 # If you're using IxLoad in Windows, SSH must be installed.  Otherwise, this variable will be ignored.
@@ -150,7 +151,7 @@ try:
 
     restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
     if forceTakePortOwnership:
-        restObj.enableForceOwnership()
+        restObj.enableForceOwnership(enable=True, enableResetPorts=True)
 
     restObj.enableAnalyzerOnAssignedPorts()
 
