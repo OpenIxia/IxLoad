@@ -734,11 +734,12 @@ class Main():
             for eachLogEntry in response.json():
                 if currentObjectId != eachLogEntry['objectID']:
                     currentObjectId = eachLogEntry['objectID']
-                    self.logInfo('\t{time}: Severity:{severity} ModuleName:{2} {3}'.format(eachLogEntry['timeStamp'],
-                                                                                    eachLogEntry['severity'],
-                                                                                    eachLogEntry['moduleName'],
-                                                                                           eachLogEntry['message']), 
-                                 timestamp=False)
+                    print('\t{time}: Severity:{severity} '
+                          'ModuleName:{modname} {message}'.format(time=eachLogEntry['timeStamp'],
+                                                                  severity=eachLogEntry['severity'],
+                                                                  modname=eachLogEntry['moduleName'],
+                                                                  message=eachLogEntry['message']),
+                          timestamp=False)
 
     def runTraffic(self):
         runTestUrl = self.sessionIdUrl+'/ixLoad/test/operations/runTest'
