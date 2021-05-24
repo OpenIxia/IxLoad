@@ -697,10 +697,12 @@ class Main():
                 raise IxLoadRestApiException('Failed to add ports to chassisIp %s: %s:' % (chassisIp, failedToAddList))
 
 
-    def enableForceOwnership(self):
+    def enableForceOwnership(self, enable=True, enableResetPorts=True):
         url = self.sessionIdUrl+'/ixLoad/test/activeTest'
-        response = self.patch(url, data={'enableForceOwnership': True})
-
+        #response = self.patch(url, data={'enableForceOwnership': True})
+        response = self.patch(url, data={'enableForceOwnership': enable,
+                                         'enableResetPorts': enableResetPorts})
+        
     def getStatNames(self):
         statsUrl = self.sessionIdUrl+'/ixLoad/stats'
         self.logInfo('\ngetStatNames: %s\n' % statsUrl)
@@ -726,20 +728,32 @@ class Main():
             self.logInfo('\nEnableConfiguredStats: %s' % configuredStats)
             response = self.patch(configuredStats, data={"enabled": True})
 
-    def showTestLogs(self):
+    def showTestLogs(self, showContinuously=False, interval=5):
+        """
+        Show all test logs.  
+        
+        Parameters
+           showContinuously <bool>: True=Show logs continuously.  False=Show once and return.
+           interval <int>: The wait time in seconds between each pull.
+        """
         testLogUrl = self.sessionIdUrl+'/ixLoad/test/logs'
-        currentObjectId = 0
+
         while True:
             response = self.get(testLogUrl)
             for eachLogEntry in response.json():
-                if currentObjectId != eachLogEntry['objectID']:
-                    currentObjectId = eachLogEntry['objectID']
-                    self.logInfo('\t{time}: Severity:{severity} ModuleName:{2} {3}'.format(eachLogEntry['timeStamp'],
-                                                                                    eachLogEntry['severity'],
-                                                                                    eachLogEntry['moduleName'],
-                                                                                           eachLogEntry['message']), 
-                                 timestamp=False)
+                self.logInfo('\t{time}: Severity:{severity} ModuleName:{moduleName} {message}'.format(
+                    time=eachLogEntry['timeStamp'],
+                    severity=eachLogEntry['severity'],
+                    moduleName=eachLogEntry['moduleName'],
+                    message=eachLogEntry['message']),
+                                timestamp=False)
 
+            if showContinuously:
+                self.logInfo('showTestLogs: Wait {} seconds'.format(interval))
+                time.sleep(interval)
+            else:
+                break
+                    
     def runTraffic(self):
         runTestUrl = self.sessionIdUrl+'/ixLoad/test/operations/runTest'
         response = self.post(runTestUrl)
@@ -1310,6 +1324,16 @@ class Main():
         else:
             self.logInfo('Upload file finished.')
 
+    def configActiveTest(self, **kwargs):
+        """
+        Configure any attributes in the path: /ixLoad/test
+        
+        
+        """
+        self.logInfo('configActiveTest')
+        url = self.sessionIdUrl+'/ixLoad/test/activeTest'
+        response = self.patch(url, data=kwargs)
+                
     def configCommunityAttributes(self, name, **kwargs):
         """
         Config any attributes in the the path of: /ixLoad/test/activeTest/communityList/<id>
@@ -1732,10 +1756,10 @@ class Main():
 
         zipFileName = 'ixLoadResults_{}.zip'.format(destinationZipFileName)
 
-        if platform.system() == 'Linux':
-            zipFile = '{}/{}'.format(targetPath, zipFileName)
-        else:  
+        if platform.system() == 'Windows':
             zipFile = '{}\\{}'.format(targetPath, zipFileName)
+        else:
+            zipFile = '{}/{}'.format(targetPath, zipFileName)
         
         # The zipName parameter will be ignored if this rest api is executed by a script.
         # zipName is used if this rest api is entered on a web browser or postman.  The zipName will be used
@@ -1771,10 +1795,10 @@ class Main():
         self.logInfo('downloadFile src:{} -> {} -> {}'.format(srcPathAndFilename, targetLocation, targetFilename))
         url = '{}/api/{}/downloadResource?localPath={}'.format(self.httpHeader, self.apiVersion, srcPathAndFilename)
         
-        if platform.system() == 'Linux':
-            targetFileLocation = '{}/{}'.format(targetLocation, targetFilename)
-        else:
+        if platform.system() == 'Windows':
             targetFileLocation = '{}\\{}'.format(targetLocation, targetFilename)
+        else:
+            targetFileLocation = '{}/{}'.format(targetLocation, targetFilename)
 
         with self.get(url, downloadStream=True) as response:
             response.raise_for_status()
