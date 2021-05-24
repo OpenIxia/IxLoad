@@ -742,7 +742,7 @@ class Main():
         if not modifyParametersDict:
             # Run test with the default values
             print("\nMethod called with an empty parameters' "
-                "dictionary: ", modifyParametersDict)
+                "dictionary: {paramDict}".format(paramDict=modifyParametersDict))
         else:
             url = self.sessionIdUrl+'ixLoad/test/activeTest'
             for item in modifyParametersDict:
