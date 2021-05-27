@@ -16,6 +16,7 @@ import re
 import datetime
 import platform
 
+
 class IxLoadRestApiException(Exception):
     def __init__(self, msg=None):
         showErrorMsg = '\nIxLoadRestApiException error: {0}\n\n'.format(msg)
@@ -1241,7 +1242,12 @@ class Main():
 
     def deleteSessionId(self):
         response = self.delete(self.sessionIdUrl)
-        
+
+    def deleteAllSessions(self):
+        sessionUrl = '{}/api/{}/sessions'.format(self.httpHeader, self.apiVersion)
+        self.delete(sessionUrl)
+        print("All Ixia Sessions Deleted")
+
     def getMaximumInstances(self):
         response = self.get(self.sessionIdUrl+'/ixLoad/preferences')
         maxInstances = response.json()['maximumInstances']
