@@ -16,6 +16,7 @@ import re
 import datetime
 import platform
 
+
 class IxLoadRestApiException(Exception):
     def __init__(self, msg=None):
         showErrorMsg = '\nIxLoadRestApiException error: {0}\n\n'.format(msg)
@@ -202,6 +203,31 @@ class Main():
         if self.generateRestLogFile:
             with open(self.restLogFile, 'a') as restLogFile:
                 restLogFile.write('Error: '+msg+end)
+
+        if self.robotFrameworkStdout:
+            self.robotStdout.log_to_console(msg)
+
+    def logWarning(self, msg, end='\n', timestamp=True):
+        """
+        Description
+           An internal function to print warnings to stdout.
+        
+        Parameter
+           msg: (str): The message to print.
+        """
+        currentTime = self.getTime()
+
+        if timestamp:
+            msg = '\n{0}: Warning: {1}'.format(currentTime, msg)
+        else:
+            # No timestamp and no newline are mainly for verifying states and status
+            msg = '\nWarning: {0}'.format(msg)
+
+        print('{0}'.format(msg), end=end)
+            
+        if self.generateRestLogFile:
+            with open(self.restLogFile, 'a') as restLogFile:
+                restLogFile.write('Warning: '+msg+end)
 
         if self.robotFrameworkStdout:
             self.robotStdout.log_to_console(msg)
@@ -1102,6 +1128,7 @@ class Main():
         waitForRunningStatusCounterExit = 120
         pollStatCounter = 0
 
+        row_dict = {}
         while True:
             currentState = self.getActiveTestCurrentState(silentMode=True)
             self.logInfo('ActiveTest current status: %s. ' % currentState)
@@ -1109,47 +1136,63 @@ class Main():
                 if statsDict == None:
                     time.sleep(1)
                     continue
-                    
+
                 # statType:  HTTPClient or HTTPServer (Just a example using HTTP.)
                 # statNameList: transaction success, transaction failures, ...
+                row_dict = {}
                 for statType,statNameList in statsDict.items():
                     self.logInfo('\n%s:' % statType, timestamp=False)
-                    statUrl = self.sessionIdUrl+'/ixLoad/stats/'+statType+'/values'
-                    response = self.getStats(statUrl)
-                    highestTimestamp = 0
-                    # Each timestamp & statnames: values                
-                    for eachTimestamp,valueList in response.json().items():
-                        if eachTimestamp == 'error':
-                            raise IxLoadRestApiException('pollStats error: Probable cause: Misconfigured stat names to retrieve.')
+                    statTypeUrl = self.sessionIdUrl+'/ixLoad/stats/'+statType
+                    statTyperesponse = self.getStats(statTypeUrl)
+                    row_dict[statType] = {}
 
-                        if int(eachTimestamp) > highestTimestamp:
-                            highestTimestamp = int(eachTimestamp)
+                    for item in statTyperesponse.json():
+                        statName = item['caption']
+                        if item['caption'] in statNameList:
+                            statTypeobjectID = str(item['objectID'])
+                            statTypeValueUrl = self.sessionIdUrl+'/ixLoad/stats/'+statType\
+                                +'/'+statTypeobjectID+'/values'
+                            statTyperesponseValue = self.getStats(statTypeValueUrl)
+                            highestTimestamp = 0
+                            # Each timestamp & statnames: values
+                            for eachTimestamp,valueList in statTyperesponseValue.json().items():
+                                if eachTimestamp == 'error':
+                                    raise IxLoadRestApiException('pollStats error: Probable cause: '
+                                        'Misconfigured stat names to retrieve.')
 
-                    if highestTimestamp == 0:
-                        time.sleep(3)
-                        continue
+                                if int(eachTimestamp) > highestTimestamp:
+                                    highestTimestamp = int(eachTimestamp)
 
-                    if csvFile:
-                        csvFilesDict[statType]['rowValueList'] = []
+                            if highestTimestamp == 0:
+                                time.sleep(3)
+                                continue
 
-                    # Get the interested stat names only
-                    for statName in statNameList:
-                        if statName in response.json()[str(highestTimestamp)]:
-                            statValue = response.json()[str(highestTimestamp)][statName]
+                            statValue = statTyperesponseValue.json()[str(highestTimestamp)]
                             self.logInfo('\t%s: %s' % (statName, statValue), timestamp=False)
-                            if csvFile:
-                                csvFilesDict[statType]['rowValueList'].append(statValue)
-                        else:
-                            self.logError('\tStat name not found. Check spelling and case sensitivity: %s' % statName)
+                            row_dict[statType][statName] = {}
+                            row_dict[statType][statName][highestTimestamp] = statValue
 
-                    if csvFile:
+                    # First poll attempts could be empty
+                    if csvFile and len(csvFilesDict[statType]['columnNameList']) == len(row_dict[statType]):
+                        # Rearrange rows to be saved in the CSV file
+                        row_list = []
+                        for columnItem in csvFilesDict[statType]['columnNameList']:
+                            row_list.append(row_dict[statType][columnItem])
+                        csvFilesDict[statType]['rowValueList'] = row_list
                         if csvFilesDict[statType]['rowValueList'] != []:
-                            csvFilesDict[statType]['csvObj'].writerow(csvFilesDict[statType]['rowValueList']) 
+                            csvFilesDict[statType]['csvObj'].writerow(
+                                csvFilesDict[statType]['rowValueList'][-len(row_dict[statType]):])
+                    else:
+                        self.logWarning('\tPolling stat is not completed yet or one of the provided stat names '
+                                        'is incorrect, Check spelling and case sensitivity!'
+                                        '\nProvided statsDict: %s' % statNameList)
 
                 time.sleep(pollStatInterval)
 
                 if exitAfterPollingIteration and pollStatCounter >= exitAfterPollingIteration:
-                    self.logInfo('pollStats exitAfterPollingIteration is set to {} iterations. Current runtime iteration is {}. Exiting PollStats'.format(exitAfterPollingIteration, pollStatCounter))
+                    self.logInfo('pollStats exitAfterPollingIteration is set to {} iterations. '
+                        'Current runtime iteration is {}. Exiting PollStats'.format(
+                            exitAfterPollingIteration, pollStatCounter))
                     return
 
                 pollStatCounter += 1
@@ -1161,7 +1204,8 @@ class Main():
                 # If currentState is "Stopping Run" or Cleaning
                 if waitForRunningStatusCounter < waitForRunningStatusCounterExit:
                     waitForRunningStatusCounter += 1
-                    self.logInfo('\tWaiting {0}/{1} seconds'.format(waitForRunningStatusCounter, waitForRunningStatusCounterExit), timestamp=False)
+                    self.logInfo('\tWaiting {0}/{1} seconds'.format(
+                        waitForRunningStatusCounter, waitForRunningStatusCounterExit), timestamp=False)
                     time.sleep(1)
                     continue
 
@@ -1241,7 +1285,12 @@ class Main():
 
     def deleteSessionId(self):
         response = self.delete(self.sessionIdUrl)
-        
+
+    def deleteAllSessions(self):
+        sessionUrl = '{}/api/{}/sessions'.format(self.httpHeader, self.apiVersion)
+        self.delete(sessionUrl)
+        print("All Ixia Sessions Deleted")
+
     def getMaximumInstances(self):
         response = self.get(self.sessionIdUrl+'/ixLoad/preferences')
         maxInstances = response.json()['maximumInstances']
