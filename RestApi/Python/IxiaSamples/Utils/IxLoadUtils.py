@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import json
 import requests
 import time
@@ -8,7 +10,7 @@ from future.utils import iteritems
 kActionStateFinished = 'finished'
 kActionStatusSuccessful = 'Successful'
 kActionStateSuccess = 'SUCCESS'
-kActionStateError = 'ERROR'
+kActionStateError = 'EXCEPTION'
 kActionStatusError = 'Error'
 kTestStateUnconfigured = 'Unconfigured'
 kGatewaySharedFolderL = '/mnt/ixload-share'
@@ -26,7 +28,7 @@ def getRxfName(connection, location):
 
 def log(message):
     currentTime = time.strftime("%H:%M:%S")
-    print ("%s -> %s" % (currentTime, message))
+    print("%s -> %s" % (currentTime, message))
 
 
 def getResourcesUrl(connection):
@@ -107,7 +109,7 @@ def performGenericOperation(connection, url, payloadDict):
 
 def performGenericPost(connection, listUrl, payloadDict):
     '''
-        This will perform a generic POST method on a given url
+        This will perform a generic POST method on a given url.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -132,7 +134,7 @@ def performGenericPost(connection, listUrl, payloadDict):
 
 def performGenericDelete(connection, listUrl, payloadDict):
     '''
-        This will perform a generic DELETE method on a given url
+        This will perform a generic DELETE method on a given url.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -150,7 +152,7 @@ def performGenericDelete(connection, listUrl, payloadDict):
 
 def performGenericPatch(connection, url, payloadDict):
     '''
-        This will perform a generic PATCH method on a given url
+        This will perform a generic PATCH method on a given url.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -165,9 +167,10 @@ def performGenericPatch(connection, url, payloadDict):
     return reply
 
 
-def downloadResource(connection, downloadFolder, localPath, zipName="", timeout=80):
+def downloadResource(connection, downloadFolder, localPath, zipName=None, timeout=80):
     '''
-        This method is used to download an entire folder as an archive or any type of file without changing it's format
+        This method is used to download an entire folder as an archive or any type of file without changing it's format.
+
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - downloadFolder is the folder were the archive/file will be saved
@@ -189,13 +192,17 @@ def downloadResource(connection, downloadFolder, localPath, zipName="", timeout=
     elif zipName.split(".")[-1] != "zip":
         zipName  = zipName + ".zip"
     downloadFile = '/'.join([downloadFolder, zipName])
+    log("Downloading resource to %s..." % (downloadFile))
     try:
         with open(downloadFile, 'wb') as fileHandle:
             for chunk in downloadResourceReply.iter_content(chunk_size=1024):
                 fileHandle.write(chunk)
-    except IOError:
-        log("Could not open or create file, please check path and/or permissions")
-        return 2
+    except IOError as e:
+        raise Exception("Download resource failed. Could not open or create file, please check path and/or permissions. Received IO error: %s" % str(e))
+    except Exception as e:
+        raise Exception('Download resource failed. Received the following error:\n %s' % str(e))
+    else:
+        log("Download resource finished.")
 
 
 def createNewSession(connection, ixLoadVersion=''):
@@ -209,7 +216,8 @@ def createNewSession(connection, ixLoadVersion=''):
 
 def startNewSession(connection):
     '''
-        This method is used to create and start a new session. It will return the url of the newly created session
+        This method is used to create and start a new session. It will return the url of the newly created session.
+
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
     '''
@@ -220,7 +228,7 @@ def startNewSession(connection):
     resourceObj = connection.httpGet(sessionLocation)
     sessionId = resourceObj.sessionId
 
-    log("Created session no %s" % sessionId)
+    log("Created session no %s." % (sessionId))
     newSessionUrl = "%s/%s" % (sessionsUrl, sessionId)
 
     return newSessionUrl
@@ -228,13 +236,12 @@ def startNewSession(connection):
 
 def createSession(connection, ixLoadVersion):
     '''
-        This method is used to create a new session. It will return the url of the newly created session
+        This method is used to create a new session. It will return the url of the newly created session.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - ixLoadVersion this is the actual IxLoad Version to start
     '''
-
     sessionsUrl = "sessions"
     apiVersion = getApiVersion(connection)
 
@@ -250,8 +257,7 @@ def createSession(connection, ixLoadVersion):
 
     # start the session
     performGenericOperation(connection, startSessionUrl, {})
-
-    log("Created session no %s" % sessionId)
+    log("Created session no %s." % (sessionId))
 
     return newSessionUrl
 
@@ -270,7 +276,8 @@ def deleteSession(connection, sessionUrl):
 
 def getSharedFolder(connection):
     '''
-    This method gets the sharedLocation folder
+    This method gets the sharedLocation folder.
+
     Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
     '''
@@ -280,9 +287,9 @@ def getSharedFolder(connection):
     return resourceObj.sharedLocation
 
 
-def changeRunResultDir(connection, sessionUrl, runResultDirPath ):
+def changeRunResultDir(connection, sessionUrl, runResultDirPath):
     '''
-        This method is used to change the path where results are saved
+        This method is used to change the path where results are saved.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -291,31 +298,54 @@ def changeRunResultDir(connection, sessionUrl, runResultDirPath ):
     '''
     testUrl = "%s/ixload/test" % sessionUrl
     payloadDict = {"outputDir": "true", "runResultDirFull": runResultDirPath}
+
     performGenericPatch(connection, testUrl, payloadDict)
+    log("Changed the result directory to %s." % (runResultDirPath))
 
 
 def uploadFile(connection, url, fileName, uploadPath, overwrite=True):
+    '''
+        This method is used to upload a file from the computer where the script runs, on the computer where the 
+        IxLoad client is running.
+
+        Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - url is the address of the resource that uploads the file. E.g. http://ip:port/api/v0/resources
+        - filename contains the name (or absolute path to the file, if the file is not in the same
+            location as the executing script) of the file to be uploaded. This is the location on the
+            computer where the script is running. E.g. "file.txt", r"D:/examples/file.txt".
+        - uploadPath is the path where the file should be copied to on the computer on which the IxLoad client runs
+        - overwrite specifies the required behavior if the file to be uploaded already exists on the remote computer
+    '''
     headers = {'Content-Type': 'multipart/form-data'}
     params = {"overwrite": overwrite, "uploadPath": uploadPath}
-    log('Uploading to %s...' % uploadPath)
+    log('Uploading to %s...' % (uploadPath))
+    result = {}
     try:
         with open(fileName, 'rb') as f:
-            resp = requests.post(url, data=f, params=params, headers=headers, verify=False)
-            if resp.ok is not True:
-                raise Exception('POST operation failed with %s' %resp.text)
+            response = requests.post(url, data=f, params=params, headers=headers, verify=False)
+            result["status"] = int(response.ok)
+            if response.ok is not True:
+                result["error"] = response.text
+                raise Exception('POST operation failed with %s' % response.text)
     except requests.exceptions.ConnectionError as e:
+        result["error"] = str(e)
         raise Exception(
             'Upload file failed. Received connection error. One common cause for this error is the size of the file to be uploaded.'
             ' The web server sets a limit of 1GB for the uploaded file size. Received the following error: %s' % str(e)
         )
     except IOError as e:
+        result["error"] = str(e)
         raise Exception('Upload file failed. Received IO error: %s' % str(e))
     except Exception as e:
+        result["error"] = str(e)
         raise Exception('Upload file failed. Received the following error:\n   %s' % str(e))
     else:
+        result["error"] = ""
         log('Upload file finished.')
-        log('Response status code %s' % resp.status_code)
-        log('Response text %s' % resp.text)
+        log('Response status code %s' % (response.status_code))
+        log('Response text %s' % (response.text))
+    return result
 
 
 def loadRepository(connection, sessionUrl, rxfFilePath):
@@ -336,6 +366,7 @@ def loadRepository(connection, sessionUrl, rxfFilePath):
 def save(connection, sessionUrl):
     '''
         This method saves the currently loaded configuration file.
+
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session to save the rxf for
@@ -349,6 +380,7 @@ def save(connection, sessionUrl):
 def saveRxf(connection, sessionUrl, rxfFilePath, overWrite=True):
     '''
         This method saves the current rxf to the disk of the machine on which the IxLoad instance is running.
+
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session to save the rxf for
@@ -364,6 +396,7 @@ def saveRxf(connection, sessionUrl, rxfFilePath, overWrite=True):
 def importConfig(connection, sessionUrl, srcFilePath, destRxfPath):
     '''
         This method will perform a POST request to load a repository.
+
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session to save the rxf for
@@ -380,6 +413,7 @@ def importConfig(connection, sessionUrl, srcFilePath, destRxfPath):
 def exportConfig(connection, sessionUrl, destFilePath):
     '''
         This method saves the current configuration as crf file to the disk of the machine on which the IxLoad instance is running.
+
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session to save the rxf for
@@ -394,7 +428,8 @@ def exportConfig(connection, sessionUrl, destFilePath):
 
 def applyConfiguration(connection, sessionUrl):
     '''
-    This method is used to apply the currently loaded test. After starting the 'Apply Config' action, wait for the action to complete.
+        This method is used to apply the currently loaded test. After starting the 'Apply Config' action, wait for the action to complete.
+
         Args:
             - connection is the connection object that manages the HTTP data transfers between the client and the REST API
             - sessionUrl is the address of the session that should run the test.
@@ -414,7 +449,7 @@ def releaseConfiguration(connection, sessionUrl):
             - sessionUrl is the address of the session that should run the test.
     '''
 
-    releaseConfigUrl = "%s/ixload/test/operation/abortAndReleaseConfigWaitFinish"  %(sessionUrl)
+    releaseConfigUrl = "%s/ixload/test/operations/abortAndReleaseConfigWaitFinish"  %(sessionUrl)
     data = {}
 
     performGenericOperation(connection, releaseConfigUrl, data)
@@ -450,7 +485,7 @@ def waitForAllCaptureData(connection, sessionUrl):
 
 def enableForcefullyTakeOwnershipAndResetPorts(connection, sessionUrl):
     '''
-        This method is used to take forcefully the ownership of the ports
+        This method is used to take forcefully the ownership of the ports.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -458,6 +493,7 @@ def enableForcefullyTakeOwnershipAndResetPorts(connection, sessionUrl):
     '''
     activeTestUrl = "%s/ixload/test/activeTest" % (sessionUrl)
     data =  {'enableForceOwnership': 'true','enableResetPorts': 'true'}
+
     performGenericPatch(connection, activeTestUrl, data)
 
 
@@ -502,36 +538,86 @@ def enableAnalyzerOnPorts(connection, sessionUrl, communityPortIdTuple):
     communityObjectID, portID = communityPortIdTuple
     portObjectID = getPortObjectId(connection, sessionUrl, communityPortIdTuple)
     if portObjectID is None:
-        log("ObjectID could not be found for the supplied tuple")
-        return 1
+        raise Exception("Port objectID could not be found for the port with ID: %s" % portID)
 
     patchUrl = sessionUrl + "/ixload/test/activeTest/communityList/%s/network/portList/%s" % (communityObjectID, portObjectID)
-    performGenericPatch(connection, patchUrl, {'enableCapture': "true"})
+    payloadDict = {'enableCapture': "true"}
 
-    return 0
+    performGenericPatch(connection, patchUrl, payloadDict)
 
 
 def enableAnalyzerOnAssignedPorts(connection, sessionUrl):
     '''
-        This method is used to enable Analyzer for all assigned ports
+        This method is used to enable Analyzer for all assigned ports.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session on which the test was ran.
-
-        Error Codes:
-        - 0 No error
-        - 2 Cannot create/open captureFile
     '''
-
-    communtiyListUrl = "%s/ixload/test/activeTest/communityList" % sessionUrl
-    communityList = connection.httpGet(communtiyListUrl)
+    communityListUrl = "%s/ixload/test/activeTest/communityList" % sessionUrl
+    communityList = connection.httpGet(communityListUrl)
 
     for community in communityList:
-        portListUrl = "%s/%s/network/portList" % (communtiyListUrl, community.objectID)
+        portListUrl = "%s/%s/network/portList" % (communityListUrl, community.objectID)
         portList = connection.httpGet(portListUrl)
         payloadDict = {"enableCapture" : "true"}
+
         performGenericPatch(connection, portListUrl, payloadDict)
+
+
+def setEnableL23RestStatViews(connection, sessionUrl, value=True):
+    '''
+        This method is used to set the value for the 'enableL23RestStatsViews' option.
+        that handles the creation of L23 statistics:
+            - L2-3 Stats for Client Ports
+            - L2-3 Stats for Server Ports
+            - L2-3 Throughput Stats
+
+        Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - sessionUrl is the address of the session on which the test was ran.
+        - value is True to enable and False to disable the L23 statistics.
+    '''
+    preferencesUrl = "%s/ixload/preferences" % sessionUrl
+    payloadDict = {"enableL23RestStatViews": value}
+
+    performGenericPatch(connection, preferencesUrl, payloadDict)
+
+
+def setEnableRestStatViewsCsvLogging(connection, sessionUrl, value=True):
+    '''
+        This method is used to set the value for the 'enableRestStatViewsCsvLogging' option
+        that handles the saving in CSV format of the stat views.
+
+        Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - sessionUrl is the address of the session on which the test was ran.
+        - value is True to enable and False to disable the CSV logging.
+    '''
+    preferencesUrl = "%s/ixload/preferences" % sessionUrl
+    payloadDict = {"enableRestStatViewsCsvLogging": value}
+
+    performGenericPatch(connection, preferencesUrl, payloadDict)
+
+
+def setEnableRestReportingPreferences(connection, sessionUrl, value=True):
+    '''
+        This method is used to set the values for the 'enableL23RestStatViews', 'enableRestStatViewsCsvLogging' and
+        'saveDataModelSnapshot' options needed to generate a report from REST API.
+
+        Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - sessionUrl is the address of the session on which the test was ran.
+        - value is True to enable and False to disable the REST reporting preferences.
+    '''
+    preferencesUrl = "%s/ixload/preferences" % sessionUrl
+    payloadDict = {
+        "enableL23RestStatViews" : value,
+        "saveDataModelSnapshot" : value,
+        "enableRestStatViewsCsvLogging" : value
+    }
+
+    performGenericPatch(connection, preferencesUrl, payloadDict)
 
 
 def retrieveCaptureFileForPorts(connection, sessionUrl, communityPortIdTuple, captureFile):
@@ -555,7 +641,7 @@ def retrieveCaptureFileForPorts(connection, sessionUrl, communityPortIdTuple, ca
     communityObjectID, portID = communityPortIdTuple
     portObjectID = getPortObjectId(connection, sessionUrl, communityPortIdTuple)
     if portObjectID is None:
-        log("ObjectID could not be found for the supplied tuple")
+        log("Error: Port objectID could not be found for port with ID: %s" % (portID))
         return 1
 
     captureFile = captureFile.replace("\\\\", "\\")
@@ -564,17 +650,19 @@ def retrieveCaptureFileForPorts(connection, sessionUrl, communityPortIdTuple, ca
     captureUrl = portUrl + "/%s/restCaptureFile" % portObjectID
     capturePayload = connection.httpRequest('GET', captureUrl, downloadStream=True)
 
-    fileHandle = None
+    log("Saving capture file %s..." % (captureFile))
     try:
         with open(captureFile, 'wb') as fileHandle:
             for chunk in capturePayload.iter_content(chunk_size=1024):
                 fileHandle.write(chunk)
-    except IOError:
-        log("Could not open or create file, please check path and/or permissions")
+    except IOError as e:
+        log("Error: Saving capture failed. Could not open or create file, please check path and/or permissions. Received IO error: %s" % (str(e)))
         return 2
-    finally:
-        if fileHandle:
-            fileHandle.close()
+    except Exception as e:
+        log("Error: Saving capture failed. Received the following error:\n %s" % (str(e)))
+        return 2
+    else:
+        log("Saving capture finished.")
     
     return 0
 
@@ -589,36 +677,35 @@ def retrieveCaptureFileForAssignedPorts(connection, sessionUrl, captureFolder):
         - captureFolder is the folder where the capture file will be saved
 
     '''
-    communtiyListUrl = "%s/ixload/test/activeTest/communityList" % sessionUrl
-    communityList = connection.httpGet(communtiyListUrl)
+    communityListUrl = "%s/ixload/test/activeTest/communityList" % sessionUrl
+    communityList = connection.httpGet(communityListUrl)
     captureFolder = captureFolder.replace("\\\\", "\\")
 
-
     for community in communityList:
-        portListUrl = "%s/%s/network/portList" % (communtiyListUrl, community.objectID)
+        portListUrl = "%s/%s/network/portList" % (communityListUrl, community.objectID)
         portList = connection.httpGet(portListUrl)
         for port in portList:
             captureUrl = portListUrl + "/%s/restCaptureFile" % port.objectID
             capturePayload = connection.httpRequest('GET', captureUrl, downloadStream=True)
             captureName = "Capture_%s_%s.cap" % (community.objectID, port.id)
             captureFile = '/'.join([captureFolder, captureName])
-            fileHandle = None
+            log("Saving capture file %s..." % (captureFile))
             try:
                 with open(captureFile, 'wb') as fileHandle:
                     for chunk in capturePayload.iter_content(chunk_size=1024):
                         fileHandle.write(chunk)
-            except IOError:
-                log("Could not open or create file, please check path and/or permissions")
-                return 2
-            finally:
-                if fileHandle:
-                    fileHandle.close()
-    return 0
+            except IOError as e:
+                raise Exception("Error: Saving capture failed. Could not open or create file, please check path and/or permissions. Received IO error: %s" % str(e))
+            except Exception as e:
+                raise Exception("Error: Saving capture failed. Received the following error:\n %s" % str(e))
+            else:
+                log("Saving capture finished.")
 
 
 def getTestCurrentState(connection, sessionUrl):
     '''
     This method gets the test current state. (for example - running, unconfigured, ..)
+
     Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session that should run the test.
@@ -629,10 +716,16 @@ def getTestCurrentState(connection, sessionUrl):
     return testObj.currentState
 
 
+def getSessionIsActive(connection, sessionUrl):
+    sessionObj = connection.httpGet(sessionUrl)
+    return sessionObj.isActive
+
+
 def getTestRunError(connection, sessionUrl):
     '''
     This method gets the error that appeared during the last test run.
     If no error appeared (the test ran successfully), the return value will be 'None'.
+
     Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session that should run the test.
@@ -641,6 +734,17 @@ def getTestRunError(connection, sessionUrl):
     testObj = connection.httpGet(activeTestUrl)
 
     return testObj.testRunError
+
+
+def getRemotePid(connection, sessionUrl):
+    '''
+    This method returns the process identifier of the IxLoad instance running for this session.
+    Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - sessionUrl is the address of the session that should run the test.
+    '''
+    sessionData = connection.httpGet(sessionUrl)
+    return sessionData.remotePid
 
 
 def collectDiagnostics(connection, sessionUrl, zipFilePath, clientOnly=False):
@@ -664,7 +768,7 @@ def collectGatewayDiagnostics(connection, zipFilePath):
 
          Args:
          - connection is the connection object that manages the HTTP data transfers between the client and the REST API
-         - zipFilePath is the local zip path on the machine that holds the IxLoad instance
+         - zipFilePath is the local zip path on the machine that holds the IxLoad instance. This needs to be the absolute path (ex: /mnt/ixload-share/diags.zip)
     '''
     collectGatewayDiagnosticsUrl = "logs/operations/collectDiagnostics"
     data = {"zipFileLocation": zipFilePath}
@@ -676,6 +780,7 @@ def waitForTestToReachUnconfiguredState(connection, sessionUrl):
     '''
     This method waits for the current test to reach the 'Unconfigured' state.
     This is required in order to make sure that the test, after finishing the run, completes the Clean Up process before the IxLoad session is closed.
+
     Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session that should run the test.
@@ -801,12 +906,14 @@ def pollStats(connection, sessionUrl, watchedStatsDict, pollingInterval=4):
 def clearChassisList(connection, sessionUrl):
     '''
         This method is used to clear the chassis list. After execution no chassis should be available in the chassisList.
+
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - sessionUrl is the address of the session that should run the test
     '''
     chassisListUrl = "%s/ixload/chassischain/chassisList" % sessionUrl
     deleteParams = {}
+
     performGenericDelete(connection, chassisListUrl, deleteParams)
 
 
@@ -827,6 +934,7 @@ def addChassisList(connection, sessionUrl, chassisList):
 
         #refresh the chassis
         refreshConnectionUrl = "%s/%s/operations/refreshConnection" % (chassisListUrl, chassisId)
+
         performGenericOperation(connection, refreshConnectionUrl, {})
 
 
@@ -843,6 +951,7 @@ def refreshAllChassis(connection, sessionUrl):
     for chassisObj in chassisList:
         chassisId = chassisObj.objectID
         refreshConnectionUrl = "%s/%s/operations/refreshConnection" % (chassisListUrl, chassisId)
+
         performGenericOperation(connection, refreshConnectionUrl, {})
 
 
@@ -881,7 +990,8 @@ def assignPorts(connection, sessionUrl, portListPerCommunity):
 
 def changeCardsInterfaceMode(connection, chassisChainUrl, chassisIp, cardIdList, mode):
     '''
-        This method is used to change the interface mode on a list of cards from a chassis. In order to call this method, the desired chassis must be already  added and connected.
+        This method is used to change the interface mode on a list of cards from a chassis. 
+        In order to call this method, the desired chassis must be already  added and connected.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -892,15 +1002,15 @@ def changeCardsInterfaceMode(connection, chassisChainUrl, chassisIp, cardIdList,
     '''
     changeCardsInterfaceModeOperationUrl = "%s/operations/changeCardsInterfaceMode" % chassisChainUrl
     cardIdStr = ",".join([str(cardId) for cardId in cardIdList])
-
-    data = {"chassisIp":chassisIp, "cardIdList":cardIdStr, "mode":mode}
+    data = {"chassisIp": chassisIp, "cardIdList": cardIdStr, "mode": mode}
 
     performGenericOperation(connection, changeCardsInterfaceModeOperationUrl, data)
 
 
 def setCardsAggregationMode(connection, chassisChainUrl, chassisIp, cardIdList, mode):
     '''
-        This method is used to change the aggregation mode on a list of cards from a chassis. In order to call this method, the desired chassis must be already  added and connected.
+        This method is used to change the aggregation mode on a list of cards from a chassis. 
+        In order to call this method, the desired chassis must be already  added and connected.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -911,8 +1021,7 @@ def setCardsAggregationMode(connection, chassisChainUrl, chassisIp, cardIdList, 
     '''
     setCardsAggregationModeOperationUrl = "%s/operations/setCardsAggregationMode" % chassisChainUrl
     cardIdStr = ",".join([str(cardId) for cardId in cardIdList])
-
-    data = {"chassisIp":chassisIp, "cardIdList":cardIdStr, "mode":mode}
+    data = {"chassisIp": chassisIp, "cardIdList": cardIdStr, "mode": mode}
 
     performGenericOperation(connection, setCardsAggregationModeOperationUrl, data)
 
@@ -920,22 +1029,36 @@ def setCardsAggregationMode(connection, chassisChainUrl, chassisIp, cardIdList, 
 def getIPRangeListUrlForNetworkObj(connection, networkUrl):
     '''
         This method will return the IP Ranges associated with an IxLoad Network component.
+        WARNING: this method was replaced with the more generic getRangeListUrlForNetworkObj, we recommend to stop using it
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
         - networkUrl is the REST address of the network object for which the network ranges will be provided.
+    '''
+    return getRangeListUrlForNetworkObj(connection, networkUrl, rangeListType='rangeList')
+
+
+def getRangeListUrlForNetworkObj(connection, networkUrl, rangeListType):
+    '''
+        This method will return the ranges associated with an IxLoad Network component.
+
+        Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - networkUrl is the REST address of the network object for which the network ranges will be provided.
+        - rangeListType is the type of the range list; it is one of the following: 'rangeList'/'macRangeList'/'vlanRangeList'
+        - the 'rangeList' type does the same thing as the getIPRangeListUrlForNetworkObj method
     '''
     networkObj = connection.httpGet(networkUrl)
 
     if isinstance(networkObj, list):
         for obj in networkObj:
             url = "%s/%s" % (networkUrl, obj.objectID)
-            rangeListUrl = getIPRangeListUrlForNetworkObj(connection, url)
+            rangeListUrl = getRangeListUrlForNetworkObj(connection, url, rangeListType)
             if rangeListUrl:
                 return rangeListUrl
     else:
         for link in networkObj.links:
-            if link.rel == 'rangeList':
+            if link.rel == rangeListType:
                 rangeListUrl = normalizeLink(link.href)
                 return rangeListUrl
 
@@ -945,7 +1068,7 @@ def getIPRangeListUrlForNetworkObj(connection, networkUrl):
 
                 childrenListUrl = normalizeLink(link.href)
 
-                return getIPRangeListUrlForNetworkObj(connection, childrenListUrl)
+                return getRangeListUrlForNetworkObj(connection, childrenListUrl, rangeListType)
 
     return None
 
@@ -953,6 +1076,7 @@ def getIPRangeListUrlForNetworkObj(connection, networkUrl):
 def changeIpRangesParams(connection, sessionUrl, ipOptionsToChangeDict):
     '''
         This method is used to change certain properties on an IP Range.
+        WARNING: this method was replaced with the more generic changeRangesParams, we recommend to stop using it.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -960,20 +1084,34 @@ def changeIpRangesParams(connection, sessionUrl, ipOptionsToChangeDict):
         - ipOptionsToChangeDict is the Python dict holding the items in the IP range that will be changed.
             (ipOptionsToChangeDict format -> { IP Range name : { optionName : optionValue } })
     '''
-    communityListUrl = "%s/ixload/test/activeTest/communityList" % sessionUrl
+    return changeRangesParams(connection, sessionUrl, rangeListType='rangeList', optionsToChangeDict=ipOptionsToChangeDict)
 
+
+def changeRangesParams(connection, sessionUrl, rangeListType, optionsToChangeDict):
+    '''
+        This method is used to change certain properties on a range.
+
+        Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - sessionUrl is the address of the session that should run the test
+        - rangeListType is the type of the range list; it is one of the following 'rangeList'/'macRangeList'/'vlanRangeList'
+        - optionsToChangeDict is the Python dict holding the items in the range that will be changed.
+            (optionsToChangeDict format -> { range name : { optionName : optionValue } })
+        - the 'rangeList' type does the same thing as the changeIpRangesParams method
+    '''
+    communityListUrl = "%s/ixload/test/activeTest/communityList" % sessionUrl
     communityList = connection.httpGet(url=communityListUrl)
 
     for community in communityList:
         stackUrl = "%s/%s/network/stack" % (communityListUrl, community.objectID)
 
-        rangeListUrl = getIPRangeListUrlForNetworkObj(connection, stackUrl)
+        rangeListUrl = getRangeListUrlForNetworkObj(connection, stackUrl, rangeListType)
         rangeList = connection.httpGet(rangeListUrl)
 
         for rangeObj in rangeList:
-            if rangeObj.name in list(ipOptionsToChangeDict):
+            if rangeObj.name in list(optionsToChangeDict):
                 rangeObjUrl = "%s/%s" % (rangeListUrl, rangeObj.objectID)
-                paramDict = ipOptionsToChangeDict[rangeObj.name]
+                paramDict = optionsToChangeDict[rangeObj.name]
 
                 performGenericPatch(connection, rangeObjUrl, paramDict)
 
@@ -1085,7 +1223,7 @@ def addDUT(connection, sessionUrl, dutDict=None):
 
 def editDutProperties(connection, sessionUrl, dutId, newInfoDict=None):
     '''
-        This method is used to modify the DUT's: name, comment, type
+        This method is used to modify the DUT's: name, comment, type.
 
         Args:
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
@@ -1228,6 +1366,21 @@ def deleteAllLogs(connection):
         - connection is the connection object that manages the HTTP data transfers between the client and the REST API
     '''
     performGenericOperation(connection, 'logs/operations/deleteAllLogs', {})
+
+
+def generateReport(connection, sessionUrl, reportName):
+    '''
+        This method is used to genererate a PDF report when running from REST API.
+
+        Args:
+        - connection is the connection object that manages the HTTP data transfers between the client and the REST API
+        - sessionUrl is the address of the session that will have its logs deleted
+        - reportName is the full name of the report file to be generated (in .pdf format)
+    '''
+    generateReportUrl = "%s/ixload/test/operations/generateRestReport"  % (sessionUrl)
+    data = {"reportFile": reportName}
+
+    performGenericOperation(connection, generateReportUrl, data)
 
 
 # To be used for removing '/api/v0/' from a link
