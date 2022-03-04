@@ -1,16 +1,18 @@
+from __future__ import print_function
+
 try:
     import requests
 except:
-    print ("The 'requests' module could not be imported. Please make sure the 'requests' module is installed in your Python build.")
+    print("The 'requests' module could not be imported. Please make sure the 'requests' module is installed in your Python build.")
     exit(1)
 
 try:
-	#python 2.7
-	from urlparse import urljoin
+    #python 2.7
+    from urlparse import urljoin
 except:
-	#python 3.5
-	import urllib
-	from urllib.parse import urljoin
+    #python 3.5
+    import urllib
+    from urllib.parse import urljoin
 import json, re
 from future.utils import iteritems
 
@@ -52,6 +54,7 @@ class Connection(object):
     kContentJson = "application/json"
     kApiKeyHeader = 'X-Api-Key'
     kApiKey = ''
+    kDefaultErrorCodes = [400, 404, 500]
 
     def __init__(self, siteUrl, apiVersion, httpRedirect=False):
         '''
@@ -90,8 +93,15 @@ class Connection(object):
                     except Exception:
                         raise Exception('Failed to import PoolManager from the requests module')
                 import ssl
-                httpAdapter = HTTPAdapter()
-                httpAdapter.poolmanager = PoolManager(ssl_version=ssl.PROTOCOL_TLSv1)
+                # BUG1518274: increased max_retries from 0 to 5 because in some situations we get
+                # error(10054, 'An existing connection was forcibly closed by the remote host')
+                httpAdapter = HTTPAdapter(max_retries=5)
+                
+                try:
+                    httpAdapter.poolmanager = PoolManager(ssl_version=ssl.PROTOCOL_TLSv1_2)
+                except Exception:
+                    raise Exception("Failed to create PoolManager for TLS version 1.2. Please make sure you are using a Python executable that has support for TLS 1.2")
+
                 self.httpSession.mount('https://', httpAdapter)
         return self.httpSession
 
@@ -142,6 +152,9 @@ class Connection(object):
         '''
         reply = self.httpRequest("GET", url, data, params, headers)
 
+
+        if errorCodes == []:
+            errorCodes = Connection.kDefaultErrorCodes
         if reply.status_code in errorCodes:
             raise Exception("Error on executing GET request on url %s: %s" % (url, reply.text))
 
