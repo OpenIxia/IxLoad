@@ -31,16 +31,25 @@ else:
 from IxL_RestApi import *
 
 # Choices of IxLoad Gateway server OS: linux or windows
-serverOs = 'windows'
+ixLoadGatewayOS = 'windows'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter:
 #    http://<server ip>:8080/api/v0/applicationTypes
-ixLoadVersion = '9.10.115.43'   ;# EA
+ixLoadVersion = '9.10.115.43'
+ixLoadVersion = '10.40.144.35'
+ixLoadVersion = '11.00.0.320'
+#ixLoadVersion = '26.0.0.94'
+
+# Get the current timestamp to store the results in a unique timestamp folder
+timestamp = getTime()
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
 forceTakePortOwnership = True
+
+# Do you want to delete the test session's result files after downloading them?
+deleteTestResultDirOnApiServer = True
 
 # API-Key: Use your user API-Key if you want added security
 apiKey = None
@@ -48,40 +57,38 @@ apiKey = None
 # The saved config file to load
 rxfFile = '5G-eLSU_HTTP_UXM_stats.rxf'
 
-if serverOs == 'windows':
-    apiServerIp = '192.168.129.6'
+if ixLoadGatewayOS == 'windows':
+    apiServerIp = '10.0.2.5'
 
-    # Where to store all of the csv result files in Windows
-    resultsDir = 'c:\\Results'
+    # Where to store all of the result files in Windows
+    resultsDirOnIxLoadGateway = f'C:\\Results\\{timestamp}'
 
-    # Where to upload the config file or where to tell IxLoad the location if you're not uploading it.
-    rxfFileOnServer = 'C:\\Results\\{}'.format(rxfFile)
+    # Where to upload the IxLoad .rxf config file or where is the IxLoad config location if you're not uploading it.
+    rxfFileOnServer = f'{resultsDirOnIxLoadGateway}\\{rxfFile}'
+    pdfTestReportFileName = f'{resultsDirOnIxLoadGateway}\\Report.pdf'
+    
+if ixLoadGatewayOS == 'linux':
+    apiServerIp = '10.0.2.14'
 
-# Where to put the downloaded csv results
-saveResultsInPath = currentDir
+    # Leave everything below as defaults. For this script reference only.
+    resultsDirOnIxLoadGateway = f'/mnt/ixload-share/Results/{timestamp}'
+    rxfFileOnServer = f'{resultsDirOnIxLoadGateway}/{rxfFile}'
+    pdfTestReportFileName = f'{resultsDirOnIxLoadGateway}/Report.pdf'
 
-# Do you need to upload your saved config file to the server?
-# If not, a saved config must be already in the IxLoad gateway server filesystem.
-upLoadFile = True
+# Where do you want to put the downloaded result files at the end of the test in the localhost running this script
+saveResultsInLocalPath = currentDir
 
-# On the local host where you are running this script.
-# The path to the saved config file. In this example, get it from the current folder.
-if platform.system() == 'Linux':
-    localConfigFileToUpload = '{}/{}'.format(currentDir, rxfFile)
-else:
-    localConfigFileToUpload = '{}\\{}'.format(currentDir, rxfFile)
-
-# The path where you want to download the csv result files to.  This is mostly used if using a Linux Gateway server.
-# If you're using IxLoad in Windows, SSH must be installed.  Otherwise, this variable will be ignored.
-scpDestPath = currentDir
+# The localhost path to the saved IxLoad config file to load. In this example, get it from the current folder.
+localConfigFileToUpload = f'{currentDir}/{rxfFile}'
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
 # Set to True if you want to save run time stat results to CSV files.
-saveStatsToCsvFile = True
+saveStatsToCsvFile = False
 
-apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
+# http=8080.  https=8443 (https is supported starting 8.50)
+apiServerIpPort = 8443
 
-licenseServerIp = '192.168.129.6'
+licenseServerIp = '10.0.2.5'
 
 # For 5G, the license model must be Perpetual Mode
 licenseModel = 'Perpetual Mode'
@@ -90,12 +97,12 @@ licenseModel = 'Perpetual Mode'
 # Traffic1@Network1 are activity names.
 # To get the Activity names, got to: /ixload/test/activeTest/communityList
 communityPortList1 = {
-    'chassisIp': '192.168.129.15',
+    'chassisIp': '10.0.2.4',
     'Traffic2@Network1': [(1,1)],
 }
 
 communityPortList2 = {
-    'chassisIp': '192.168.129.15',
+    'chassisIp': '10.0.2.4',
     'Traffic1@SGi': [(1,2)],
 }
 
@@ -124,22 +131,27 @@ statsDict = {
 try:
     restObj = Main(apiServerIp=apiServerIp,
                    apiServerIpPort=apiServerIpPort,
-                   osPlatform=serverOs,
+                   osPlatform=ixLoadGatewayOS,
                    deleteSession=deleteSession,
                    pollStatusInterval=1,
                    apiKey=apiKey,
-                   generateRestLogFile=True)
+                   generateRestLogFile='5g_eval_stats.log')
 
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
 
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
-    restObj.setResultDir(resultsDir, createTimestampFolder=True)
-
-    if upLoadFile == True:
-        restObj.uploadFile(localConfigFileToUpload, rxfFileOnServer)
-
     restObj.loadConfigFile(rxfFileOnServer)
+    
+    # Tell IxLoad where to save the results on the IxLoad gateway server
+    resultsDirOnIxLoadGateway = restObj.setResultDir(resultsDirOnIxLoadGateway)
+
+    # Enable these settings if you want to generate a PDF test report
+    restObj.enableNetworkDiagnostics(True)
+    restObj.setPreferences({"enableL23RestStatViews": True,
+                            "saveDataModelSnapshot": True,
+                            "enableRestStatViewsCsvLogging": True})
+    
     restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
 
     if forceTakePortOwnership:
@@ -151,18 +163,30 @@ try:
     runTestOperationsId = restObj.runTraffic()
 
     restObj.pollStatsAndCheckStatResults(statsDict,
-                                         csvFile=saveStatsToCsvFile,
+                                         csvFile=saveResultsInLocalPath,
                                          csvFilePrependName=None,
                                          pollStatInterval=2,
                                          exitAfterPollingIteration=None)
 
-
-    testResult = restObj.getTestResults()
-
     restObj.waitForActiveTestToUnconfigure()
-    restObj.downloadResults(targetPath=saveResultsInPath)
-    restObj.retrievePortCaptureFileForAssignedPorts(currentDir)
+    restObj.retrievePortCaptureFileForAssignedPorts(saveResultsInLocalPath)
 
+    # Showing you where the results are stored on the server running IxLoad gateway.
+    # You have to manually delete these result folders as they accumulate over time.
+    restObj.logInfo(f'Results are saved in the IxLoad Gateway path: {restObj.getTestResultFolder()}')
+
+    restObj.generatePdfTestReport(filePath=pdfTestReportFileName)
+    restObj.downloadResults(targetPath=saveResultsInLocalPath)
+
+    # Use this API if you want to download the Report.pdf file to a different path
+    # Otherwise, the Report.pdf is included in saveResultsInLocalPath when calling downloadResults.
+    restObj.downloadFile(pdfTestReportFileName,
+                         targetLocation='/home/hgee/Downloads/ixload',
+                         targetFilename='ixload_test_report.pdf')
+    
+    if deleteTestResultDirOnApiServer: 
+        restObj.deleteResultDir()
+        
     if deleteSession:
         restObj.deleteSessionId()
 

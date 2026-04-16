@@ -1,9 +1,6 @@
 """
 By Hubert Gee
-
-
 """
-
 from __future__ import absolute_import, print_function
 import requests
 import json
@@ -15,6 +12,14 @@ import os
 import re
 import datetime
 import platform
+
+def getTime():
+    """
+    Return format: 13-31-44-083426
+    """
+    dateAndTime = str(datetime.datetime.now()).split(' ')[1]
+    return dateAndTime.replace(':', '-').replace('.', '-')
+
 
 class IxLoadRestApiException(Exception):
     def __init__(self, msg=None):
@@ -124,6 +129,7 @@ class Main():
                 raise IxLoadRestApiException('connect failed. No sessionId created')
 
         self.sessionId = str(sessionId)
+        self.sessionConnection = f'{self.httpHeader}/api/{self.apiVersion}'
         self.sessionIdUrl = '{}/api/{}/sessions/{}'.format(self.httpHeader, self.apiVersion, self.sessionId)
         
         # Start operations
@@ -357,17 +363,17 @@ class Main():
                 errorMessage = response.json()['error']
                 raise IxLoadRestApiException('Operation failed: {0}'.format(errorMessage))
 
-            if counter <= timeout and currentStatus not in ['Successful']:
+            if counter <= timeout and currentStatus not in ['Successful', 'SUCCESS']:
                 self.logInfo('\tCurrent status: {0}. Wait {1}/{2} seconds...'.format(currentStatus, counter, timeout),
                              timestamp=False)
                 time.sleep(self.pollStatusInterval)
                 counter += self.pollStatusInterval
                 continue
  
-            if counter <= timeout and currentStatus in ['Successful']:
+            if counter <= timeout and currentStatus in ['Successful', 'SUCCESS']:
                 return
 
-            if counter >= timeout and currentStatus not in ['Successful']:
+            if counter >= timeout and currentStatus not in ['Successful', 'SUCCESS']:
                 raise IxLoadRestApiException('Operation failed: {0}'.format(url))
 
     def extractDataModelToFile(self, extractToFilename='dataModel.txt', timeout=120):
@@ -485,10 +491,18 @@ class Main():
         Use the IxLoad API browser for parameters
         
         Example usage:
-            params = {'enableRestStatViewsCsvLogging': True, 'enableL23RestStatViews': True}
+            params = {'enableRestStatViewsCsvLogging': True, 'enableL23RestStatViews': True, "saveDataModelSnapshot": True}
+
         """
         self.patch(self.sessionIdUrl+'/ixLoad/preferences', data=params)
-        
+    
+    def enableNetworkDiagnostics(self, value=True):
+        """
+        value: True|False
+        """
+        self.patch(self.sessionIdUrl+'/ixLoad/test/activeTest', data={'enableNetworkDiagnostics': value,
+                                                                      'enableNetworkDiagnosticsLogging': value})
+             
     def refreshConnection(self, locationUrl):
         url = self.httpHeader+locationUrl+'/operations/refreshConnection'
         response = self.post(url)
@@ -515,6 +529,7 @@ class Main():
                 if eachChassisIp['name'] == chassisIp:
                     self.logInfo('\naddNewChassis: Chassis Ip exists in config. No need to add new chassis')
                     objectId = eachChassisIp['objectID']
+                    self.logInfo(f'Chassis ID: {eachChassisIp["id"]}')
                     # /api/v0/sessions/10/ixLoad/chassisChain/chassisList/1/docs
                     return eachChassisIp['id'], eachChassisIp['links'][0]['href'].replace('/docs', '')
 
@@ -524,7 +539,7 @@ class Main():
             response = self.post(url, data = {"name": chassisIp})
             objectId = response.headers['Location'].split('/')[-1]
 
-            # /api/v0/sessions/2/ixLoad/chassisChain/chassisList/0
+            # locationUrl = /api/v0/sessions/2/ixLoad/chassisChain/chassisList/0
             locationUrl = response.headers['Location']
 
             self.logInfo('\nAddNewChassis: locationUrl: %s' % locationUrl)
@@ -650,15 +665,17 @@ class Main():
         for communityPorts in communityPortListDict:
             # Assign Chassis
             chassisIp = communityPorts['chassisIp']
-            newChassisId, locationUrl = self. addNewChassis(chassisIp)
-            self.logInfo('assignChassisAndPorts: To new chassis: %s' % locationUrl, timestamp=False)
+            newChassisId, locationUrl = self.addNewChassis(chassisIp)
+            # localUrl = /api/v0/sessions/4/ixLoad/chassisChain/chassisList/1/computeNodeList
+            
+            self.logInfo('assignChassisAndPorts: To new chassis: %s' % locationUrl.replace('/computeNodeList', ''), timestamp=False)
 
             # Assign Ports
             communityListUrl = self.sessionIdUrl+'/ixLoad/test/activeTest/communityList/'
             communityList = self.get(communityListUrl)
 
-            self.refreshConnection(locationUrl=locationUrl)
-            self.waitForChassisIpToConnect(locationUrl=locationUrl)
+            self.refreshConnection(locationUrl=locationUrl.replace('/computeNodeList', ''))
+            self.waitForChassisIpToConnect(locationUrl=locationUrl.replace('/computeNodeList', ''))
 
             failedToAddList = []
             communityNameNotFoundList = []
@@ -699,7 +716,6 @@ class Main():
 
     def enableForceOwnership(self, enable=True, enableResetPorts=True):
         url = self.sessionIdUrl+'/ixLoad/test/activeTest'
-        #response = self.patch(url, data={'enableForceOwnership': True})
         response = self.patch(url, data={'enableForceOwnership': enable,
                                          'enableResetPorts': enableResetPorts})
         
@@ -822,6 +838,11 @@ class Main():
         self.testResults['result'] = finalResult
         self.logInfo('\nFinal Result: {}'.format(finalResult), timestamp=False)
         return self.testResults
+
+    def getTestResultFolder(self):
+        url = self.sessionIdUrl+'/ixLoad/test'
+        response = self.get(url)
+        return response.json()['runResultDirFull']
     
     def pollStatsAndCheckStatResults(self, statsDict=None, pollStatInterval=2, csvFile=False,
                                     csvEnableFileTimestamp=True, csvFilePrependName=None, exitAfterPollingIteration=None):
@@ -1208,6 +1229,45 @@ class Main():
             if counter >= timeout and currentState != 'Unconfigured':
                 raise IxLoadRestApiException('ActiveTest is stuck at: {0}'.format(currentState))
 
+    # def waitForActionToFinish(self, response):
+    #     """
+    #     connection:  https://10.0.2.14:8443/api/v0/sessions/3/ixLoad/test/activeTest
+    #     """
+    #     # location = /api/v0/sessions/4/ixload/test/operations/generateRestReport/0
+    #     actionResultURL = response.headers.get('location')
+    #     counter = 0
+    #     timeout = 30
+        
+    #     while True:
+    #         response = self.get(self.httpHeader + actionResultURL)
+    #         # {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+    #         # {'status': 'Error', 'actionName': 'generateRestReport', 'state': 'finished', 'result': '', 'error': 'No last test run for the TestController'}
+    #         # {'status': 'Not started', 'actionName': 'generateRestReport', 'state': 'created', 'result': ''}
+    #         # {'status': 'Successful', 'actionName': 'generateRestReport', 'state': 'finished', 'result': ''}
+    #         self.logInfo(f'waitForActionToFinish: {response.json()}')
+            
+    #         if counter > timeout and response.json()['status'] == 'Not started':
+    #             counter += 1
+    #             time.sleep(1)
+    #             continue
+            
+    #         if response.json()['status'] == 'Error':
+    #             return
+    #         elif 'error ' in response.json():
+    #             self.logError(response.json()['error'])
+    #             return
+    #         else:
+    #             if counter < timeout and response.json()['status'] == 'Successful':
+    #                 return
+                
+    #             if counter < timeout and response.json()['status'] != 'Successful':
+    #                 counter += 1
+    #                 time.sleep(1)
+                
+    #             if counter == timeout and response.json()['status'] != 'Successful':
+    #                 self.logError('waitForActionToFinish: Timed out waited {timeout} seconds!')
+    #                 return
+
     def applyConfiguration(self):
         # Apply the configuration.
         # If applying configuration failed, you have the option to keep the 
@@ -1452,6 +1512,7 @@ class Main():
                        For Linux, must begin with path /mnt/ixload-share
         """
         timestampFolder = str(self.getTime()).replace(':', '-').replace('.', '-')
+        
         if createTimestampFolder:
             if self.osPlatform == 'windows':
                 resultDirPath = resultDirPath+'\\'+timestampFolder
@@ -1461,6 +1522,7 @@ class Main():
         url = self.sessionIdUrl+'/ixLoad/test'
         data = {'outputDir': True, 'runResultDirFull': resultDirPath}
         self.patch(url, data=data)
+        return resultDirPath
 
     def deleteResultDir(self):
         """
@@ -1606,7 +1668,14 @@ class Main():
         if searchNameExists == False:
             self.logError('configIp: No name found: {}'.format(searchName))
 
-
+    def generatePdfTestReport(self, filePath):
+        # /ixload/test/operations/generateRestReport"
+        url = self.sessionIdUrl + '/ixload/test/operations/generateRestReport'
+        response = self.post(url, data={'reportFile': filePath})
+        operationsId = response.headers.get('location')
+        self.verifyStatus(self.httpHeader+operationsId)
+        #self.waitForActionToFinish(response=response)
+    
     def sshSetCredentials(self, username='ixload', password='ixia123', sshPasswordFile=None, port=22, pkeyFile=None):
         """
         For scpFiles and deleteFolder.

@@ -1,0 +1,1575 @@
+
+16:42:41.689250: 
+	POST: https://10.0.2.5:8443/api/v0/sessions
+	DATA: {"ixLoadVersion": "11.00.0.320"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+16:42:41.766547: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/operations/start
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+
+
+
+16:42:41.803821: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 0/120 seconds
+
+16:42:42.842249: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 1/120 seconds
+
+16:42:43.885870: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 2/120 seconds
+
+16:42:44.920973: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 3/120 seconds
+
+16:42:45.944665: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 4/120 seconds
+
+16:42:46.983315: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 5/120 seconds
+
+16:42:48.014098: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 6/120 seconds
+
+16:42:49.043185: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 7/120 seconds
+
+16:42:50.070662: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 8/120 seconds
+
+16:42:51.110799: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 9/120 seconds
+
+16:42:52.149954: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 10/120 seconds
+
+16:42:53.180718: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 11/120 seconds
+
+16:42:54.211740: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 12/120 seconds
+
+16:42:55.242741: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 13/120 seconds
+
+16:42:56.271542: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 14/120 seconds
+
+16:42:57.289944: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 15/120 seconds
+
+16:42:58.323084: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 16/120 seconds
+
+16:42:59.361621: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 17/120 seconds
+
+16:43:00.390944: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: True
+
+16:43:00.425862: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/preferences
+	DATA: {'licenseServer': '10.0.2.5', 'licenseModel': 'Subscription Mode'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:43:00.607729: 
+UploadFile: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/IxL_Http_Ipv4Ftp_vm_8.20.rxf file to C:\Results\16-42-41-688653\IxL_Http_Ipv4Ftp_vm_8.20.rxf...
+
+16:43:00.608382: 
+	POST: https://10.0.2.5:8443/api/v0/resources
+	DATA: {'overwrite': True, 'uploadPath': 'C:\\Results\\16-42-41-688653\\IxL_Http_Ipv4Ftp_vm_8.20.rxf'}
+	HEADERS: {'content-type': 'application/json'}
+
+16:43:00.660731: Upload file finished.
+
+16:43:00.660922: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/
+	DATA: {"fullPath": "C:\\Results\\16-42-41-688653\\IxL_Http_Ipv4Ftp_vm_8.20.rxf"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+16:43:00.738352: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: Not started. Wait 0/120 seconds...
+
+16:43:01.790812: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 1/120 seconds...
+
+16:43:07.970899: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 2/120 seconds...
+
+16:43:10.008298: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 3/120 seconds...
+
+16:43:19.504461: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 4/120 seconds...
+
+16:43:21.010905: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 5/120 seconds...
+
+16:43:22.184819: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:43:22.213692: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test
+	DATA: {'outputDir': True, 'runResultDirFull': 'C:\\Results\\16-42-41-688653'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:43:22.255311: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest
+	DATA: {'enableNetworkDiagnostics': True, 'enableNetworkDiagnosticsLogging': True}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:43:22.320626: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/preferences
+	DATA: {'enableL23RestStatViews': True, 'saveDataModelSnapshot': True, 'enableRestStatViewsCsvLogging': True}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:43:22.419406: addNewChassis: ['10.0.2.4']
+
+16:43:22.419573: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:43:22.469984: addNewChassis: Chassis IP does not exists
+
+16:43:22.470108: addNewChassis: Adding new chassisIP: 10.0.2.4:
+URL: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList
+
+16:43:22.470157: addNewChassis: Server synchronous blocking state. Please wait a few seconds ...
+
+16:43:22.470230: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList
+	DATA: {"name": "10.0.2.4"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+16:44:11.403597: 
+AddNewChassis: locationUrl: /api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+
+16:44:11.403634: 
+Added new chassisIp Object to chainList: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+
+16:44:11.403655: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:11.448131: 
+addNewChassis: New Chassis ID: 2
+
+16:44:11.448232: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+16:44:11.498569: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: Not started. Wait 0/120 seconds...
+
+16:44:12.538908: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:12.565845: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:12.601297: waitForChassisIpToConnect response: {'chassisIp': '10.0.2.4', 'name': '10.0.2.4', 'links': [{'href': '/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/cardList', 'rel': 'cardList'}, {'href': '/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/docs', 'rel': 'docs'}], 'isConnected': True, 'version': 1.0, 'ixOsVersion': 'IxOS 11.00.9100.17 ', 'chassisType': 'Ixia Virtual Test Appliance', 'restObjectType': 'ixChassis', 'id': 2, 'isDisconnected': False}
+waitForChassisIpToConnect: Status: True
+Chassis is connected
+assignChassisAndPorts: To new chassis: /api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+
+16:44:12.602976: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:12.699943: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+16:44:12.749824: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: Not started. Wait 0/120 seconds...
+
+16:44:13.790540: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:13.828604: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:13.862718: waitForChassisIpToConnect response: {'chassisIp': '10.0.2.4', 'name': '10.0.2.4', 'links': [{'href': '/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/cardList', 'rel': 'cardList'}, {'href': '/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/docs', 'rel': 'docs'}], 'isConnected': True, 'version': 1.0, 'ixOsVersion': 'IxOS 11.00.9100.17 ', 'chassisType': 'Ixia Virtual Test Appliance', 'restObjectType': 'ixChassis', 'id': 2, 'isDisconnected': False}
+waitForChassisIpToConnect: Status: True
+Chassis is connected
+assignChassisAndPorts URL: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/0/network/portList
+assignChassisAndPorts Params: {"chassisId": 2, "cardId": 1, "portId": 1}
+
+16:44:13.863830: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/0/network/portList
+	DATA: {"chassisId": 2, "cardId": 1, "portId": 1}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+16:44:13.977864: addNewChassis: ['10.0.2.4']
+
+16:44:13.978138: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:14.020136: 
+addNewChassis: Chassis Ip exists in config. No need to add new chassis
+
+16:44:14.020366: Chassis ID: 2
+assignChassisAndPorts: To new chassis: /api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+
+16:44:14.020515: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:14.133114: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+16:44:14.191621: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/2
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: Not started. Wait 0/120 seconds...
+
+16:44:15.237251: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/2
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:15.326472: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:15.490075: waitForChassisIpToConnect response: {'chassisIp': '10.0.2.4', 'name': '10.0.2.4', 'links': [{'href': '/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/cardList', 'rel': 'cardList'}, {'href': '/api/v0/sessions/3/ixLoad/chassisChain/chassisList/1/docs', 'rel': 'docs'}], 'isConnected': True, 'version': 1.0, 'ixOsVersion': 'IxOS 11.00.9100.17 ', 'chassisType': 'Ixia Virtual Test Appliance', 'restObjectType': 'ixChassis', 'id': 2, 'isDisconnected': False}
+waitForChassisIpToConnect: Status: True
+Chassis is connected
+assignChassisAndPorts URL: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/1/network/portList
+assignChassisAndPorts Params: {"chassisId": 2, "cardId": 1, "portId": 2}
+
+16:44:15.490630: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/1/network/portList
+	DATA: {"chassisId": 2, "cardId": 1, "portId": 2}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+16:44:15.558645: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest
+	DATA: {'enableForceOwnership': True, 'enableResetPorts': True}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:44:15.638485: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:15.722041: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList/0/network/portList
+	DATA: {'enableCapture': 'true'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:44:15.805325: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList/1/network/portList
+	DATA: {'enableCapture': 'true'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:44:15.870984: configTimeLine
+
+16:44:15.871125: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/timelineList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:15.963428: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/timelineList/0
+	DATA: {'name': 'Timeline1', 'sustainTime': 12}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:44:16.035685: setUserObjectiveValue
+
+16:44:16.035771: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:16.091182: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/0/activityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:16.163369: 
+	PATCH: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest/communityList/0/activityList/0
+	DATA: {'userObjectiveValue': 100}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+16:44:16.245232: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+16:44:16.296588: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: Not started. Wait 0/300 seconds...
+
+16:44:17.332284: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 1/300 seconds...
+
+16:44:18.363542: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 2/300 seconds...
+
+16:44:19.395103: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 3/300 seconds...
+
+16:44:20.440221: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 4/300 seconds...
+
+16:44:21.472285: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 5/300 seconds...
+
+16:44:22.504625: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 6/300 seconds...
+
+16:44:23.535068: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 7/300 seconds...
+
+16:44:24.568953: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 8/300 seconds...
+
+16:44:25.598218: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 9/300 seconds...
+
+16:44:26.625846: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 10/300 seconds...
+
+16:44:27.656969: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 11/300 seconds...
+
+16:44:28.688705: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 12/300 seconds...
+
+16:44:29.730753: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 13/300 seconds...
+
+16:44:30.771353: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 14/300 seconds...
+
+16:44:31.819377: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 15/300 seconds...
+
+16:44:32.865198: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 16/300 seconds...
+
+16:44:33.901345: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 17/300 seconds...
+
+16:44:34.931808: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 18/300 seconds...
+
+16:44:36.170548: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 19/300 seconds...
+
+16:44:37.208828: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 20/300 seconds...
+
+16:44:38.244711: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 21/300 seconds...
+
+16:44:39.336202: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 22/300 seconds...
+
+16:44:40.371375: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 23/300 seconds...
+
+16:44:41.400120: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 24/300 seconds...
+
+16:44:42.443207: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 25/300 seconds...
+
+16:44:43.486773: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 26/300 seconds...
+
+16:44:44.540050: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 27/300 seconds...
+
+16:44:45.570410: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 28/300 seconds...
+
+16:44:46.656590: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 29/300 seconds...
+
+16:44:47.695885: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 30/300 seconds...
+
+16:44:48.745567: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 31/300 seconds...
+
+16:44:49.827134: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 32/300 seconds...
+
+16:44:50.869053: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 33/300 seconds...
+
+16:44:51.907150: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 34/300 seconds...
+
+16:44:52.952782: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 35/300 seconds...
+
+16:44:54.005270: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 36/300 seconds...
+
+16:44:55.039823: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:44:55.530064: ActiveTest current status: Running. 
+
+HTTPClient:
+
+HTTPServer:
+	TCP Connections Established: 3
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached: Expecting: <1
+
+
+16:45:01.760749: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 11
+		Threshold not reached: Expecting: >60
+
+	HTTP Simulated Users: 5
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 13
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 0
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 13
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 11
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:04.106125: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 23
+		Threshold not reached: Expecting: >60
+
+	HTTP Simulated Users: 9
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 24
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 0
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 24
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 23
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:06.523662: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 23
+		Threshold not reached: Expecting: >60
+
+	HTTP Simulated Users: 9
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 24
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 0
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 24
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 49
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:09.711957: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 49
+		Threshold not reached: Expecting: >60
+
+	HTTP Simulated Users: 17
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 52
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 1
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 52
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 62
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:12.172176: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 62
+		Threshold reached: Expecting: >60
+
+	HTTP Simulated Users: 21
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 65
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 2
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 65
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 75
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:14.875830: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 88
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 29
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 91
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 4
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 91
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 100
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:17.729211: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 100
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 33
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 103
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 5
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 103
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 112
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:20.298896: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 112
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 37
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 113
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 5
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 113
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 125
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:23.759555: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 139
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 45
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 139
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 8
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 139
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 139
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:26.433727: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 152
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 49
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 152
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 9
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 152
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 152
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:29.562429: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 178
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 57
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 178
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 10
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 178
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 178
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:32.398780: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 192
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 61
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 191
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 12
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 191
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 205
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:36.030136: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 217
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 69
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 218
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 14
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 218
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 217
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:38.496173: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 230
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 73
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 231
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 15
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 231
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 244
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:41.717050: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 258
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 80
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 259
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 19
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 259
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 258
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:44.220096: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 272
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 84
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 271
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 20
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 271
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 272
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:47.306952: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 296
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 92
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 297
+		Threshold not reached: Expecting: >300
+
+	HTTP Transactions: 21
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 297
+		Threshold not reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 296
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:49.988922: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 309
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 96
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 309
+		Threshold reached: Expecting: >300
+
+	HTTP Transactions: 22
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 309
+		Threshold reached: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 309
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:52.619708: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 324
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 324
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 24
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 324
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 324
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:56.246323: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 326
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 326
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 26
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 326
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 326
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:45:59.483634: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 329
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 329
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 29
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 329
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 329
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:46:01.962582: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 331
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 332
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 32
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 332
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 331
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:46:04.559419: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 333
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 333
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 34
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 333
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 333
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:46:07.607685: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 333
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 333
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 39
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 333
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 333
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:46:09.885446: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 333
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 333
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 44
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 333
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 333
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:46:12.119404: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 333
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 100
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 333
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 46
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 333
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 333
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:46:14.660039: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 333
+		Threshold reached and sustaining: Expecting: >60
+
+	HTTP Simulated Users: 0
+		Threshold not reached: Expecting: >100
+
+	HTTP Connections: 333
+		Threshold reached and sustaining: Expecting: >300
+
+	HTTP Transactions: 49
+		Threshold not reached: Expecting: >190
+
+	HTTP Connection Attempts: 333
+		Threshold reached and sustaining: Expecting: >300
+
+
+HTTPServer:
+	TCP Connections Established: 333
+		Threshold not reached: Expecting: >=1000
+
+	TCP Connection Requests Failed: 0
+		Threshold reached and sustaining: Expecting: <1
+
+
+16:46:17.107624: ActiveTest current status: Stopping Run. 
+	Waiting 1/120 seconds
+
+16:46:18.181464: ActiveTest current status: Stopping Run. 
+	Waiting 3/120 seconds
+
+16:46:19.262849: ActiveTest current status: Stopping Run. 
+	Waiting 5/120 seconds
+
+16:46:20.454677: ActiveTest current status: Stopping Run. 
+	Waiting 7/120 seconds
+
+16:46:21.562949: ActiveTest current status: Stopping Run. 
+	Waiting 9/120 seconds
+
+16:46:22.631123: ActiveTest current status: Stopping Run. 
+	Waiting 11/120 seconds
+
+16:46:23.715299: ActiveTest current status: Cleaning. 
+	Waiting 13/120 seconds
+
+16:46:24.785608: ActiveTest current status: Cleaning. 
+	Waiting 15/120 seconds
+
+16:46:25.862426: ActiveTest current status: Cleaning. 
+	Waiting 17/120 seconds
+
+16:46:26.932626: ActiveTest current status: Cleaning. 
+	Waiting 19/120 seconds
+
+16:46:28.016395: ActiveTest current status: Cleaning. 
+	Waiting 21/120 seconds
+
+16:46:29.088510: ActiveTest current status: Cleaning. 
+	Waiting 23/120 seconds
+
+16:46:30.192243: ActiveTest current status: Cleaning. 
+	Waiting 25/120 seconds
+
+16:46:31.261693: ActiveTest current status: Cleaning. 
+	Waiting 27/120 seconds
+
+16:46:32.336917: ActiveTest current status: Unconfigured. 
+
+16:46:32.337330: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test/activeTest
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:46:32.421922: waitForActiveTestToUnconfigure current state:Unconfigured
+16:46:32.422532: 
+ActiveTest is Unconfigured
+
+16:46:32.424030: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:46:32.489801: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList/0/network/portList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:46:32.559161: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList/0/network/portList/0/restCaptureFile
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:46:32.889845: retrievePortCaptureFileForAssignedPorts: Saved as: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/Capture_0_2.1.1.cap
+
+16:48:15.700123: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList/1/network/portList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:48:15.780087: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/activeTest/communityList/1/network/portList/1/restCaptureFile
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:48:16.107479: retrievePortCaptureFileForAssignedPorts: Saved as: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/Capture_1_2.1.2.cap
+
+16:48:22.356566: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:48:22.409057: Results are saved in the IxLoad Gateway path: C:\Results\16-42-41-688653
+
+16:48:22.409309: 
+	POST: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport
+	DATA: {"reportFile": "C:\\Results\\16-42-41-688653\\Report.pdf"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+16:48:22.465535: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: Not started. Wait 0/120 seconds...
+
+16:48:23.507292: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 1/120 seconds...
+
+16:48:24.552562: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 2/120 seconds...
+
+16:48:25.589013: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 3/120 seconds...
+
+16:48:26.626793: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 4/120 seconds...
+
+16:48:27.668819: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 5/120 seconds...
+
+16:48:28.712010: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 6/120 seconds...
+
+16:48:29.787833: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	Current status: In Progress. Wait 7/120 seconds...
+
+16:48:30.827085: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:48:30.865930: 
+	GET: https://10.0.2.5:8443/api/v0/sessions/3/ixLoad/test
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:48:30.921806: downloadResults: Saving results from C:\\Results\\16-42-41-688653 to: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/ixLoadResults_16-42-41-688653.zip
+
+16:48:30.921843: 
+	GET: https://10.0.2.5:8443/api/v1/downloadResource?localPath=C:\\Results\\16-42-41-688653&zipName=zipFileName
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+16:48:33.325461: downloadFile src:C:\Results\16-42-41-688653\Report.pdf -> /home/hgee/Downloads/ixload -> ixload_test_report.pdf
+
+16:48:33.325557: 
+	GET: https://10.0.2.5:8443/api/v0/downloadResource?localPath=C:\Results\16-42-41-688653\Report.pdf
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
