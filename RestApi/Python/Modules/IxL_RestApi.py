@@ -35,7 +35,7 @@ class Main():
     enableDebugLogFile = False
 
     def __init__(self, apiServerIp, apiServerIpPort, useHttps=False, apiKey=None, verifySsl=False, deleteSession=True,
-                 osPlatform='windows', generateRestLogFile='ixLoad_testLog.txt', pollStatusInterval=1, robotFrameworkStdout=False):
+                 osPlatform='windows', generateRestLogFile='ixLoad_test.log', pollStatusInterval=1, robotFrameworkStdout=False):
         """
         Description
            Initialize the class variables
@@ -49,7 +49,7 @@ class Main():
            osPlatform: <str>: windows or linux
            deleteSession: <bool>: True = Delete the session after test is done.
            generateRestLogFile: <bool>: True = generate a complete log file.
-                                Filename = ixLoadRestApiLog.txt
+                                Filename = ixLoad_test.log
            robotFrameworkStdout: <bool>: True = Display print statements on stdout.
            pollStatusInterval: <int>: Defaults = 1 second.
                                 The delay time in seconds to poll for operation status like 
@@ -97,8 +97,11 @@ class Main():
         # If True, create default log file name: restApiLog.txt
         if generateRestLogFile == True:
             # Default the log file name since user didn't provide a log file name.
-            self.restLogFile = 'ixLoad_testLog.txt'
+            self.restLogFile = 'ixLoad_test.log'
             Main.debugLogFile = self.restLogFile
+        else:
+            self.restLogFile = generateRestLogFile
+            Main.debugLogFile = generateRestLogFile
 
         # User provided a log file name.
         if type(generateRestLogFile) != bool:
@@ -130,7 +133,7 @@ class Main():
 
         self.sessionId = str(sessionId)
         self.sessionConnection = f'{self.httpHeader}/api/{self.apiVersion}'
-        self.sessionIdUrl = '{}/api/{}/sessions/{}'.format(self.httpHeader, self.apiVersion, self.sessionId)
+        self.sessionIdUrl = f'{self.httpHeader}/api/{self.apiVersion}/sessions/{self.sessionId}'
         
         # Start operations
         if ixLoadVersion is not None:
@@ -346,7 +349,6 @@ class Main():
         while True:
             response = self.get(url)
 
-            #print('\n\tverifyStatus:', response.json())
             if 'status' in response.json():
                 currentStatus = response.json()['status']
             elif 'state' in response.json():
@@ -359,17 +361,27 @@ class Main():
             else:
                 raise IxLoadRestApiException('verifyStatus failed: No status and no state in json response')
 
+            self.logInfo(f'verifyStatus: {response.json()}')
+            
             if currentStatus == 'Error' and 'error' in response.json():
                 errorMessage = response.json()['error']
                 raise IxLoadRestApiException('Operation failed: {0}'.format(errorMessage))
 
+            if currentStatus == 'EXCEPTION':
+                if 'error' in response.json():
+                    errorMessage = response.json()['error']
+                    raise IxLoadRestApiException(f'Operation failed: {errorMessage}')
+                else:
+                    raise IxLoadRestApiException(f'Operation failed')
+                
             if counter <= timeout and currentStatus not in ['Successful', 'SUCCESS']:
-                self.logInfo('\tCurrent status: {0}. Wait {1}/{2} seconds...'.format(currentStatus, counter, timeout),
-                             timestamp=False)
+                self.logInfo(f'\tCurrent status: {currentStatus}. Wait {counter}/{timeout} seconds...', timestamp=False)
                 time.sleep(self.pollStatusInterval)
                 counter += self.pollStatusInterval
                 continue
  
+            self.logInfo(f'\n\tverifyStatus: Current Status: {currentStatus}')
+             
             if counter <= timeout and currentStatus in ['Successful', 'SUCCESS']:
                 return
 
@@ -1229,45 +1241,6 @@ class Main():
             if counter >= timeout and currentState != 'Unconfigured':
                 raise IxLoadRestApiException('ActiveTest is stuck at: {0}'.format(currentState))
 
-    # def waitForActionToFinish(self, response):
-    #     """
-    #     connection:  https://10.0.2.14:8443/api/v0/sessions/3/ixLoad/test/activeTest
-    #     """
-    #     # location = /api/v0/sessions/4/ixload/test/operations/generateRestReport/0
-    #     actionResultURL = response.headers.get('location')
-    #     counter = 0
-    #     timeout = 30
-        
-    #     while True:
-    #         response = self.get(self.httpHeader + actionResultURL)
-    #         # {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
-    #         # {'status': 'Error', 'actionName': 'generateRestReport', 'state': 'finished', 'result': '', 'error': 'No last test run for the TestController'}
-    #         # {'status': 'Not started', 'actionName': 'generateRestReport', 'state': 'created', 'result': ''}
-    #         # {'status': 'Successful', 'actionName': 'generateRestReport', 'state': 'finished', 'result': ''}
-    #         self.logInfo(f'waitForActionToFinish: {response.json()}')
-            
-    #         if counter > timeout and response.json()['status'] == 'Not started':
-    #             counter += 1
-    #             time.sleep(1)
-    #             continue
-            
-    #         if response.json()['status'] == 'Error':
-    #             return
-    #         elif 'error ' in response.json():
-    #             self.logError(response.json()['error'])
-    #             return
-    #         else:
-    #             if counter < timeout and response.json()['status'] == 'Successful':
-    #                 return
-                
-    #             if counter < timeout and response.json()['status'] != 'Successful':
-    #                 counter += 1
-    #                 time.sleep(1)
-                
-    #             if counter == timeout and response.json()['status'] != 'Successful':
-    #                 self.logError('waitForActionToFinish: Timed out waited {timeout} seconds!')
-    #                 return
-
     def applyConfiguration(self):
         # Apply the configuration.
         # If applying configuration failed, you have the option to keep the 
@@ -1432,9 +1405,13 @@ class Main():
         Requirement:
            You must include the 'name' of the timeline in the **kwargs.
            It is most likely Timeline1.
+           
+        Example:
+           restObj.configTimeline(name= 'Timeline1', iterations= 2, sustainTime=12)
 
         Parameters
            name
+           iterations
            sustainTime
            rampDownTime
            rampUpTime
@@ -1519,6 +1496,7 @@ class Main():
             if self.osPlatform == 'linux':
                 resultDirPath = resultDirPath+'/'+timestampFolder
 
+        self.logInfo(f'setResultDir: {resultDirPath}')
         url = self.sessionIdUrl+'/ixLoad/test'
         data = {'outputDir': True, 'runResultDirFull': resultDirPath}
         self.patch(url, data=data)
@@ -1674,7 +1652,6 @@ class Main():
         response = self.post(url, data={'reportFile': filePath})
         operationsId = response.headers.get('location')
         self.verifyStatus(self.httpHeader+operationsId)
-        #self.waitForActionToFinish(response=response)
     
     def sshSetCredentials(self, username='ixload', password='ixia123', sshPasswordFile=None, port=22, pkeyFile=None):
         """

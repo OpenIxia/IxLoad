@@ -1,0 +1,1592 @@
+
+23:48:52.457560: 
+	POST: https://10.0.2.16:8443/api/v0/sessions
+	DATA: {"ixLoadVersion": "11.00.0.320"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+23:48:52.502113: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/operations/start
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+
+
+
+23:48:52.518773: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 0/120 seconds
+
+23:48:53.583506: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 1/120 seconds
+
+23:48:54.616839: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 2/120 seconds
+
+23:48:55.655760: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 3/120 seconds
+
+23:48:56.680158: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 4/120 seconds
+
+23:48:57.703082: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 5/120 seconds
+
+23:48:58.715222: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 6/120 seconds
+
+23:48:59.733017: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 7/120 seconds
+
+23:49:00.746205: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 8/120 seconds
+
+23:49:01.765883: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 9/120 seconds
+
+23:49:02.786324: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 10/120 seconds
+
+23:49:03.804316: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 11/120 seconds
+
+23:49:04.835875: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 12/120 seconds
+
+23:49:05.845699: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 13/120 seconds
+
+23:49:06.864580: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 14/120 seconds
+
+23:49:07.895623: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 15/120 seconds
+
+23:49:08.911828: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 16/120 seconds
+
+23:49:09.930302: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 17/120 seconds
+
+23:49:10.944242: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 18/120 seconds
+
+23:49:11.971452: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 19/120 seconds
+
+23:49:12.984308: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 20/120 seconds
+
+23:49:14.003580: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 21/120 seconds
+
+23:49:15.034257: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 22/120 seconds
+
+23:49:16.047046: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 23/120 seconds
+
+23:49:17.067641: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 24/120 seconds
+
+23:49:18.082310: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 25/120 seconds
+
+23:49:19.107463: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 26/120 seconds
+
+23:49:20.119148: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 27/120 seconds
+
+23:49:21.134323: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 28/120 seconds
+
+23:49:22.150306: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 29/120 seconds
+
+23:49:23.169780: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 30/120 seconds
+
+23:49:24.181732: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: False
+	Wait 31/120 seconds
+
+23:49:25.192273: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+	CurrentStatus: True
+
+23:49:25.213873: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/preferences
+	DATA: {'licenseServer': '10.0.2.5', 'licenseModel': 'Subscription Mode'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:49:25.307668: 
+UploadFile: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/IxL_Http_Ipv4Ftp_vm_8.20.rxf file to /mnt/ixload-share/Results/23-48-52-457068/IxL_Http_Ipv4Ftp_vm_8.20.rxf...
+
+23:49:25.307764: 
+	POST: https://10.0.2.16:8443/api/v0/resources
+	DATA: {'overwrite': True, 'uploadPath': '/mnt/ixload-share/Results/23-48-52-457068/IxL_Http_Ipv4Ftp_vm_8.20.rxf'}
+	HEADERS: {'content-type': 'application/json'}
+
+23:49:25.325477: Upload file finished.
+
+23:49:25.326901: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/
+	DATA: {"fullPath": "/mnt/ixload-share/Results/23-48-52-457068/IxL_Http_Ipv4Ftp_vm_8.20.rxf"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:49:25.380038: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:49:25.487368: verifyStatus: {'status': 'In Progress', 'actionName': 'loadTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 0/120 seconds...
+
+23:49:26.489989: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:49:46.966271: verifyStatus: {'status': 'In Progress', 'actionName': 'loadTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 1/120 seconds...
+
+23:49:47.967439: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:49:51.779677: verifyStatus: {'status': 'In Progress', 'actionName': 'loadTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 2/120 seconds...
+
+23:49:52.781409: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:49:53.544582: verifyStatus: {'status': 'In Progress', 'actionName': 'loadTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 3/120 seconds...
+
+23:49:54.547817: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:03.037646: verifyStatus: {'status': 'In Progress', 'actionName': 'loadTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 4/120 seconds...
+
+23:50:04.038314: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:04.511361: verifyStatus: {'status': 'In Progress', 'actionName': 'loadTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 5/120 seconds...
+
+23:50:05.514324: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:06.033883: verifyStatus: {'status': 'In Progress', 'actionName': 'loadTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 6/120 seconds...
+
+23:50:07.035027: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/loadTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:07.068393: verifyStatus: {'status': 'Successful', 'actionName': 'loadTest', 'state': 'finished', 'result': ''}
+
+23:50:07.074008: 
+	verifyStatus: Current Status: Successful
+
+23:50:07.074320: setResultDir: {resultDirPath}
+
+23:50:07.074783: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test
+	DATA: {'outputDir': True, 'runResultDirFull': '/mnt/ixload-share/Results/23-48-52-457068'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:07.136967: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest
+	DATA: {'enableNetworkDiagnostics': True, 'enableNetworkDiagnosticsLogging': True}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:07.268364: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/preferences
+	DATA: {'enableL23RestStatViews': True, 'saveDataModelSnapshot': True, 'enableRestStatViewsCsvLogging': True}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:07.295791: addNewChassis: ['10.0.2.4']
+
+23:50:07.296055: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:07.401087: addNewChassis: Chassis IP does not exists
+
+23:50:07.401692: addNewChassis: Adding new chassisIP: 10.0.2.4:
+URL: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList
+
+23:50:07.401935: addNewChassis: Server synchronous blocking state. Please wait a few seconds ...
+
+23:50:07.402141: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList
+	DATA: {"name": "10.0.2.4"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+23:50:27.489996: 
+AddNewChassis: locationUrl: /api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+
+23:50:27.490072: 
+Added new chassisIp Object to chainList: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+
+23:50:27.490098: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:27.605676: 
+addNewChassis: New Chassis ID: 2
+
+23:50:27.605827: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:50:27.645970: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:27.684212: verifyStatus: {'status': 'Not started', 'actionName': 'refreshConnection', 'state': 'created', 'warning': 'The operation has not started yet.', 'result': ''}
+	Current status: Not started. Wait 0/120 seconds...
+
+23:50:28.686358: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:28.711301: verifyStatus: {'status': 'Successful', 'actionName': 'refreshConnection', 'state': 'finished', 'result': '', 'refreshedChassis': '10.0.2.4'}
+
+23:50:28.711571: 
+	verifyStatus: Current Status: Successful
+
+23:50:28.711873: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:28.748531: waitForChassisIpToConnect response: {'name': '10.0.2.4', 'links': [{'href': '/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/cardList', 'rel': 'cardList'}, {'href': '/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/docs', 'rel': 'docs'}], 'isConnected': True, 'version': 1.0, 'ixOsVersion': 'IxOS 11.00.9100.17 ', 'chassisType': 'Ixia Virtual Test Appliance', 'restObjectType': 'ixChassis', 'isDisconnected': False, 'id': 2, 'chassisIp': '10.0.2.4'}
+waitForChassisIpToConnect: Status: True
+Chassis is connected
+assignChassisAndPorts: To new chassis: /api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+
+23:50:28.749899: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:28.943369: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:50:28.969784: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:29.000406: verifyStatus: {'status': 'Not started', 'actionName': 'refreshConnection', 'state': 'created', 'warning': 'The operation has not started yet.', 'result': ''}
+	Current status: Not started. Wait 0/120 seconds...
+
+23:50:30.002332: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:30.037297: verifyStatus: {'status': 'Successful', 'actionName': 'refreshConnection', 'state': 'finished', 'result': '', 'refreshedChassis': '10.0.2.4'}
+
+23:50:30.037484: 
+	verifyStatus: Current Status: Successful
+
+23:50:30.037591: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:30.081979: waitForChassisIpToConnect response: {'name': '10.0.2.4', 'links': [{'href': '/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/cardList', 'rel': 'cardList'}, {'href': '/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/docs', 'rel': 'docs'}], 'isConnected': True, 'version': 1.0, 'ixOsVersion': 'IxOS 11.00.9100.17 ', 'chassisType': 'Ixia Virtual Test Appliance', 'restObjectType': 'ixChassis', 'isDisconnected': False, 'id': 2, 'chassisIp': '10.0.2.4'}
+waitForChassisIpToConnect: Status: True
+Chassis is connected
+assignChassisAndPorts URL: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/0/network/portList
+assignChassisAndPorts Params: {"chassisId": 2, "cardId": 1, "portId": 1}
+
+23:50:30.082319: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/0/network/portList
+	DATA: {"chassisId": 2, "cardId": 1, "portId": 1}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+23:50:30.331044: addNewChassis: ['10.0.2.4']
+
+23:50:30.331117: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:30.407209: 
+addNewChassis: Chassis Ip exists in config. No need to add new chassis
+
+23:50:30.407253: Chassis ID: 2
+assignChassisAndPorts: To new chassis: /api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+
+23:50:30.407324: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:30.528530: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:50:30.557192: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/2
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:30.607378: verifyStatus: {'status': 'In Progress', 'actionName': 'refreshConnection', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 0/120 seconds...
+
+23:50:31.609975: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/operations/refreshConnection/2
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:31.637294: verifyStatus: {'status': 'Successful', 'actionName': 'refreshConnection', 'state': 'finished', 'result': '', 'refreshedChassis': '10.0.2.4'}
+
+23:50:31.637376: 
+	verifyStatus: Current Status: Successful
+
+23:50:31.637464: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:31.677761: waitForChassisIpToConnect response: {'name': '10.0.2.4', 'links': [{'href': '/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/cardList', 'rel': 'cardList'}, {'href': '/api/v0/sessions/12/ixLoad/chassisChain/chassisList/1/docs', 'rel': 'docs'}], 'isConnected': True, 'version': 1.0, 'ixOsVersion': 'IxOS 11.00.9100.17 ', 'chassisType': 'Ixia Virtual Test Appliance', 'restObjectType': 'ixChassis', 'isDisconnected': False, 'id': 2, 'chassisIp': '10.0.2.4'}
+waitForChassisIpToConnect: Status: True
+Chassis is connected
+assignChassisAndPorts URL: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/1/network/portList
+assignChassisAndPorts Params: {"chassisId": 2, "cardId": 1, "portId": 2}
+
+23:50:31.679900: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/1/network/portList
+	DATA: {"chassisId": 2, "cardId": 1, "portId": 2}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 201
+
+23:50:31.941243: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest
+	DATA: {'enableForceOwnership': True, 'enableResetPorts': True}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:32.060913: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:32.131591: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList/0/network/portList
+	DATA: {'enableCapture': 'true'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:32.342603: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList/1/network/portList
+	DATA: {'enableCapture': 'true'}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:32.511383: configTimeLine
+
+23:50:32.511556: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/timelineList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:32.641083: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/timelineList/0
+	DATA: {'name': 'Timeline1', 'sustainTime': 5}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:32.770312: setUserObjectiveValue
+
+23:50:32.770638: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:32.864580: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/0/activityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:33.131304: 
+	PATCH: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest/communityList/0/activityList/0
+	DATA: {'userObjectiveValue': 100}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 204
+
+23:50:33.281809: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:50:33.314669: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:33.359310: verifyStatus: {'status': 'Not started', 'actionName': 'runTest', 'state': 'created', 'result': ''}
+	Current status: Not started. Wait 0/300 seconds...
+
+23:50:34.361769: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:34.442092: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 1/300 seconds...
+
+23:50:35.445231: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:35.468267: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 2/300 seconds...
+
+23:50:36.505051: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:36.533550: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 3/300 seconds...
+
+23:50:37.535659: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:37.572382: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 4/300 seconds...
+
+23:50:38.575573: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:38.611545: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 5/300 seconds...
+
+23:50:39.620569: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:39.649753: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 6/300 seconds...
+
+23:50:40.651024: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:40.678860: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 7/300 seconds...
+
+23:50:41.680312: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:41.717064: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 8/300 seconds...
+
+23:50:42.718697: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:42.745156: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 9/300 seconds...
+
+23:50:43.746834: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:43.777407: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 10/300 seconds...
+
+23:50:44.778835: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:45.205489: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 11/300 seconds...
+
+23:50:46.206592: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:46.260450: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 12/300 seconds...
+
+23:50:47.261695: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:47.284759: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 13/300 seconds...
+
+23:50:48.286031: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:48.316398: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 14/300 seconds...
+
+23:50:49.318719: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:49.342346: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 15/300 seconds...
+
+23:50:50.343146: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:50.364382: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 16/300 seconds...
+
+23:50:51.366575: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:51.388768: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 17/300 seconds...
+
+23:50:52.389788: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:52.412906: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 18/300 seconds...
+
+23:50:53.413986: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:53.449014: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 19/300 seconds...
+
+23:50:54.450329: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:54.476603: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 20/300 seconds...
+
+23:50:55.478104: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:55.522906: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 21/300 seconds...
+
+23:50:56.523868: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:56.548739: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 22/300 seconds...
+
+23:50:57.550162: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:57.590358: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 23/300 seconds...
+
+23:50:58.591629: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:58.618233: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 24/300 seconds...
+
+23:50:59.619979: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:50:59.698815: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 25/300 seconds...
+
+23:51:00.701034: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:00.723580: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 26/300 seconds...
+
+23:51:01.725020: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:01.745071: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 27/300 seconds...
+
+23:51:02.746272: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:02.773467: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 28/300 seconds...
+
+23:51:03.774883: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:03.815887: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 29/300 seconds...
+
+23:51:04.816936: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:04.846694: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 30/300 seconds...
+
+23:51:05.848127: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:05.878603: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 31/300 seconds...
+
+23:51:06.879249: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:06.910763: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 32/300 seconds...
+
+23:51:07.913369: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:07.946031: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 33/300 seconds...
+
+23:51:08.965146: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:08.993513: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 34/300 seconds...
+
+23:51:09.994697: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:10.090228: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 35/300 seconds...
+
+23:51:11.091990: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:11.290926: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 36/300 seconds...
+
+23:51:12.292590: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:12.331120: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 37/300 seconds...
+
+23:51:13.332899: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:13.538610: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 38/300 seconds...
+
+23:51:14.540674: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:14.785794: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 39/300 seconds...
+
+23:51:15.787692: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:17.359029: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 40/300 seconds...
+
+23:51:18.360755: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:23.517992: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 41/300 seconds...
+
+23:51:24.519859: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:24.601153: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 42/300 seconds...
+
+23:51:25.602485: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:25.654907: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 43/300 seconds...
+
+23:51:26.664856: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:26.726094: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 44/300 seconds...
+
+23:51:27.727805: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:27.762101: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 45/300 seconds...
+
+23:51:28.763579: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:28.785792: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 46/300 seconds...
+
+23:51:29.786885: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:29.809665: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 47/300 seconds...
+
+23:51:30.812300: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:30.866786: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 48/300 seconds...
+
+23:51:31.868645: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:31.891034: verifyStatus: {'status': 'In Progress', 'actionName': 'runTest', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 49/300 seconds...
+
+23:51:32.893050: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/runTest/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:51:33.066153: verifyStatus: {'status': 'Successful', 'actionName': 'runTest', 'state': 'finished', 'result': True}
+
+23:51:33.066236: 
+	verifyStatus: Current Status: Successful
+
+23:51:33.721576: ActiveTest current status: Running. 
+
+HTTPClient:
+
+HTTPServer:
+
+23:51:42.219502: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 31
+	HTTP Simulated Users: 9
+	HTTP Connections: 28
+	HTTP Transactions: 0
+	HTTP Connection Attempts: 28
+
+HTTPServer:
+	TCP Connections Established: 31
+	TCP Connection Requests Failed: 0
+
+23:51:44.634677: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 46
+	HTTP Simulated Users: 13
+	HTTP Connections: 43
+	HTTP Transactions: 3
+	HTTP Connection Attempts: 43
+
+HTTPServer:
+	TCP Connections Established: 46
+	TCP Connection Requests Failed: 0
+
+23:51:47.345293: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 61
+	HTTP Simulated Users: 17
+	HTTP Connections: 58
+	HTTP Transactions: 6
+	HTTP Connection Attempts: 58
+
+HTTPServer:
+	TCP Connections Established: 74
+	TCP Connection Requests Failed: 0
+
+23:51:49.960835: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 74
+	HTTP Simulated Users: 21
+	HTTP Connections: 70
+	HTTP Transactions: 6
+	HTTP Connection Attempts: 70
+
+HTTPServer:
+	TCP Connections Established: 85
+	TCP Connection Requests Failed: 0
+
+23:51:52.486180: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 85
+	HTTP Simulated Users: 25
+	HTTP Connections: 83
+	HTTP Transactions: 7
+	HTTP Connection Attempts: 83
+
+HTTPServer:
+	TCP Connections Established: 97
+	TCP Connection Requests Failed: 0
+
+23:51:55.045983: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 110
+	HTTP Simulated Users: 33
+	HTTP Connections: 109
+	HTTP Transactions: 9
+	HTTP Connection Attempts: 109
+
+HTTPServer:
+	TCP Connections Established: 124
+	TCP Connection Requests Failed: 0
+
+23:51:58.028572: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 124
+	HTTP Simulated Users: 37
+	HTTP Connections: 122
+	HTTP Transactions: 11
+	HTTP Connection Attempts: 122
+
+HTTPServer:
+	TCP Connections Established: 138
+	TCP Connection Requests Failed: 0
+
+23:52:00.633159: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 138
+	HTTP Simulated Users: 41
+	HTTP Connections: 136
+	HTTP Transactions: 13
+	HTTP Connection Attempts: 136
+
+HTTPServer:
+	TCP Connections Established: 154
+	TCP Connection Requests Failed: 0
+
+23:52:03.378821: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 171
+	HTTP Simulated Users: 49
+	HTTP Connections: 170
+	HTTP Transactions: 22
+	HTTP Connection Attempts: 170
+
+HTTPServer:
+	TCP Connections Established: 187
+	TCP Connection Requests Failed: 0
+
+23:52:06.065306: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 187
+	HTTP Simulated Users: 53
+	HTTP Connections: 186
+	HTTP Transactions: 27
+	HTTP Connection Attempts: 186
+
+HTTPServer:
+	TCP Connections Established: 187
+	TCP Connection Requests Failed: 0
+
+23:52:08.615117: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 202
+	HTTP Simulated Users: 57
+	HTTP Connections: 201
+	HTTP Transactions: 30
+	HTTP Connection Attempts: 201
+
+HTTPServer:
+	TCP Connections Established: 202
+	TCP Connection Requests Failed: 0
+
+23:52:11.662367: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 231
+	HTTP Simulated Users: 65
+	HTTP Connections: 230
+	HTTP Transactions: 34
+	HTTP Connection Attempts: 230
+
+HTTPServer:
+	TCP Connections Established: 231
+	TCP Connection Requests Failed: 0
+
+23:52:14.287010: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 247
+	HTTP Simulated Users: 69
+	HTTP Connections: 246
+	HTTP Transactions: 38
+	HTTP Connection Attempts: 246
+
+HTTPServer:
+	TCP Connections Established: 231
+	TCP Connection Requests Failed: 0
+
+23:52:16.918756: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 262
+	HTTP Simulated Users: 73
+	HTTP Connections: 259
+	HTTP Transactions: 42
+	HTTP Connection Attempts: 259
+
+HTTPServer:
+	TCP Connections Established: 262
+	TCP Connection Requests Failed: 0
+
+23:52:19.579510: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 288
+	HTTP Simulated Users: 81
+	HTTP Connections: 288
+	HTTP Transactions: 44
+	HTTP Connection Attempts: 288
+
+HTTPServer:
+	TCP Connections Established: 274
+	TCP Connection Requests Failed: 0
+
+23:52:22.298483: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 303
+	HTTP Simulated Users: 85
+	HTTP Connections: 303
+	HTTP Transactions: 47
+	HTTP Connection Attempts: 303
+
+HTTPServer:
+	TCP Connections Established: 288
+	TCP Connection Requests Failed: 0
+
+23:52:24.937070: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 316
+	HTTP Simulated Users: 89
+	HTTP Connections: 315
+	HTTP Transactions: 47
+	HTTP Connection Attempts: 315
+
+HTTPServer:
+	TCP Connections Established: 316
+	TCP Connection Requests Failed: 0
+
+23:52:27.892147: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 346
+	HTTP Simulated Users: 97
+	HTTP Connections: 345
+	HTTP Transactions: 53
+	HTTP Connection Attempts: 345
+
+HTTPServer:
+	TCP Connections Established: 346
+	TCP Connection Requests Failed: 0
+
+23:52:30.663049: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 355
+	HTTP Simulated Users: 99
+	HTTP Connections: 356
+	HTTP Transactions: 57
+	HTTP Connection Attempts: 356
+
+HTTPServer:
+	TCP Connections Established: 355
+	TCP Connection Requests Failed: 0
+
+23:52:33.854110: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 360
+	HTTP Simulated Users: 100
+	HTTP Connections: 360
+	HTTP Transactions: 60
+	HTTP Connection Attempts: 360
+
+HTTPServer:
+	TCP Connections Established: 360
+	TCP Connection Requests Failed: 0
+
+23:52:36.612682: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 361
+	HTTP Simulated Users: 100
+	HTTP Connections: 361
+	HTTP Transactions: 63
+	HTTP Connection Attempts: 361
+
+HTTPServer:
+	TCP Connections Established: 361
+	TCP Connection Requests Failed: 0
+
+23:52:39.383096: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 361
+	HTTP Simulated Users: 100
+	HTTP Connections: 361
+	HTTP Transactions: 67
+	HTTP Connection Attempts: 361
+
+HTTPServer:
+	TCP Connections Established: 361
+	TCP Connection Requests Failed: 0
+
+23:52:42.459367: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 361
+	HTTP Simulated Users: 99
+	HTTP Connections: 361
+	HTTP Transactions: 69
+	HTTP Connection Attempts: 361
+
+HTTPServer:
+	TCP Connections Established: 361
+	TCP Connection Requests Failed: 0
+
+23:52:45.212127: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 361
+	HTTP Simulated Users: 36
+	HTTP Connections: 361
+	HTTP Transactions: 72
+	HTTP Connection Attempts: 361
+
+HTTPServer:
+	TCP Connections Established: 361
+	TCP Connection Requests Failed: 0
+
+23:52:48.365583: ActiveTest current status: Running. 
+
+HTTPClient:
+	TCP Connections Established: 361
+	HTTP Simulated Users: 0
+	HTTP Connections: 361
+	HTTP Transactions: 72
+	HTTP Connection Attempts: 361
+
+HTTPServer:
+	TCP Connections Established: 361
+	TCP Connection Requests Failed: 0
+
+23:52:51.158384: ActiveTest current status: Stopping Run. 
+	Waiting 1/120 seconds
+
+23:52:52.516371: ActiveTest current status: Stopping Run. 
+	Waiting 2/120 seconds
+
+23:52:53.882945: ActiveTest current status: Stopping Run. 
+	Waiting 3/120 seconds
+
+23:52:55.125515: ActiveTest current status: Stopping Run. 
+	Waiting 4/120 seconds
+
+23:52:56.347696: ActiveTest current status: Cleaning. 
+	Waiting 5/120 seconds
+
+23:52:57.825346: ActiveTest current status: Cleaning. 
+	Waiting 6/120 seconds
+
+23:52:59.409208: ActiveTest current status: Cleaning. 
+	Waiting 7/120 seconds
+
+23:53:00.587110: ActiveTest current status: Cleaning. 
+	Waiting 8/120 seconds
+
+23:53:01.828491: ActiveTest current status: Cleaning. 
+	Waiting 9/120 seconds
+
+23:53:03.109786: ActiveTest current status: Cleaning. 
+	Waiting 10/120 seconds
+
+23:53:04.288246: ActiveTest current status: Cleaning. 
+	Waiting 11/120 seconds
+
+23:53:05.427516: ActiveTest current status: Cleaning. 
+	Waiting 12/120 seconds
+
+23:53:06.694114: ActiveTest current status: Cleaning. 
+	Waiting 13/120 seconds
+
+23:53:07.929154: ActiveTest current status: Cleaning. 
+	Waiting 14/120 seconds
+
+23:53:09.102570: ActiveTest current status: Cleaning. 
+	Waiting 15/120 seconds
+
+23:53:10.317423: ActiveTest current status: Unconfigured. 
+
+23:53:10.317806: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/waitForAllCaptureData
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:53:10.348628: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/waitForAllCaptureData/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:10.376976: verifyStatus: {'status': 'Not started', 'actionName': 'waitForAllCaptureData', 'state': 'created', 'result': ''}
+	Current status: Not started. Wait 0/120 seconds...
+
+23:53:11.382069: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/operations/waitForAllCaptureData/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:11.410485: verifyStatus: {'status': 'Successful', 'actionName': 'waitForAllCaptureData', 'state': 'finished', 'result': ''}
+
+23:53:11.410521: 
+	verifyStatus: Current Status: Successful
+
+23:53:11.410609: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test/activeTest
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:11.574363: waitForActiveTestToUnconfigure current state:Unconfigured
+23:53:11.574436: 
+ActiveTest is Unconfigured
+
+23:53:11.574515: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:11.657695: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList/0/network/portList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:11.836255: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList/0/network/portList/0/restCaptureFile
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:12.181650: retrievePortCaptureFileForAssignedPorts: Saved as: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/Capture_0_2.1.1.cap
+
+23:53:14.381221: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList/1/network/portList
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:14.604294: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/activeTest/communityList/1/network/portList/1/restCaptureFile
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:15.197078: retrievePortCaptureFileForAssignedPorts: Saved as: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/Capture_1_2.1.2.cap
+
+23:53:18.668796: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:18.721347: Results are saved in the IxLoad Gateway path: /mnt/ixload-share/Results/23-48-52-457068
+
+23:53:18.721701: 
+	POST: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport
+	DATA: {"reportFile": "/mnt/ixload-share/Results/23-48-52-457068/Report.pdf"}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:53:18.768540: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:18.809605: verifyStatus: {'status': 'Not started', 'actionName': 'generateRestReport', 'state': 'created', 'result': ''}
+	Current status: Not started. Wait 0/120 seconds...
+
+23:53:19.810830: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:19.856065: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 1/120 seconds...
+
+23:53:20.858078: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:20.887263: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 2/120 seconds...
+
+23:53:21.890450: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:21.922024: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 3/120 seconds...
+
+23:53:22.923280: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:22.949586: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 4/120 seconds...
+
+23:53:23.950696: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:23.980395: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 5/120 seconds...
+
+23:53:24.983102: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:25.032132: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 6/120 seconds...
+
+23:53:26.032779: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:26.092064: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 7/120 seconds...
+
+23:53:27.094724: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:27.124696: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 8/120 seconds...
+
+23:53:28.126066: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:28.150919: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 9/120 seconds...
+
+23:53:29.151760: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:29.172961: verifyStatus: {'status': 'In Progress', 'actionName': 'generateRestReport', 'state': 'executing', 'result': ''}
+	Current status: In Progress. Wait 10/120 seconds...
+
+23:53:30.176331: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixload/test/operations/generateRestReport/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:30.203182: verifyStatus: {'status': 'Successful', 'actionName': 'generateRestReport', 'state': 'finished', 'result': ''}
+
+23:53:30.203295: 
+	verifyStatus: Current Status: Successful
+
+23:53:30.203465: 
+	GET: https://10.0.2.16:8443/api/v0/sessions/12/ixLoad/test
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:30.250366: downloadResults: Saving results from /mnt/ixload-share/Results/23-48-52-457068 to: /home/hgee/OpenIxiaGit/IxLoad/RestApi/Python/SampleScripts/LoadSavedConfigFile/ixLoadResults_23-48-52-457068.zip
+
+23:53:30.250664: 
+	GET: https://10.0.2.16:8443/api/v1/downloadResource?localPath=/mnt/ixload-share/Results/23-48-52-457068&zipName=zipFileName
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:31.159256: downloadFile src:/mnt/ixload-share/Results/23-48-52-457068/Report.pdf -> /home/hgee/Downloads/ixload -> ixload_test_report.pdf
+
+23:53:31.159462: 
+	GET: https://10.0.2.16:8443/api/v0/downloadResource?localPath=/mnt/ixload-share/Results/23-48-52-457068/Report.pdf
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:31.185165: deleteResultDir
+
+23:53:31.185372: 
+	POST: https://10.0.2.16:8443/api/v1/sessions/12/ixLoad/test/operations/deleteTestResultDirectory
+	DATA: {}
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 202
+
+23:53:31.229676: 
+	GET: https://10.0.2.16:8443/api/v1/sessions/12/ixLoad/test/operations/deleteTestResultDirectory/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:31.251911: verifyStatus: {'url': '/api/v1/sessions/12/ixLoad/test/operations/deleteTestResultDirectory/0', 'state': 'IN_PROGRESS', 'result': '', 'progress': 0, 'type': 'deleteTestResultDirectory', 'id': 0}
+	Current status: IN_PROGRESS. Wait 0/120 seconds...
+
+23:53:32.254454: 
+	GET: https://10.0.2.16:8443/api/v1/sessions/12/ixLoad/test/operations/deleteTestResultDirectory/0
+	HEADERS: {'content-type': 'application/json'}
+	STATUS CODE: 200
+
+23:53:32.279529: verifyStatus: {'url': '/api/v1/sessions/12/ixLoad/test/operations/deleteTestResultDirectory/0', 'state': 'SUCCESS', 'result': '', 'progress': 100, 'type': 'deleteTestResultDirectory', 'id': 0}
+
+23:53:32.279812: 
+	verifyStatus: Current Status: SUCCESS

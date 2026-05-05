@@ -26,7 +26,7 @@ else:
 from IxL_RestApi import *
 
 # Which IxLoad Gateway server are you using: linux or windows 
-ixLoadGatewayOS = 'windows'
+ixLoadGatewayOS = 'linux'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
@@ -43,7 +43,7 @@ timestamp = getTime()
 deleteSession = False
 forceTakePortOwnership = True
 
-# Do you want to delete the test session's result files after downloading them?
+# Do you want to delete the test session's result files on the IxLoad gateway server after downloading them?
 deleteTestResultDirOnApiServer = True
 
 # API-Key: Use your user API-Key if you want added security
@@ -64,7 +64,7 @@ if ixLoadGatewayOS == 'windows':
     pdfTestReportFileName = f'{resultsDirOnIxLoadGateway}\\Report.pdf'
     
 if ixLoadGatewayOS == 'linux':
-    apiServerIp = '10.0.2.14'
+    apiServerIp = '10.0.2.16'
 
     # Leave everything below as defaults. For this script reference only.
     resultsDirOnIxLoadGateway = f'/mnt/ixload-share/Results/{timestamp}'
@@ -123,18 +123,18 @@ try:
                    deleteSession=deleteSession,
                    pollStatusInterval=1,
                    apiKey=apiKey,
-                   generateRestLogFile=True)
+                   generateRestLogFile='ixload_test.log')
         
     # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
     
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
 
-    # uploadConfigFile: None or path to the config file on your local host    
+    # localConfigFileToUpload: None or path to the config file on your local host    
     restObj.loadConfigFile(rxfFileOnServer, uploadConfigFile=localConfigFileToUpload)
 
     # Tell IxLoad where to save the results on the IxLoad gateway server
-    resultsDirOnIxLoadGateway = restObj.setResultDir(resultsDirOnIxLoadGateway)
+    restObj.setResultDir(resultsDirOnIxLoadGateway)
 
     # Enable these settings if you want to generate a PDF test report
     restObj.enableNetworkDiagnostics(True)
@@ -146,6 +146,7 @@ try:
     if forceTakePortOwnership:
         restObj.enableForceOwnership()
 
+    # Enable packet capturing
     restObj.enableAnalyzerOnAssignedPorts()
 
     # Optional: Modify the sustain time
@@ -164,7 +165,10 @@ try:
                       csvFilePrependName=None,
                       pollStatInterval=2,
                       exitAfterPollingIteration=None)
-    
+
+    # Wait if your configuration has port capturing enabled
+    restObj.waitForAllCapturedData()
+        
     restObj.waitForActiveTestToUnconfigure()
     restObj.retrievePortCaptureFileForAssignedPorts(saveResultsInLocalPath)
 

@@ -46,7 +46,7 @@ timestamp = getTime()
 deleteSession = False
 forceTakePortOwnership = True
 
-# Do you want to delete the test session's result files after downloading them?
+# Do you want to delete the test session's result files on the IxLoad gateway server after downloading them?
 deleteTestResultDirOnApiServer = False
 
 # API-Key: Use your user API-Key if you want added security
@@ -148,7 +148,7 @@ try:
     restObj.loadConfigFile(rxfFileOnServer, uploadConfigFile=localConfigFileToUpload)
 
     # Tell IxLoad where to save the results on the IxLoad gateway server
-    resultsDirOnIxLoadGateway = restObj.setResultDir(resultsDirOnIxLoadGateway)
+    restObj.setResultDir(resultsDirOnIxLoadGateway)
 
     # Enable these settings if you want to generate a PDF test report
     restObj.enableNetworkDiagnostics(True)
@@ -181,6 +181,9 @@ try:
                                          pollStatInterval=2,
                                          exitAfterPollingIteration=None)
 
+    # Wait if your configuration has port capturing enabled
+    restObj.waitForAllCapturedData()
+    
     restObj.waitForActiveTestToUnconfigure()
     restObj.retrievePortCaptureFileForAssignedPorts(saveResultsInLocalPath)
 

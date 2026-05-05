@@ -33,70 +33,79 @@ else:
 from IxL_RestApi import *
 
 # Choices of IxLoad Gateway server OS: linux or windows 
-serverOs = 'linux'
+ixLoadGatewayOS = 'linux'
 
 # Which IxLoad version are you using for your test?
 # To view all the installed versions, go on a web browser and enter: 
 #    http://<server ip>:8080/api/v0/applicationTypes
 ixLoadVersion = '9.10.115.43'
+ixLoadVersion = '10.40.144.35'
+ixLoadVersion = '11.00.0.320'
+#ixLoadVersion = '26.0.0.94'
+
+# Get the current timestamp to store the results in a unique timestamp folder
+timestamp = getTime()
 
 # Do you want to delete the session at the end of the test or if the test failed?
 deleteSession = True
 forceTakePortOwnership = True
+
+# Do you want to delete the test session's result files on the IxLoad gateway server after downloading them?
+deleteTestResultDirOnApiServer = True
 
 crfFile = 'voipSip.crf'
 
 # API-Key: Use your user API-Key if you want added security
 apiKey = None
 
-if serverOs == 'windows':
-    apiServerIp = '192.168.129.6'
+if ixLoadGatewayOS == 'windows':
+    apiServerIp = '10.0.2.5'
 
-    # Where to store the results on the Windows filesystem
-    resultsDir = 'c:\\Results'
+    # Where to store all of the result files in Windows
+    resultsDirOnIxLoadGateway = f'C:\\Results\\{timestamp}'
 
-    # Where to put the crf file or where to tell IxLoad the location in the Windows filesystem
-    crfFileOnServer = 'c:\\VoIP\\{}'.format(crfFile)
+    # Where to upload the IxLoad .rxf config file or where is the IxLoad config location if you're not uploading it.
+    crfFileOnServer = f'{resultsDirOnIxLoadGateway}\\{crfFile}'
+    pdfTestReportFileName = f'{resultsDirOnIxLoadGateway}\\Report.pdf'
+    
+if ixLoadGatewayOS == 'linux':
+    apiServerIp = '10.0.2.16'
 
-if serverOs == 'linux':
-    apiServerIp = '192.168.129.24'
+    # Leave everything below as defaults. For this script reference only.
+    resultsDirOnIxLoadGateway = f'/mnt/ixload-share/Results/{timestamp}'
+    crfFileOnServer = f'{resultsDirOnIxLoadGateway}/{crfFile}'
+    pdfTestReportFileName = f'{resultsDirOnIxLoadGateway}/Report.pdf'
 
-    # Leave as defaults. For your reference only.
-    resultsDir = '/mnt/ixload-share/Results' 
+# Where do you want to put the downloaded result files at the end of the test in the localhost running this script
+saveResultsInLocalPath = currentDir
 
-    # Leave as default
-    crfFileOnServer = '/mnt/ixload-share/VoIP/{}'.format(crfFile)
-
-# Where to put the downloaded saved csv results
-saveResultsInPath = currentDir
-
-# Where is the VoIP .crf file located on your local filesystem to be uploaded to the IxLoad Gateway server
-# In this example, get it from the current folder.
-localConfigFileToUpload = '{}/{}'.format(currentDir, crfFile)
+# The localhost path to the saved IxLoad VoIP config file to load. In this example, get it from the current folder.
+localConfigFileToUpload = f'{currentDir}/{crfFile}'
 
 # For IxLoad versions prior to 8.50 that doesn't have the rest api to download results.
-# Set to True if you want to save realtime results to CSV files.
+# Set to True if you want to save run time results to CSV files.
 saveStatsToCsvFile = False
 
 # Where to put the csv results on your local system. This example puts it in the current directory.
 scpResultsDestPath = currentDir
 
-apiServerIpPort = 8443 ;# http=8080.  https=8443 (https is supported starting 8.50)
+# http=8080.  https=8443 (https is supported starting 8.50)
+apiServerIpPort = 8443
 
+licenseServerIp = '10.0.2.5'
 # licenseModel choices: 'Subscription Mode' or 'Perpetual Mode'
 licenseModel = 'Subscription Mode'
-licenseServerIp = '192.168.129.6'
 
 # Assign ports for testing.  Format = (cardId,portId)
 # 'Traffic1@Network1' are activity names.
 # To get the Activity names, go to: /ixload/test/activeTest/communityList
 communityPortList1 = {
-    'chassisIp': '192.168.129.15',
+    'chassisIp': '10.0.2.4',
     'Traffic1@Network1': [(1,1)],
 }
 
 communityPortList2 = {
-    'chassisIp': '192.168.129.15',
+    'chassisIp': '10.0.2.4',
     'Traffic2@Network2': [(1,2)],
 }
 
@@ -128,25 +137,39 @@ statsDict = {
 try:
     restObj = Main(apiServerIp=apiServerIp,
                    apiServerIpPort=apiServerIpPort,
-                   osPlatform=serverOs,
+                   osPlatform=ixLoadGatewayOS,
                    deleteSession=deleteSession,
                    pollStatusInterval=1,
                    apiKey=apiKey,
-                   generateRestLogFile=True)
+                   generateRestLogFile='VoIP_test_with_eval_stats.log')
 
+   # sessionId is an opened existing session that you like to connect to instead of starting a new session.
     restObj.connect(ixLoadVersion, sessionId=None, timeout=120)
+    
     restObj.configLicensePreferences(licenseServerIp=licenseServerIp, licenseModel=licenseModel)
-    restObj.setResultDir(resultsDir, createTimestampFolder=True)
-    restObj.deleteLogsOnSessionClose()
-    restObj.importCrfFile(crfFileOnServer, localConfigFileToUpload)
-    restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
 
+    # localConfigFileToUpload: None or path to the config file on your local host    
+    restObj.importCrfFile(crfFileOnServer, localConfigFileToUpload)
+    
+    # Tell IxLoad where to save the results on the IxLoad gateway server
+    resultDirPath = restObj.setResultDir(resultsDirOnIxLoadGateway)
+
+    # Enable these settings if you want to generate a PDF test report
+    restObj.enableNetworkDiagnostics(True)
+    restObj.setPreferences({"enableL23RestStatViews": True,
+                            "saveDataModelSnapshot": True,
+                            "enableRestStatViewsCsvLogging": True})
+            
+    restObj.assignChassisAndPorts([communityPortList1, communityPortList2])
     if forceTakePortOwnership:
         restObj.enableForceOwnership()
 
-    # Optional: Modify the sustain time
-    restObj.configTimeline(name='Timeline1', sustainTime=12)
-
+    # Enable packet capturing
+    restObj.enableAnalyzerOnAssignedPorts()
+    
+    # Modify timeline attributes: sustain time and iterations
+    restObj.configTimeline(name='Timeline1', sustainTime=12, iterations=2)
+    
     runTestOperationsId = restObj.runTraffic()
 
     restObj.pollStatsAndCheckStatResults(statsDict,
@@ -154,20 +177,29 @@ try:
                                          csvFilePrependName=None,
                                          pollStatInterval=2,
                                          exitAfterPollingIteration=None)
-    
-    testResult = restObj.getTestResults()
 
     # Wait if your configuration has port capturing enabled
     restObj.waitForAllCapturedData()
+
     restObj.waitForActiveTestToUnconfigure()
+    restObj.retrievePortCaptureFileForAssignedPorts(saveResultsInLocalPath)
 
-    restObj.downloadResults(targetPath=saveResultsInPath)
+    # Showing you where the results are stored on the server running IxLoad gateway.
+    # You have to manually delete these result folders as they accumulate over time.
+    restObj.logInfo(f'Results are saved in the IxLoad Gateway path: {restObj.getTestResultFolder()}')
 
+    restObj.generatePdfTestReport(filePath=pdfTestReportFileName)
+    restObj.downloadResults(targetPath=saveResultsInLocalPath)
+
+    # Use this API if you want to download the Report.pdf file to a different path
+    # Otherwise, the Report.pdf is included in saveResultsInLocalPath when calling downloadResults.
+    restObj.downloadFile(pdfTestReportFileName, targetLocation='/home/hgee/Downloads/ixload', targetFilename='ixload_test_report.pdf')
+    
+    if deleteTestResultDirOnApiServer: 
+        restObj.deleteResultDir()
+        
     if deleteSession:
         restObj.deleteSessionId()
-
-    if testResult['result'] == 'Failed':
-        sys.exit(1)
         
 except (IxLoadRestApiException, Exception) as errMsg:
     print('\n%s' % traceback.format_exc())
